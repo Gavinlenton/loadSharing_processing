@@ -182,6 +182,14 @@ for i = 1:length(subjectFolders)
           end
           tf = isempty(k);
           
+          % Use the times to crop the pressure pad data into the same
+          % timeframes
+          
+          % First convert the mocap frames into pressure pad frames.
+          
+          % Now use these frames to crop the pressure pad data
+          % INSERT FUNCTION HERE
+          
           % EMG PROCESSING
           
           % Check if notch filter should be applied.

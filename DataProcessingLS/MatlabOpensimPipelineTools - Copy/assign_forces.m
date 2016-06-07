@@ -91,7 +91,7 @@ for i = 1:length(data.fp_data.GRF_data)
     % point and off as the last point), a gap of greater than 25
     % miliseconds is considered a new event (change the 0.025 value below
     % to adjust this).
-    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);  
+    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.025);  
     on_i = [nt(1); nt(dnt+1)];
     off_i = [nt(dnt); nt(end)];
     
