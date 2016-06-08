@@ -1,0 +1,1318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OpenSimDocument Version="30000">
+	<ScaleTool name="Fullbody_LS_Scaled">
+		<defaults>
+			<ControlLinear name="default">
+				<is_model_control>true</is_model_control>
+				<extrapolate>true</extrapolate>
+				<default_min>-1</default_min>
+				<default_max>1</default_max>
+				<filter_on>false</filter_on>
+				<use_steps>false</use_steps>
+				<x_nodes />
+				<min_nodes />
+				<max_nodes />
+				<kp>100</kp>
+				<kv>20</kv>
+			</ControlLinear>
+			<Ligament name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--the set of points defining the path of the ligament-->
+				<GeometryPath>
+					<!--The set of points defining the path-->
+					<PathPointSet>
+						<objects />
+						<groups />
+					</PathPointSet>
+					<!--The wrap objecs that are associated with this path-->
+					<PathWrapSet>
+						<objects />
+						<groups />
+					</PathWrapSet>
+					<!--Used to display the path in the 3D window-->
+					<VisibleObject name="display">
+						<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+						<GeometrySet>
+							<objects />
+							<groups />
+						</GeometrySet>
+						<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+						<scale_factors> 1 1 1</scale_factors>
+						<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+						<transform> 0 0 0 0 0 0</transform>
+						<!--Whether to show a coordinate frame-->
+						<show_axes>false</show_axes>
+						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+						<display_preference>4</display_preference>
+					</VisibleObject>
+				</GeometryPath>
+				<!--resting length of the ligament-->
+				<resting_length>0</resting_length>
+				<!--force magnitude that scales the force-length curve-->
+				<pcsa_force>0</pcsa_force>
+				<!--Function representing the force-length behavior of the ligament-->
+				<SimmSpline name="force_length_curve">
+					<x> -5 0.998 0.999 1 1.1 1.2 1.3 1.4 1.5 1.6 1.601 1.602 5</x>
+					<y> 0 0 0 0 0.035 0.12 0.26 0.55 1.17 2 2 2 2</y>
+				</SimmSpline>
+			</Ligament>
+			<CoordinateActuator name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>-Inf</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>Inf</max_control>
+				<!--Name of the generalized coordinate to which the actuator applies.-->
+				<coordinate>Unassigned</coordinate>
+				<!--The maximum generalized force produced by this actuator.-->
+				<optimal_force>300</optimal_force>
+			</CoordinateActuator>
+			<PointActuator name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>-Inf</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>Inf</max_control>
+				<!--Name of Body to which this actuator is applied.-->
+				<body></body>
+				<!--Location of application point; in body frame unless point_is_global=true-->
+				<point>0 0 0</point>
+				<!--Interpret point in Ground frame if true; otherwise, body frame.-->
+				<point_is_global>false</point_is_global>
+				<!--Force application direction; in body frame unless force_is_global=true.-->
+				<direction>-1 -0 -0</direction>
+				<!--Interpret direction in Ground frame if true; otherwise, body frame.-->
+				<force_is_global>true</force_is_global>
+				<!--The maximum force produced by this actuator when fully activated.-->
+				<optimal_force>1000</optimal_force>
+			</PointActuator>
+			<TorqueActuator name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>-Inf</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>Inf</max_control>
+				<!--Name of Body to which the torque actuator is applied.-->
+				<bodyA>Unassigned</bodyA>
+				<!--Name of Body to which the equal and opposite torque is applied.-->
+				<bodyB>Unassigned</bodyB>
+				<!--Interpret axis in Ground frame if true; otherwise, body A's frame.-->
+				<torque_is_global>true</torque_is_global>
+				<!--Fixed direction about which torque is applied, in Ground or body A frame depending on 'torque_is_global' property.-->
+				<axis>-1 -0 -0</axis>
+				<!--The maximum torque produced by this actuator when fully activated.-->
+				<optimal_force>1</optimal_force>
+			</TorqueActuator>
+			<Thelen2003Muscle name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>0.01</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>1</max_control>
+				<!--The set of points defining the path of the muscle.-->
+				<GeometryPath>
+					<!--The set of points defining the path-->
+					<PathPointSet>
+						<objects />
+						<groups />
+					</PathPointSet>
+					<!--The wrap objecs that are associated with this path-->
+					<PathWrapSet>
+						<objects />
+						<groups />
+					</PathWrapSet>
+					<!--Used to display the path in the 3D window-->
+					<VisibleObject name="display">
+						<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+						<GeometrySet>
+							<objects />
+							<groups />
+						</GeometrySet>
+						<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+						<scale_factors> 1 1 1</scale_factors>
+						<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+						<transform> -0 0 -0 0 0 0</transform>
+						<!--Whether to show a coordinate frame-->
+						<show_axes>false</show_axes>
+						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+						<display_preference>4</display_preference>
+					</VisibleObject>
+				</GeometryPath>
+				<!--The maximum force this actuator can produce.-->
+				<optimal_force>1</optimal_force>
+				<!--Maximum isometric force that the fibers can generate-->
+				<max_isometric_force>546</max_isometric_force>
+				<!--Optimal length of the muscle fibers-->
+				<optimal_fiber_length>0.0535</optimal_fiber_length>
+				<!--Resting length of the tendon-->
+				<tendon_slack_length>0.078</tendon_slack_length>
+				<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+				<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+				<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+				<max_contraction_velocity>10</max_contraction_velocity>
+				<!--time constant for ramping up muscle activation-->
+				<activation_time_constant>0.01</activation_time_constant>
+				<!--time constant for ramping down of muscle activation-->
+				<deactivation_time_constant>0.04</deactivation_time_constant>
+				<!--tendon strain at maximum isometric muscle force-->
+				<FmaxTendonStrain>0.033</FmaxTendonStrain>
+				<!--passive muscle strain at maximum isometric muscle force-->
+				<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+				<!--shape factor for Gaussian active muscle force-length relationship-->
+				<KshapeActive>0.5</KshapeActive>
+				<!--exponential shape factor for passive force-length relationship-->
+				<KshapePassive>4</KshapePassive>
+				<!--force-velocity shape factor-->
+				<Af>0.3</Af>
+				<!--maximum normalized lengthening force-->
+				<Flen>1.8</Flen>
+			</Thelen2003Muscle>
+			<CMC_Joint name="default">
+				<!--Flag (true or false) indicating whether or not a task is enabled.-->
+				<on>false</on>
+				<!--Weight with which a task is tracked relative to other tasks. To track a task more tightly, make the weight larger.-->
+				<weight> 1 1 1</weight>
+				<!--Name of body frame with respect to which a tracking objective is specified. The special name 'center_of_mass' refers to the system center of mass. This property is not used for tracking joint angles.-->
+				<wrt_body>-1</wrt_body>
+				<!--Name of body frame in which the tracking objectives are expressed.  This property is not used for tracking joint angles.-->
+				<express_body>-1</express_body>
+				<!--Array of 3 flags (each true or false) specifying whether a component of a task is active.  For example, tracking the trajectory of a point in space could have three components (x,y,z).  This allows each of those to be made active (true) or inactive (false).  A task for tracking a joint coordinate only has one component.-->
+				<active>false false false </active>
+				<!--Position error feedback gain (stiffness). To achieve critical damping of errors, choose kv = 2*sqrt(kp).-->
+				<kp> 1 1 1</kp>
+				<!--Velocity error feedback gain (damping). To achieve critical damping of errors, choose kv = 2*sqrt(kp).-->
+				<kv> 1 1 1</kv>
+				<!--Feedforward acceleration gain.  This is normally set to 1.0, so no gain.-->
+				<ka> 1 1 1</ka>
+				<!--Direction vector[3] for component 0 of a task. Joint tasks do not use this propery.-->
+				<r0> 0 0 0</r0>
+				<!--Direction vector[3] for component 1 of a task. Joint tasks do not use this property.-->
+				<r1> 0 0 0</r1>
+				<!--Direction vector[3] for component 2 of a task. Joint tasks do not use this property.-->
+				<r2> 0 0 0</r2>
+				<!--Name of the coordinate to be tracked.-->
+				<coordinate />
+				<!--Error limit on the tracking accuracy for this coordinate. If the tracking errors approach this limit, the weighting for this coordinate is increased. -->
+				<limit>0</limit>
+			</CMC_Joint>
+		</defaults>
+		<!--Mass of the subject in kg.  Subject-specific model generated by scaling step will have this total mass.-->
+		<mass>71.2</mass>
+		<!--Height of the subject in mm.  For informational purposes only (not used by scaling).-->
+		<height>-1</height>
+		<!--Age of the subject in years.  For informational purposes only (not used by scaling).-->
+		<age>-1</age>
+		<!--Notes for the subject.-->
+		<notes>Unassigned</notes>
+		<!--Specifies the name of the unscaled model (.osim) and the marker set.-->
+		<GenericModelMaker name="FullBodyModel_LS_Main">
+			<!--Model file (.osim) for the unscaled model.-->
+			<model_file>Unassigned</model_file>
+			<!--Set of model markers used to scale the model. Scaling is done based on distances between model markers compared to the same distances between the corresponding experimental markers.-->
+			<marker_set_file>Unassigned</marker_set_file>
+		</GenericModelMaker>
+		<!--Specifies parameters for scaling the model.-->
+		<ModelScaler>
+			<!--Whether or not to use the model scaler during scale-->
+			<apply>true</apply>
+			<!--Specifies the scaling method and order. Valid options are 'measurements', 'manualScale', singly or both in any sequence.-->
+			<scaling_order> measurements</scaling_order>
+			<!--Specifies the measurements by which body segments are to be scaled.-->
+			<MeasurementSet>
+				<objects>
+					<Measurement name="head">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LFHD LBHD</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RFHD RBHD</markers>
+								</MarkerPair>
+							</objects>
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="head">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Z</axes>
+								</BodyScale>
+							</objects>
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="torso_height">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RHJC CLAV</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LHJC CLAV</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="torso">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="torso_breadth">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> T8 CLAV</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> THO3 CLAV</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="torso">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="torso_width">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RACR1 LACR1</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="torso">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="Rhumerus">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RSJC REJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="humerus_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes>X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measuremen>
+					<Measurement name="Lhumerus">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LSJC LEJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="humerus_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="R_radius_ulna">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> REJC RWJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="ulna_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes>X Y Z</axes>
+								</BodyScale>
+								<BodyScale name="radius_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes>X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+										<Measurement name=" L_radius_ulna">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LEJC LWJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="ulna_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Y</axes>
+								</BodyScale>
+								<BodyScale name="radius_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="R_hand">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RWJC RCAR</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="hand_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes>X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="L_hand">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LWJC LCAR</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="hand_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes>X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="pelvis_w">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RASI LASI</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RPSI LPSI</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="pelvis">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="pelvis_d">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RPSI RASI</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LPSI LASI</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="pelvis">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="pelvis_h">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>false</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RHJC RASI</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LHJC LASI</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="pelvis">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="RFemurXY">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RHJC RMFC</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RHJC RLFC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="femur_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="RFemurZ">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RMFC RLFC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="femur_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="RTibiaY">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RMFC RAJC</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RLFC RAJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="origin_tibia_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y</axes>
+								</BodyScale>
+								<BodyScale name="tibia_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="RTibiaZ">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RMMAL RLMAL</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="origin_tibia_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="RFoot">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RCAL RMT1</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> RCAL RMT5</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="talus_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+								<BodyScale name="calcn_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+								<BodyScale name="toes_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="LFemurY">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LHJC LMFC</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LHJC LLFC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="femur_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="LFemurZ">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LMFC LLFC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="femur_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="LTibiaY">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LMFC LAJC</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LLFC LAJC</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="origin_tibia_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y</axes>
+								</BodyScale>
+								<BodyScale name="tibia_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="LTibiaZ">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LLMAL LMMAL</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="origin_tibia_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+					<Measurement name="LFoot">
+						<!--Flag to turn on and off scaling for this measurement.-->
+						<apply>true</apply>
+						<!--Set of marker pairs used to determine the scale factors.-->
+						<MarkerPairSet>
+							<objects>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LCAL LMT5</markers>
+								</MarkerPair>
+								<MarkerPair>
+									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
+									<markers> LCAL LMT1</markers>
+								</MarkerPair>
+							</objects>
+							<groups />
+						</MarkerPairSet>
+						<!--Set of bodies to be scaled by this measurement.-->
+						<BodyScaleSet>
+							<objects>
+								<BodyScale name="talus_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+								<BodyScale name="calcn_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+								<BodyScale name="toes_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> X Y Z</axes>
+								</BodyScale>
+							</objects>
+							<groups />
+						</BodyScaleSet>
+					</Measurement>
+				</objects>
+				<groups />
+			</MeasurementSet>
+			<!--TRC file (.trc) containing the marker positions used for measurement-based scaling. This is usually a static trial, but doesn't need to be.  The marker-pair distances are computed for each time step in the TRC file and averaged across the time range.-->
+			<marker_file>Static1.trc</marker_file>
+			<!--Time range over which to average marker-pair distances in the marker file (.trc) for measurement-based scaling.-->
+			<time_range> 3 3.5</time_range>
+			<!--Flag (true or false) indicating whether or not to preserve relative mass between segments.-->
+			<preserve_mass_distribution>true</preserve_mass_distribution>
+			<!--Name of OpenSim model file (.osim) to write when done scaling.-->
+			<output_model_file />
+			<!--Name of file to write containing the scale factors that were applied to the unscaled model (optional).-->
+			<output_scale_file>Unassigned</output_scale_file>
+		</ModelScaler>
+		<!--Specifies parameters for placing markers on the model once a model is scaled. -->
+		<MarkerPlacer>
+			<!--Whether or not to use the marker placer during scale-->
+			<apply>true</apply>
+			<!--Task set used to specify weights used in the IK computation of the static pose.-->
+			<IKTaskSet>
+				<objects>
+					<IKMarkerTask name="LFHD">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RFHD">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LBHD">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>40</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RBHD">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>40</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="THO1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="THO2">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="THO3">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="CLAV">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="T8">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LACR4">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LSJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LLEP">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LEJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LWRU">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LWJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LHNDR">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LHNDU">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LCAR">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RACR4">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RSJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RLEP">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="REJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RWRU">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RWJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RHNDR">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RHNDU">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RCAR">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LASI">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>100</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RASI">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>100</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LPSI">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>100</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RPSI">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>100</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LHJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RHJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTH1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTH2">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTH3">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LKJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LMFC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LLFC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTB1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTB2">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LTB3">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LAJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LMMAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LLMAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LCAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LMT1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LMT23">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="LMT5">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTH1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTH2">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTH3">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RKJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RMFC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RLFC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTB1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTB2">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RTB3">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RAJC">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>50</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RMMAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RLMAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>30</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RCAL">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>20</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RMT1">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RMT23">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>5</weight>
+					</IKMarkerTask>
+					<IKMarkerTask name="RMT5">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>10</weight>
+					</IKMarkerTask>
+					<IKCoordinateTask name="ankle_angle_r">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1000</weight>
+						<!--Indicates the source of the coordinate value for this task.  Possible values are default_value (use default value of coordinate, as specified in the model file, as the fixed target value), manual_value (use the value specified in the value property of this task as the fixed target value), or from_file (use the coordinate values from the coordinate data specified by the coordinates_file property).-->
+						<value_type>default_value</value_type>
+						<!--This value will be used as the desired (or prescribed) coordinate value if value_type is set to manual_value.-->
+						<value>0</value>
+					</IKCoordinateTask>
+					<IKCoordinateTask name="ankle_angle_l">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>false</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>1000</weight>
+						<!--Indicates the source of the coordinate value for this task.  Possible values are default_value (use default value of coordinate, as specified in the model file, as the fixed target value), manual_value (use the value specified in the value property of this task as the fixed target value), or from_file (use the coordinate values from the coordinate data specified by the coordinates_file property).-->
+						<value_type>default_value</value_type>
+						<!--This value will be used as the desired (or prescribed) coordinate value if value_type is set to manual_value.-->
+						<value>0</value>
+					</IKCoordinateTask>
+					<IKCoordinateTask name="neck_extension">
+						<!--Whether or not this task will be used during inverse kinematics solve.-->
+						<apply>true</apply>
+						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
+						<weight>500</weight>
+						<!--Indicates the source of the coordinate value for this task.  Possible values are default_value (use default value of coordinate, as specified in the model file, as the fixed target value), manual_value (use the value specified in the value property of this task as the fixed target value), or from_file (use the coordinate values from the coordinate data specified by the coordinates_file property).-->
+						<value_type>default_value</value_type>
+						<!--This value will be used as the desired (or prescribed) coordinate value if value_type is set to manual_value.-->
+						<value>0</value>
+					</IKCoordinateTask>
+				</objects>
+				<groups />
+			</IKTaskSet>
+			<!--TRC file (.trc) containing the time history of experimental marker positions (usually a static trial).-->
+			<marker_file>static1.trc</marker_file>
+			<!--Name of file containing the joint angles used to set the initial configuration of the model for the purpose of placing the markers. These coordinate values can also be included in the optimization problem used to place the markers. Before the model markers are placed, a single frame of an inverse kinematics (IK) problem is solved. The IK problem can be solved simply by matching marker positions, but if the model markers are not in the correct locations, the IK solution will not be very good and neither will marker placement. Alternatively, coordinate values (specified in this file) can be specified and used to influence the IK solution. This is valuable particularly if you have high confidence in the coordinate values. For example, you know for the static trial the subject was standing will all joint angles close to zero. If the coordinate set (see the CoordinateSet property) contains non-zero weights for coordinates, the IK solution will try to match not only the marker positions, but also the coordinates in this file. Least-squared error is used to solve the IK problem. -->
+			<coordinate_file>Unassigned</coordinate_file>
+			<!--Time range over which the marker positions are averaged.-->
+			<time_range> 2.5 3</time_range>
+			<!--Name of the motion file (.mot) written after marker relocation (optional).-->
+			<output_motion_file>Unassigned</output_motion_file>
+			<!--Output OpenSim model file (.osim) after scaling and maker placement.-->
+			<output_model_file>LSMain_Scaled</output_model_file>
+			<!--Output marker set containing the new marker locations after markers have been placed.-->
+			<output_marker_file>Unassigned</output_marker_file>
+			<!--Maximum amount of movement allowed in marker data when averaging frames of the static trial. A negative value means there is not limit.-->
+			<max_marker_movement>-1</max_marker_movement>
+		</MarkerPlacer>
+	</ScaleTool>
+</OpenSimDocument>
