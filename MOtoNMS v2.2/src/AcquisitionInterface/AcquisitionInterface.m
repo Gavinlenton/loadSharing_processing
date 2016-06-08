@@ -42,13 +42,13 @@ if nargin>0
     %AcquisitionDate
     def_AcqDate=setAcqDateFromFile(oldAcquisition);
     %VideoFrameRate
-    def_VRate=setVideoFrameRateFromFile(oldAcquisition);
-    %def_NumEmgSystems{1}=num2str(oldAcquisition.EMGSystems.Number);
-    if isfield(oldAcquisition,'EMGs')==1
-        def_NumEmgSystems{1}=num2str(length(oldAcquisition.EMGs.Systems.System));
-    else
-        def_NumEmgSystems{1}='0';
-    end
+%     def_VRate=setVideoFrameRateFromFile(oldAcquisition);
+%     %def_NumEmgSystems{1}=num2str(oldAcquisition.EMGSystems.Number);
+%     if isfield(oldAcquisition,'EMGs')==1
+%         def_NumEmgSystems{1}=num2str(length(oldAcquisition.EMGs.Systems.System));
+%     else
+%         def_NumEmgSystems{1}='0';
+%     end
     %StancesOnFP
     %def_String=setTrialsStancesFromFile(nTrails,oldAcquisition);
 else
@@ -56,8 +56,8 @@ else
 %     def_staff=setStaffValuesFromFile();
     def_subject=setSubjectValuesFromFile();
     def_AcqDate=setAcqDateFromFile();
-    def_VRate=setVideoFrameRateFromFile();
-    def_NumEmgSystems={'1'};
+%     def_VRate=setVideoFrameRateFromFile();
+%     def_NumEmgSystems={'1'};
     %def_String=setTrialsStancesFromFile();
 end
 

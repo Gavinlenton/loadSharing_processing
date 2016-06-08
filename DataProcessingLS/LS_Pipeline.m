@@ -10,9 +10,16 @@ isub=[subjectDirs(:).isdir];
 subjectFolders={subjectDirs(isub).name}';
 subjectFolders(ismember(subjectFolders,{'.','..'}))=[]; % dynamic subject folders
 
+
 %% Loop through all sessions for that subject.
 
 for i = 1:length(subjectFolders)
+     
+     % Run Acquisition Interface for each session to determine Subject name,
+     % weight, and height
+     % Nav to file directory
+     cd('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\MOtoNMS v2.2\src\AcquisitionInterface\')
+     mainAcquisitionInterface()
      
      % Assign session name
      pname = [fName, filesep, subjectFolders{i}];
@@ -66,7 +73,7 @@ for i = 1:length(subjectFolders)
      % Run MOtoNMS c3d2btk function on data
      
      % Navigate to directory where function is
-     cd('C:\Users\s2921887\Documents\Load Sharing Main Data Collection\MOtoNMS v2.2\src\C3D2MAT_btk');
+     cd('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\MOtoNMS v2.2\src\C3D2MAT_btk');
      C3D2MAT(fName);
      % Navigate to sessionData folder and select AnalogDataLabels file
      [matFileName, matPathName] = uigetfile('*.mat', 'Select AnalogDataLabels.mat file');
