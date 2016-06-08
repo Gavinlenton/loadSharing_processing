@@ -24,7 +24,7 @@ emgSamplingRate = 1000;
 a2v = emgSamplingRate/videoSamplingRate;
 emgSamplingTimeStep = 1/emgSamplingRate;
 emgNyquistLimit = emgSamplingRate/2;
-nominalPassBand = [30, 400]; % Need to double check what the upper pass band should be
+nominalPassBand = [30, 450]; % Need to double check what the upper pass band should be
 passBandLowerEdge = nominalPassBand(1)/emgNyquistLimit;
 passBandUpperEdge = nominalPassBand(2)/emgNyquistLimit;
 normalizedPassBand = [passBandLowerEdge, passBandUpperEdge];
@@ -101,13 +101,6 @@ cd('shared')
 sharedFunctionsPath=pwd;
 addpath(sharedFunctionsPath)
 cd(originalPath)
-
-%% Load trial info sheet - cannot do this without importScopexTrials function.
-% [apmTrialsRaw] = importScopexTrials(trialsFile, 'Baseline TestLeg');
-% % consider only the top portion of the excel sheet
-% [apmTrialsRaw] = apmTrialsRaw(1:30, :);
-% nCols = size(apmTrialsRaw,2);
-% nRows = size(apmTrialsRaw,1);
 
 %% Load session data
 analogData = [sessionData, filesep, sessionName]; % Dynamic subject dir
