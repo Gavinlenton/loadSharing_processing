@@ -28,12 +28,12 @@
 
 %%
 
-function [] = AcquisitionInterface(oldAcquisition)
+function [] = AcquisitionInterface_LS(subjectName, folderPath, subjectFolder, oldAcquisition)
 
 %% -----------------------------------------------------------------------%
 %        Definition of oldAcquisition Values for loading old file         %
 %-------------------------------------------------------------------------%
-if nargin>0
+if nargin>3
 
     %Staff
 %     def_staff=setStaffValuesFromFile(oldAcquisition);
@@ -68,7 +68,7 @@ options.Resize='on';
 options.WindowStyle='modal';
 
 %% Dataset folder
-DataSetPath = uigetdir('Select your dataset folder');
+DataSetPath = folderPath;
 
 
 %% -----------------------------------------------------------------------%
@@ -81,7 +81,7 @@ cd('..')
 laboratoryPath=[pwd filesep fullfile('SetupFiles', 'AcquisitionInterface', 'Laboratories') filesep];   
 cd (originalPath)
 
-if nargin>0
+if nargin>3
     [laboratoryName] = uigetfile([ filesep '*.xml'],'Select the .xml file corresponding to the lab',[laboratoryPath oldAcquisition.Laboratory.Name '.xml']);
 else
     [laboratoryName] = uigetfile([laboratoryPath filesep '*.xml'],'Select the .xml file corresponding to the lab');
@@ -116,31 +116,21 @@ Laboratory=xml_read([laboratoryPath laboratoryName],Pref);
 %-------------------------------------------------------------------------% 
 clear prompt 
 
-prompt{1}='First Name';
-prompt{2}='Last Name';
-prompt{3}='Code';
-prompt{4}='Age';
-prompt{5}='Weight';
-prompt{6}='Height';
+prompt{1}='Age';
+prompt{2}='Weight';
+prompt{3}='Height';
 
 answer = inputdlg(prompt,'Subject',num_lines,def_subject,options);
   
-Subject.FirstName=char(answer{1});
-Subject.LastName=char(answer{2});
-Subject.Code=char(answer{3});
-Subject.Age=str2num(answer{4});
-Subject.Weight=str2num(answer{5});
-Subject.Height=str2num(answer{6});
+Subject.Code=subjectName;
+Subject.Age=str2num(answer{1});
+Subject.Weight=str2num(answer{2});
+Subject.Height=str2num(answer{3});
 
 %% -----------------------------------------------------------------------%
 %                          ACQUISITION DATE                               %
 %-------------------------------------------------------------------------%
-clear prompt 
-
-prompt{1}='Acquisition Date (year-month-day)';
-
-answer= inputdlg(prompt,'Insert Acqusition Date',num_lines,def_AcqDate,options);
-AcquisitionDate=char(answer{1});
+AcquisitionDate= subjectFolder;
 
 %% -----------------------------------------------------------------------%
 %                          VIDEO FRAME RATE                               %
@@ -462,8 +452,8 @@ acquisition.AcquisitionDate=AcquisitionDate;
 %     acquisition.EMGs.Protocol=EMGsProtocol;
 %     acquisition.EMGs.Channels=Channels;
 % end
-acquisition.Trials=Trials;
-acquisition.ATTRIBUTE=ATTRIBUTE;
+% acquisition.Trials=Trials;
+% acquisition.ATTRIBUTE=ATTRIBUTE;
 
 %% -----------------------------------------------------------------------%
 %                     acquisition.xml WRITING                             %

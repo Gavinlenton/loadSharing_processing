@@ -9,20 +9,20 @@ subjectDirs = dir(fName);
 isub=[subjectDirs(:).isdir];
 subjectFolders={subjectDirs(isub).name}';
 subjectFolders(ismember(subjectFolders,{'.','..'}))=[]; % dynamic subject folders
-
+subjectName = fName(73:end);
 
 %% Loop through all sessions for that subject.
 
 for i = 1:length(subjectFolders)
      
+     % Assign session name
+     pname = [fName, filesep, subjectFolders{i}];
+     
      % Run Acquisition Interface for each session to determine Subject name,
      % weight, and height
      % Nav to file directory
      cd('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\MOtoNMS v2.2\src\AcquisitionInterface\')
-     mainAcquisitionInterface()
-     
-     % Assign session name
-     pname = [fName, filesep, subjectFolders{i}];
+     AcquisitionInterface_LS(subjectName, pname, subjectFolders{i,1})
      
      % Set folder as that chosen above
      c3dFile_folder = pname;
