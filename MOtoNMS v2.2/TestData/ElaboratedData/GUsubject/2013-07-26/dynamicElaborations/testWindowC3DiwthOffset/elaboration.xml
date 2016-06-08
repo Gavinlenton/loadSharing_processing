@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<elaboration>
+   <FolderName>.\InputData\GUsubject\2013-07-26</FolderName>
+   <Trials>Walk1 Walk3</Trials>
+   <MarkersInterpolation>
+      <MaxGapSize>62.5</MaxGapSize>
+   </MarkersInterpolation>
+   <Filtering>
+      <Trial>
+         <Name>Walk1</Name>
+         <Fcut>
+            <Markers>20</Markers>
+            <Forces>20</Forces>
+         </Fcut>
+      </Trial>
+      <Trial>
+         <Name>Walk3</Name>
+         <Fcut>
+            <Markers>20</Markers>
+            <Forces>20</Forces>
+         </Fcut>
+      </Trial>
+   </Filtering>
+   <WindowSelectionProcedure>
+      <WindowFromC3D>
+         <FullLabelForStartEvent>Right Foot Strike</FullLabelForStartEvent>
+         <FullLabelForStopEvent>Right Foot Off</FullLabelForStopEvent>
+         <Offset>20</Offset>
+      </WindowFromC3D>
+   </WindowSelectionProcedure>
+   <Markers>RFA1 RTH7 RUA1 RTH10 RTH9 RFA2 LHNU LFA2 LCAR LUA2 LACR LUA3 LTB5 LUA1 RHNU LFA1 RACR RCAR LTH2 RTB5 RTH5 LTH6 LTH9 LTH7 STRN RHNR RTH6 LHNR RTB9 LTB2 LFA3 LPSI LTH4 CLAV RTB3 T10 RMT1 RTB2 RTB4 RTH8 RTB1 RMT5 LTH10 RCAL RASI LTH5 LTH3 RTB8 LTB4 RTH2 LTB6 RTH3 RTH4 RTB10 C7 LTH8 RTB6 RTB7 RFA3 LTB9 RPSI RUA3 RTH1 LTB7 LTB8 RBHD LTB1 LTB10 LBHD LTH1 LTB3 LMT1 LCAL LMT5 RUA2 LASI LFHD RFHD</Markers>
+   <EMGMaxTrials>Walk1 Walk3</EMGMaxTrials>
+   <EMGsSelection>
+      <EMGSet>GU-CEINMS</EMGSet>
+      <EMGs>
+         <EMG>
+            <OutputLabel>addmag_r</OutputLabel>
+            <C3DLabel>AG</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>bicfemlh_r</OutputLabel>
+            <C3DLabel>BF</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gaslat_r</OutputLabel>
+            <C3DLabel>LG</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gasmed_r</OutputLabel>
+            <C3DLabel>MG</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gmax_r</OutputLabel>
+            <C3DLabel>GlutMax</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gmed_r</OutputLabel>
+            <C3DLabel>GlutMed</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>recfem_r</OutputLabel>
+            <C3DLabel>RF</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>sol_r</OutputLabel>
+            <C3DLabel>Sol</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>tibant_r</OutputLabel>
+            <C3DLabel>TA</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>vaslat_r</OutputLabel>
+            <C3DLabel>VL</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>vasmed_r</OutputLabel>
+            <C3DLabel>VM</C3DLabel>
+         </EMG>
+      </EMGs>
+   </EMGsSelection>
+   <EMGOffset>0.2</EMGOffset>
+   <OutputFileFormats>
+      <MarkerTrajectories>.trc</MarkerTrajectories>
+      <GRF>.mot</GRF>
+      <EMG>.mot</EMG>
+   </OutputFileFormats>
+</elaboration>

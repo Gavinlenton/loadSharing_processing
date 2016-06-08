@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<elaboration>
+   <FolderName>.\InputData\UMGsubject\2013-07-11</FolderName>
+   <Trials>Walking3 Walking4</Trials>
+   <MarkersInterpolation>
+      <MaxGapSize>60</MaxGapSize>
+   </MarkersInterpolation>
+   <Filtering>
+      <Trial>
+         <Name>Walking3</Name>
+         <Fcut>
+            <Markers>8</Markers>
+            <Forces>8</Forces>
+         </Fcut>
+      </Trial>
+      <Trial>
+         <Name>Walking4</Name>
+         <Fcut>
+            <Markers>8</Markers>
+            <Forces>8</Forces>
+         </Fcut>
+      </Trial>
+   </Filtering>
+   <WindowSelectionProcedure>
+      <ComputeStancePhase>
+         <Leg>Right</Leg>
+         <Offset>30</Offset>
+      </ComputeStancePhase>
+   </WindowSelectionProcedure>
+   <Markers>C7 CLAV LA RA T10 LASIS RASIS LPSIS RPSIS LT1 LT2 LT3 LT4 LS1 LS2 LS3 LS4 RT1 RT2 RT3 RT4 RS1 RS2 RS3 RS4 LCA RCA LLE LME RLE RME LMM LLM RLM RMM RIMH LIMH RVMH LVMH</Markers>
+   <OutputFileFormats>
+      <MarkerTrajectories>.trc</MarkerTrajectories>
+      <GRF>.mot</GRF>
+      <EMG>.mot</EMG>
+   </OutputFileFormats>
+</elaboration>

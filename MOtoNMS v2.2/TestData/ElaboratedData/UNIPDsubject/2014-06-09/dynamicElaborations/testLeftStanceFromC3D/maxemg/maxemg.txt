@@ -1,0 +1,16 @@
+Muscle	MaxEMGvalue	Trial	Time(s)
+Right Adductor Longus	7.2918e-02	cbma_walking17	0.3245
+Biceps femoris caput longus	1.3440e-01	cbma_walking14	4.6029
+Gastrocnemius lateralis	7.3112e-02	cbma_walking14	0.6196
+Gastrocnemius medialis	1.2753e-01	cbma_walking10	0.6118
+Gluteus maximus	2.3166e-02	cbma_walking17	1.3765
+Gluteus medius	6.3779e-02	cbma_walking17	1.3451
+Peroneus longus	1.6695e-01	cbma_walking14	2.5755
+Rectus femoris	3.1467e-02	cbma_walking7	6.3216
+Sartorius	1.1443e-02	cbma_walking17	5.2755
+Semitendinosus	7.3236e-02	cbma_walking10	4.7020
+Soleus	6.3845e-02	cbma_walking7	1.0941
+Tensor fasciae latae	4.5848e-02	cbma_walking14	1.3333
+Tibialis anterior	2.1378e-01	cbma_walking10	1.7010
+Vastus lateralis	1.1927e-01	cbma_walking17	2.5324
+Vastus medialis	4.4516e-02	cbma_walking17	2.5637

@@ -1,0 +1,17 @@
+Muscle	MaxEMGvalue	Trial	Time(s)
+Add Magnus	3.1607e-04	CrossOvers1	2.2730
+Biceps Fem	5.0160e-04	Running3	3.0815
+Lat Gas	8.4367e-04	CrossOvers1	2.8930
+Med Gas	9.4145e-04	SideStep2	3.5580
+Gluet Max	2.8407e-04	Running3	1.7570
+Gluet Med	5.4767e-04	Running3	3.1685
+Grac	4.2877e-04	CrossOvers1	2.2780
+Peroneus longus	6.7348e-04	SideStep2	3.5575
+Rec Fem	7.5952e-04	SideStep2	3.6440
+Sart	1.1377e-03	SideStep2	3.6625
+Semi Mem	1.5458e-03	Running3	3.0875
+Soleus	1.3017e-03	Running3	3.1865
+TFL	7.3731e-04	SideStep2	3.6485
+Tib Ant	4.7359e-04	FastWalking9	3.8855
+Vast Lat	1.5613e-03	SideStep2	3.5465
+Vast Med	1.8756e-03	SideStep2	3.5615

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<static>
+   <FolderName>.\InputData\UMGsubject\2013-07-11\</FolderName>
+   <TrialName>Static1</TrialName>
+   <Fcut>8</Fcut>
+   <JCcomputation>
+      <Joint>
+         <Name>Ankle</Name>
+         <Method>AJCMidPoint</Method>
+         <Input>
+            <MarkerNames>
+               <Marker>LLM</Marker>
+               <Marker>RLM</Marker>
+               <Marker>LMM</Marker>
+               <Marker>RMM</Marker>
+            </MarkerNames>
+         </Input>
+      </Joint>
+      <Joint>
+         <Name>Hip</Name>
+         <Method>HJCHarrington</Method>
+         <Input>
+            <MarkerNames>
+               <Marker>LASIS</Marker>
+               <Marker>RASIS</Marker>
+               <Marker>LPSIS</Marker>
+               <Marker>RPSIS</Marker>
+            </MarkerNames>
+         </Input>
+      </Joint>
+      <Joint>
+         <Name>Knee</Name>
+         <Method>KJCMidPoint</Method>
+         <Input>
+            <MarkerNames>
+               <Marker>LLE</Marker>
+               <Marker>RLE</Marker>
+               <Marker>LME</Marker>
+               <Marker>RME</Marker>
+            </MarkerNames>
+         </Input>
+      </Joint>
+   </JCcomputation>
+   <trcMarkers>C7 CLAV LA RA T10 LASIS RASIS LPSIS RPSIS LT1 LT2 LT3 LT4 LS1 LS2 LS3 LS4 RT1 RT2 RT3 RT4 RS1 RS2 RS3 RS4 LCA RCA LLE LME RLE RME LMM LLM RLM RMM RIMH LIMH RVMH LVMH</trcMarkers>
+</static>

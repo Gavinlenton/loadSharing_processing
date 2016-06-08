@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<elaboration>
+   <FolderName>.\InputData\UWAsubject\2010-05-11</FolderName>
+   <Trials>FastWalking9 Running3</Trials>
+   <MarkersInterpolation>
+      <MaxGapSize>62.5</MaxGapSize>
+   </MarkersInterpolation>
+   <Filtering>
+      <Trial>
+         <Name>FastWalking9</Name>
+         <Fcut>
+            <Markers>10</Markers>
+            <Forces>10</Forces>
+         </Fcut>
+      </Trial>
+      <Trial>
+         <Name>Running3</Name>
+         <Fcut>
+            <Markers>12</Markers>
+            <Forces>12</Forces>
+         </Fcut>
+      </Trial>
+   </Filtering>
+   <WindowSelectionProcedure>
+      <ComputeStancePhase>
+         <Leg>Right</Leg>
+         <Offset>0</Offset>
+      </ComputeStancePhase>
+   </WindowSelectionProcedure>
+   <Markers>C7 RACR LPSI RPSH LUA1 LFA1 RUA3 LACR LUA3 LTH3 RUA1 LTB2 LASH LMT5 LUA2 LTH1 LMT1 SACR LFA2 LTB1 LCAL RCAL LTB3 RFA2 RFA3 RTH2 STRN RTH3 LPSH RASH RHNU CLAV RFA1 RASI LFA3 RHNR LASI RTH1 RMT1 RTB2 RCAR RMT5 LCAR RTB1 RUA2 RTB3 LTH2 LHNU RPSI T10 LHNR</Markers>
+   <EMGMaxTrials>CrossOvers1 FastWalking9 Running3 SideStep2</EMGMaxTrials>
+   <EMGsSelection>
+      <EMGSet>UWA-CEINMS</EMGSet>
+      <EMGs>
+         <EMG>
+            <OutputLabel>addmag_r</OutputLabel>
+            <C3DLabel>Add Magnus</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>bicfemlh_r</OutputLabel>
+            <C3DLabel>Biceps Fem</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gaslat_r</OutputLabel>
+            <C3DLabel>Lat Gas</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gasmed_r</OutputLabel>
+            <C3DLabel>Med Gas</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gmax_r</OutputLabel>
+            <C3DLabel>Gluet Max</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gmed_r</OutputLabel>
+            <C3DLabel>Gluet Med</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>gra_r</OutputLabel>
+            <C3DLabel>Grac</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>perlong_r</OutputLabel>
+            <C3DLabel>Peroneus longus</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>recfem_r</OutputLabel>
+            <C3DLabel>Rec Fem</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>sar_r</OutputLabel>
+            <C3DLabel>Sart</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>semimem_r</OutputLabel>
+            <C3DLabel>Semi Mem</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>sol_r</OutputLabel>
+            <C3DLabel>Soleus</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>tfl_r</OutputLabel>
+            <C3DLabel>TFL</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>tibant_r</OutputLabel>
+            <C3DLabel>Tib Ant</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>vaslat_r</OutputLabel>
+            <C3DLabel>Vast Lat</C3DLabel>
+         </EMG>
+         <EMG>
+            <OutputLabel>vasmed_r</OutputLabel>
+            <C3DLabel>Vast Med</C3DLabel>
+         </EMG>
+      </EMGs>
+   </EMGsSelection>
+   <EMGOffset>0.2</EMGOffset>
+   <OutputFileFormats>
+      <MarkerTrajectories>.trc</MarkerTrajectories>
+      <GRF>.mot</GRF>
+      <EMG>.mot</EMG>
+   </OutputFileFormats>
+</elaboration>
