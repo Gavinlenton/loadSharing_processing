@@ -74,14 +74,14 @@ for i = 1:length(data.fp_data.GRF_data)
     end
 
     % filter the force and determine when the foot is in contact with the
-    % gound - this is not the same filtering as is done on the final data
+    % ground - this is not the same filtering as is done on the final data
     % and is required to be able to determine the contact periods
     Fv = matfiltfilt(1/data.fp_data.Info(1).frequency,filter_freq,2,data.fp_data.GRF_data(i).F(:,3));
     
     % if this is a cyclic movement, then it is best to make the baseline
     % zero as this improves capacity for detecting events
     if (max(Fv)-min(Fv))>400
-        Fv = Fv-median(Fv(Fv<(min(Fv)+20)));
+        Fv = Fv-median(Fv(Fv<(min(Fv)+15)));
     end
     nt = find(Fv>thresh(1));
     
@@ -91,7 +91,7 @@ for i = 1:length(data.fp_data.GRF_data)
     % point and off as the last point), a gap of greater than 25
     % miliseconds is considered a new event (change the 0.025 value below
     % to adjust this).
-    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.025);  
+    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);  
     on_i = [nt(1); nt(dnt+1)];
     off_i = [nt(dnt); nt(end)];
     
@@ -120,20 +120,42 @@ for i = 1:length(data.fp_data.GRF_data)
         
         % define the current period of interest
         a = on_i(j):off_i(j);
+        
+        % Change FP index to marker data index
         aa = ceil((on_i(j))/F:(off_i(j))/F);
 
         for b = 1:length(assign_markers)
             % loop through each of the bodies that need assigning to forces
             % and determine the median distance between the markers defining
             % body and the COP  
-            D(b) = nanmedian(dist_markers(data.fp_data.GRF_data(i).P(aa*F,:),...
-                [data.marker_data.Markers.(assign_markers{b})(aa,1) ...
+            
+            % Calculate the mean position over the frames that correspond
+            % with motion capture data.
+            m = [];
+            
+            for long = 1:10:length(a)
+                 try
+                 meanCOP = mean(data.fp_data.GRF_data(i).P([a(long):a(long+9)], :));
+                 catch ME
+                      if (strcmp(ME.identifier, 'MATLAB:badsubscript'))
+                           meanCOP = mean(data.fp_data.GRF_data(i).P([a(long):a(end)], :));
+                      else
+                           rethrow(ME)
+                      end   
+                 end
+                 m = [m; meanCOP];
+            end
+            
+            % Define the distance between COP and markers for left and
+            % right side
+           D(b) = nanmedian(dist_markers(m,[data.marker_data.Markers.(assign_markers{b})(aa,1) ...
                 data.marker_data.Markers.(assign_markers{b})(aa,2) ...
                 zeros(size(data.marker_data.Markers.(assign_markers{b})(aa,1)))])/1000);
+           
         end
-        % determine which of the markers are within the threshold distance defined
+        % determine which marker is within the threshold distance defined
         aD = find(D<thresh(2));
-        % if a markers is below the threshold, assign the force event to
+        % if a marker is below the threshold, assign the force event to
         % that body for the current force plate
         if ~isempty(aD)
             if length(aD) < 2 
