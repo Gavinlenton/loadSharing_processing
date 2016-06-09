@@ -72,17 +72,17 @@ end
 % if the mass, height and name aren't present then presribe - it is
 % preferrable to have these defined in the data structure before running
 % this function - btk_loadc3d should try and do this for vicon data
-if ~isfield(data,'Mass')
-     data.Mass = 75;
-end
-
-if ~isfield(data,'Height')
-     data.Height = 1750;
-end
-
-if ~isfield(data,'Name')
-     data.Name = 'NoName';
-end
+% if ~isfield(data,'Mass')
+%      data.Mass = 75;
+% end
+% 
+% if ~isfield(data,'Height')
+%      data.Height = 1750;
+% end
+% 
+% if ~isfield(data,'Name')
+%      data.Name = 'NoName';
+% end
 
 %% define the start and end frame for analysis as first and last frame unless
 % this has already been done to change the analysed frames
@@ -248,7 +248,10 @@ if isfield(data,'fp_data')
                data.GRF.FP(i).(bodies{i}).M(:,3) data.GRF.FP(i).(bodies{i}).M]/p_sc;
           
           % define the period which we are analysing
-          K = (F*data.Start_Frame):1:(F*data.End_Frame);
+          
+          % Modified K to start from first frame and not start from first
+          % frame * 10.
+          K = (data.Start_Frame):1:(F*data.End_Frame);
           
           % add the force, COP and moment data for current plate to the force matrix
           force_data_out = [force_data_out data.GRF.FP(i).(bodies{i}).F(K,:) data.GRF.FP(i).(bodies{i}).P(K,:) data.GRF.FP(i).(bodies{i}).M(K,:)];
