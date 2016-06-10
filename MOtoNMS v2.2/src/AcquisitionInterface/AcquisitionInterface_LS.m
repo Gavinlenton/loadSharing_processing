@@ -145,22 +145,22 @@ AcquisitionDate= subjectFolder;
 %% -----------------------------------------------------------------------%
 %                          MARKERS PROTOCOL                               %
 %-------------------------------------------------------------------------%
-% originalPath=pwd;
-% cd('..')
-% cd('..')
-% 
-% markersProtocolPath=[pwd filesep fullfile('SetupFiles','AcquisitionInterface','MarkersProtocols') filesep];   
-% 
-% cd(markersProtocolPath)
-% if nargin>0
-%     [markersProtocolName] = uigetfile([markersProtocolPath filesep '*.xml'],'Select the .xml file corresponding to the Markers Protocol',[oldAcquisition.MarkersProtocol.Name '.xml']);
-% else
-%     [markersProtocolName] = uigetfile([markersProtocolPath filesep '*.xml'],'Select the .xml file corresponding to the Markers Protocol');
-% end
-% cd (originalPath)
-% 
-% Pref.ReadAttr=false;
-% MarkersProtocol=xml_read([markersProtocolPath markersProtocolName],Pref);
+originalPath=pwd;
+cd('..')
+cd('..')
+
+markersProtocolPath=[pwd filesep fullfile('SetupFiles','AcquisitionInterface','MarkersProtocols') filesep];   
+
+cd(markersProtocolPath)
+if nargin>3
+    [markersProtocolName] = uigetfile([markersProtocolPath filesep '*.xml'],'Select the .xml file corresponding to the Markers Protocol',[oldAcquisition.MarkersProtocol.Name '.xml']);
+else
+    [markersProtocolName] = uigetfile([markersProtocolPath filesep '*.xml'],'Select the .xml file corresponding to the Markers Protocol');
+end
+cd (originalPath)
+
+Pref.ReadAttr=false;
+MarkersProtocol=xml_read([markersProtocolPath markersProtocolName],Pref);
 
 
 %% -----------------------------------------------------------------------%
@@ -445,7 +445,7 @@ acquisition.Laboratory=Laboratory;
 acquisition.Subject=Subject;
 acquisition.AcquisitionDate=AcquisitionDate;
 % acquisition.VideoFrameRate=VideoFrameRate;
-% acquisition.MarkersProtocol=MarkersProtocol;
+acquisition.MarkersProtocol=MarkersProtocol;
 %acquisition.EMGSystems.Number=nEMGSystem;
 % if nEMGSystem>0
 %     acquisition.EMGs.Systems.System=EMGSystem;
