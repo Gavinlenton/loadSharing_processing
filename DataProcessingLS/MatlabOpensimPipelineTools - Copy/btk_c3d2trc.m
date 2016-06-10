@@ -201,7 +201,7 @@ if isfield(data,'fp_data')
     
     F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; % assume that all force plates are collected at the same frequency!!!
     
-    fp_time = 1/data.marker_data.Info.frequency:1/data.fp_data.Info(1).frequency:(F*(data.End_Frame-data.Start_Frame+1))/data.fp_data.Info(1).frequency;
+    fp_time = 0.001/data.marker_data.Info.frequency:1/data.fp_data.Info(1).frequency:(F*(data.End_Frame-data.Start_Frame+1))/data.fp_data.Info(1).frequency;
     
     % initialise force data matrix with the time array and column header
     force_data_out = fp_time';
@@ -236,7 +236,7 @@ if isfield(data,'fp_data')
             end
             
             % define the period which we are analysing
-            K = (F*data.Start_Frame):1:(F*data.End_Frame);
+            K = (data.Start_Frame):1:(F*data.End_Frame);
             
             % add the force, COP and moment data for current plate to the force matrix
             force_data_out = [force_data_out data.fp_data.GRF_data(i).F(K,:) data.fp_data.GRF_data(i).P(K,:) data.fp_data.GRF_data(i).M(K,:)];
@@ -286,7 +286,7 @@ if isfield(data,'fp_data')
 %                     end
                     
                     % define the period which we are analysing
-                    K = (F*data.Start_Frame):1:(F*data.End_Frame);
+                    K = (data.Start_Frame):1:(F*data.End_Frame);
                     
                     % add the force, COP and moment data for current plate to the force matrix
                     force_data_out = [force_data_out data.GRF.FP(i).(fnames{j}).F(K,:) data.GRF.FP(i).(fnames{j}).P(K,:) data.GRF.FP(i).(fnames{j}).M(K,:)];
@@ -312,9 +312,11 @@ if isfield(data,'fp_data')
 
 newfilename = [fname(1:end-4) '_grf.mot'];
 
+pname = 'C:\Users\s2921887\Documents';
+
 data.GRF_Filename = [pname newfilename];
 
-fid_2 = fopen([pname newfilename],'w');
+fid_2 = fopen([pname filesep newfilename],'w');
 
 % write the header information
 fprintf(fid_2,'%s\n',newfilename);

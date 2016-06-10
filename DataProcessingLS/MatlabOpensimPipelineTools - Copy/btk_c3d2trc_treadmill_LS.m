@@ -1,4 +1,4 @@
-function data = btk_c3d2trc_treadmill(varargin)
+function data = btk_c3d2trc_treadmill_LS(varargin)
 % function btk_c3d2trc_treadmill(file) OR
 % function btk_c3d2trc_treadmill(data)
 %
@@ -75,11 +75,11 @@ end
 % if ~isfield(data,'Mass')
 %      data.Mass = 75;
 % end
-% 
+%
 % if ~isfield(data,'Height')
 %      data.Height = 1750;
 % end
-% 
+%
 % if ~isfield(data,'Name')
 %      data.Name = 'NoName';
 % end
@@ -219,12 +219,15 @@ disp('Writing grf.mot file...')
 
 if isfield(data,'fp_data')
      
-     F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; % assume that all force plates are collected at the same frequency!!!
+     Fp_change = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; % assume that all force plates are collected at the same frequency!!!
      
-     fp_time = 1/data.marker_data.Info.frequency:1/data.fp_data.Info(1).frequency:(F*(data.End_Frame-data.Start_Frame+1))/data.fp_data.Info(1).frequency;
+     % Changed this to start from frame 1, not from frame 10.
+     %      fp_time = 1/data.marker_data.Info.frequency:1/data.fp_data.Info(1).frequency:(F*(data.End_Frame-data.Start_Frame+1))/data.fp_data.Info(1).frequency;
+     
+     fp_time1 = 0.001:1/data.fp_data.Info(1).frequency:(Fp_change*(data.End_Frame-data.Start_Frame+1))/data.fp_data.Info(1).frequency;
      
      % initialise force data matrix with the time array and column header
-     force_data_out = fp_time';
+     force_data_out = fp_time1';
      force_header = 'time\t';
      force_format = '%20.6f\t';
      
@@ -238,61 +241,154 @@ if isfield(data,'fp_data')
      for i = 1:2
           
           bodies = {'calcn_r', 'calcn_l'};
-          % reoder data so lab coordinate system to match that of the OpenSim
-          % system
-          data.GRF.FP(i).(bodies{i}).P =  [data.GRF.FP(i).(bodies{i}).P(:,2)/p_sc ...
-               data.GRF.FP(i).(bodies{i}).P(:,3)/p_sc data.GRF.FP(i).(bodies{i}).P(:,1)/p_sc];
-          data.GRF.FP(i).(bodies{i}).F =  [data.GRF.FP(i).(bodies{i}).F(:,2) ...
-               data.GRF.FP(i).(bodies{i}).F(:,3) data.GRF.FP(i).(bodies{i}).F(:,1)];
-          data.GRF.FP(i).(bodies{i}).M =  [data.GRF.FP(i).(bodies{i}).M(:,2) ...
-               data.GRF.FP(i).(bodies{i}).M(:,3) data.GRF.FP(i).(bodies{i}).M]/p_sc;
           
           % define the period which we are analysing
           
           % Modified K to start from first frame and not start from first
           % frame * 10.
-          K = (data.Start_Frame):1:(F*data.End_Frame);
+          K = (data.Start_Frame):1:(Fp_change*data.End_Frame);
+          
           
           % add the force, COP and moment data for current plate to the force matrix
-          force_data_out = [force_data_out data.GRF.FP(i).(bodies{i}).F(K,:) data.GRF.FP(i).(bodies{i}).P(K,:) data.GRF.FP(i).(bodies{i}).M(K,:)];
-          % define the header and formats
-          force_header = [force_header num2str(i) '_ground_force_vx\t' num2str(i) '_ground_force_vy\t' num2str(i) '_ground_force_vz\t'...
-               num2str(i) '_ground_force_px\t' num2str(i) '_ground_force_py\t' num2str(i) '_ground_force_pz\t' ...
-               num2str(i) '_ground_torque_x\t' num2str(i) '_ground_torque_y\t' num2str(i) '_ground_torque_z\t'];
-          force_format = [force_format '%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t'];
-          
+          % Needs to loop through both force plates
+          for k = 1:2
+               
+               % reorder data so lab coordinate system to match that of the OpenSim
+               % system
+               
+               data.GRF.FP(k).(bodies{i}).P =  [data.GRF.FP(k).(bodies{i}).P(:,2)/p_sc ...
+                    data.GRF.FP(k).(bodies{i}).P(:,3)/p_sc data.GRF.FP(k).(bodies{i}).P(:,1)/p_sc];
+               data.GRF.FP(k).(bodies{i}).F =  [data.GRF.FP(k).(bodies{i}).F(:,2) ...
+                    data.GRF.FP(k).(bodies{i}).F(:,3) data.GRF.FP(k).(bodies{i}).F(:,1)];
+               data.GRF.FP(k).(bodies{i}).M =  [data.GRF.FP(k).(bodies{i}).M(:,2) ...
+                    data.GRF.FP(k).(bodies{i}).M(:,3) data.GRF.FP(k).(bodies{i}).M]/p_sc;
+               
+               % Check if moments have duplicate columns (for some reason
+               % they do)
+               check = iscolumn(data.GRF.FP(k).(bodies{i}).M(:,4));
+               if check == 1
+                    
+                    % Then delete
+                    data.GRF.FP(k).(bodies{i}).M(:,4:5) = [];
+               end
+               
+               % If plate one for either body then assign normally (i.e.,
+               % concat horz)
+               if k ==1
+                    force_data_out = [force_data_out, data.GRF.FP(k).(bodies{i}).F(K,:)...
+                         data.GRF.FP(k).(bodies{i}).P(K,:) data.GRF.FP(k).(bodies{i}).M(K,:)];
+                    
+                    % If plate two append on to end of FP 1 data
+               elseif k == 2 && i == 1
+                    
+                    % Find when FP 1 values are at max during FP transfer
+                    % between feet
+                    
+                    [pks, locs] = findpeaks(data.GRF.FP(1).(bodies{i}).F(:,2));
+                    val = data.GRF.FP(1).(bodies{i}).F(locs(end),2);
+                    tmp = abs(data.GRF.FP(k).(bodies{i}).F(:,2) - val);
+                    [idx idx1] = min(tmp);
+                    
+                    % Find the value in FP 2 closest to value at end of FP 1
+                    closest = data.GRF.FP(2).(bodies{1}).F(idx1,2);
+                    
+                    % Find when Foot is on FP 2
+                    startFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > closest);
+                    endFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > 1);
+                    
+                    % Calc difference between the two
+                    difference = abs(closest - val);
+                    
+                    if difference < 20
+                         
+                         % Create dummy var so I know length of array
+                         dummy = data.GRF.FP(k).(bodies{i}).F((startFrame(1):endFrame(end)),:);
+                         
+                         % Stitch these forces onto those from Plate 1
+                         force_data_out((locs(end):(locs(end)+length(dummy)-1)), 2:10) = [data.GRF.FP(k).(bodies{i}).F((startFrame(1):endFrame(end)),:),...
+                              data.GRF.FP(k).(bodies{i}).P((startFrame(1):endFrame(end)),:),...
+                              data.GRF.FP(k).(bodies{i}).M((startFrame(1):endFrame(end)),:)];
+                    else
+                         disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
+                         uiwait
+                    end
+                    
+                    % If plate two and left foot
+               elseif k == 2 && i == 2
+                    
+                    % Same procedure for stitching
+                    
+                    [pks, locs] = findpeaks(data.GRF.FP(1).(bodies{i}).F(:,2));
+                    val = data.GRF.FP(1).(bodies{i}).F(locs(end),2);
+                    tmp = abs(data.GRF.FP(k).(bodies{i}).F(:,2) - val);
+                    % Only get index from second half of data
+                    [idx idx1] = min(tmp((500:end),1));
+                    
+                    % Add back frames not included in min function
+                    idx1 = idx1 + 499;
+                    
+                    % Find the value in FP 2 closest to value at end of FP 1
+                    closest = data.GRF.FP(2).(bodies{i}).F(idx1,2);
+                    
+                    % Find when Foot is on FP 2
+                    startFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > closest);
+                    endFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > 1);
+                    
+                    % Find startFrame at end of trial
+                    startFrameIndex = find(startFrame > 500);
+                    
+                    % Calc difference between the two
+                    difference = abs(closest - val);
+                    
+                    if difference < 20
+                         
+                         % Create dummy var so I know length of array
+                         dummy = data.GRF.FP(k).(bodies{i}).F((startFrame(startFrameIndex(1)):endFrame(end)),:);
+                         
+                         % Stitch these forces onto those from Plate 1
+                         force_data_out((locs(end):(locs(end)+length(dummy))), 11:19) = [data.GRF.FP(k).(bodies{i}).F((startFrame(startFrameIndex(1)))-1:endFrame(end),:),...
+                              data.GRF.FP(k).(bodies{i}).P((startFrame(startFrameIndex(1)))-1:endFrame(end),:),...
+                              data.GRF.FP(k).(bodies{i}).M((startFrame(startFrameIndex(1)))-1:endFrame(end),:)];
+                         
+
+                    else
+                         disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
+                         uiwait
+                    end
+
+               end
+               
+               % define the header and formats
+               force_header = [force_header num2str(i) '_ground_force_vx\t' num2str(i) '_ground_force_vy\t' num2str(i) '_ground_force_vz\t'...
+                    num2str(i) '_ground_force_px\t' num2str(i) '_ground_force_py\t' num2str(i) '_ground_force_pz\t' ...
+                    num2str(i) '_ground_torque_x\t' num2str(i) '_ground_torque_y\t' num2str(i) '_ground_torque_z\t'];
+               force_format = [force_format '%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t%20.6f\t'];
+          end
+
      end
-     
+
      force_header = [force_header(1:end-2) '\n'];
      force_format = [force_format(1:end-2) '\n'];
      
      % assign a value of zero to any NaNs
      force_data_out(logical(isnan(force_data_out))) = 0;
      
+     % Re-arrange so data matches MOtoNMS convention
+     force_data2 = force_data_out(:, 2:19);
+     
+     force_data2(:,7:12) = force_data_out(:,11:16);
+     force_data2(:,13:15) = force_data_out(:,8:10);
+     force_data2(:,16:18) = force_data_out(:,17:19);
+     
+     % Specify new file name
      newfilename = [fname(1:end-4) '_grf.mot'];
      
-     %Create new folder to store .trc and .mot files
-     
-     cd(finalpathname);
-     
-     data.GRF_Filename = [finalpathname '\' newfilename];
-     
-     fid_2 = fopen([finalpathname '\' newfilename],'w');
-     
-     % write the header information
-     fprintf(fid_2,'name %s\n',newfilename);
-     fprintf(fid_2,'datacolumns %d\n', size(force_data_out,2));  % total # of datacolumns
-     fprintf(fid_2,'datarows %d\n',length(fp_time)); % number of datarows
-     fprintf(fid_2,'range %f %f\n',fp_time(1),fp_time(end)); % range of time data
-     fprintf(fid_2,'endheader\n');
-     fprintf(fid_2,force_header);
-     
-     % write the data
-     fprintf(fid_2,force_format,force_data_out');
-     
-     fclose(fid_2);
+     % WRite the MOT file using MOtoNMS function/s
+     writeMot_LS(force_data2 ,force_data_out(:,1), [pname filesep newfilename]);
      
      disp('Done.')
      cd ..\
+     
 else disp('No force plate information available.')
+end
 end
