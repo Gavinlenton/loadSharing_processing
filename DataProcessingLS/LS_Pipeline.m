@@ -31,9 +31,10 @@ for i = 1:length(subjectFolders)
           AcquisitionInterface_LS(subjectName, pname, subjectFolders{i,1})
           
      else
-          message = [sprintf('acquisition.xml already exist in folder: %s', pname), ', continuing with analysis'];
+          message = [sprintf('acquisition.xml already exist in folder: %s', pname), ',\n continuing with analysis...'];
           disp(message)
           
+     end
           % Set folder as that chosen above
           c3dFile_folder = pname;
           c3dFiles=dir([c3dFile_folder,'\*.c3d']);
@@ -129,7 +130,7 @@ for i = 1:length(subjectFolders)
           def = {'KneeFJC'};
           maxNames = inputdlg(prompt, dlg_title, num_lines, def);
           
-          %% Load the c3dfiles and crop into multiple gait cycles - potential to expand this to analyse trials in a for loop.
+          % Load the c3dfiles and crop into multiple gait cycles - potential to expand this to analyse trials in a for loop.
           
           for t_trial = 1:length(c3dFiles)
                
@@ -274,7 +275,6 @@ for i = 1:length(subjectFolders)
                data1 = btk_loadc3d([c3dFile_folderCropped, filesep, fileName], 50);
                dataFinal = assignForceOutputTrcMot(data1);
           end
-     end
 end
 %% Run BOPS for IK
 % Navigate to folder where BOPS is;
