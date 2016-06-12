@@ -203,7 +203,6 @@ for i = 1:length(subjectFolders)
                          % Copy file to Google Drive folder
                          copyfile(fileSource, c3dFile_folder)
                     catch error
-                         disp(error.message)
                          
                          % Switch to the next file
                          fileSource = [physFolderName, filesep, [c3dFile_name(1:end-4), ...
@@ -215,7 +214,7 @@ for i = 1:length(subjectFolders)
                               
                          catch error2
                               % Re-throw original error
-                              uiwait(error.message);
+                              uiwait
                          end                     
                     end              
                end

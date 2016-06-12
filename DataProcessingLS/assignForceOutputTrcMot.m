@@ -1,4 +1,4 @@
-function [dataFinal] = assignForceOutputTrcMot(data, times)
+function [dataFinal] = assignForceOutputTrcMot(data)
 %Assign forces to a each foot and use this data to create .trc and .mot
 %files for OpenSim
 %   % Assign force to the feet and generate the .trc and .mot files. Data

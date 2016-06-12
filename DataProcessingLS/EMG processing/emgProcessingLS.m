@@ -487,11 +487,16 @@ if isMax == 1
      clearvars me
      
 else
+     % This is where I should include normal EMG processing steps for
+     % dynamic trials - also load max data here
+     
      
 end
 %% Dynamic signal conditioning
 
-if isMax == 1
+% If not a max trial, then load the max data and use for processing
+
+if isMax == 0
      
      emgMaxDir = [sessionDataMax, filesep, 'maxEMG'];
      emgMaxFile = fullfile(emgMaxDir, 'maxEmg.txt');
@@ -499,10 +504,6 @@ if isMax == 1
 else
 end
 
-trials = dir(sessionData);
-trialsDir = [trials(:).isdir];
-trialFolder = {trials(trialsDir).name}';
-trialFolder(ismember(trialFolder,{'.','..', 'KneeFJC2', 'KneeFJC1'}))=[];
 analogData = sessionName;
 
 %% Create empty structure for outputs
