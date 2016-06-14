@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Laboratory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Name>DSTO</Name>
-  <MotionCaptureSystem>Vicon</MotionCaptureSystem>
-  <CoordinateSystemOrientation>YZX</CoordinateSystemOrientation>
-  <NumberOfForcePlatforms>0</NumberOfForcePlatforms>
-  </Laboratory>
- 
