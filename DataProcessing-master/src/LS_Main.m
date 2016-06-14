@@ -1,6 +1,9 @@
 % This script will create the appropriate files to run an OpenSim
 % simulation sequence for the Load Sharing Data
 
+% Please acknowledge Glen Lichtwark from the University of Queensland
+% for the use of his OpenSim pipeline tools
+
 % Written by Gavin Lenton June 2016
 % gavin.lenton@griffithuni.edu.au
 
@@ -17,7 +20,7 @@ subjectName = fName(70:end);
 
 %% Loop through all sessions for chosen subject.
 
-for i = 1:length(subjectFolders)
+for i = 1 %:length(subjectFolders)
      
      % Assign session name
      pname = [fName, filesep, subjectFolders{i}];
@@ -27,17 +30,17 @@ for i = 1:length(subjectFolders)
      c3dFiles=dir([c3dFile_folder,'\*.c3d']);
      txtFiles=dir([c3dFile_folder,'\*.txt']);
      
-     %% RUN ACQUISITION INTERFACE IF .XML DOES NOT EXIST
-     % generate one.
+     % Select MOtoNMS directory
+     motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
+          'Select the folder corresponding to your MOtoNMS directory');
+     
+     %% RUN ACQUISITION INTERFACE IF .XML DOES NOT EXIST THEN GENERATE ONE.
      
      if ~exist(fullfile(pname, 'acquisition.xml'), 'file')
           disp('acquisition.xml file does not exist, running AcquisitionInterface...');
           
           % Run Acquisition Interface for each session to determine subject name,
           % weight, and height for use in LinScale
-          % Select MOtoNMS directory
-          motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
-               'Select the folder corresponding to your MOtoNMS directory');
           
           % Nav to file directory
           cd([motoDir, '\src\AcquisitionInterface\']);
@@ -103,7 +106,7 @@ for i = 1:length(subjectFolders)
      %% RUN MOtoNMS C3D2BTK AND RENAME EMG CHANNELS
      
      % Navigate to directory where function is
-     cd([motoDir, 'src\C3D2MAT_btk']);
+     cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
      % Run c3d2mat
      C3D2MAT(fName);
      
@@ -241,7 +244,12 @@ for i = 1:length(subjectFolders)
           
           % --Check to see if EMG data is from txt file or from .c3d to
           % know if we need to apply a notch filter--
+          
           % Initialise
+          asciiNames = {'Subject 6', 'Subject 8', 'Subject 13', 'Subject 14',...
+          'Subject 15', 'Subject 16', 'Subject 17', 'Subject 18',...
+          'Subject 19'}; % Careful because Subjects 18 and 19 contain EMG data from both sources
+
           isASCII = [];
           
           % Loop through subject names known have txt files
@@ -254,17 +262,17 @@ for i = 1:length(subjectFolders)
           % Run EMG processing function. 
           % First check if notch filter should be applied. Only applied to data
           % collected directly into c3d
-          if tf == 0
-               
-               %Processing for txt data.
-               emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), isMax, maxName{1,1});
-               
-          else
-               % Processing for EMG data collected directly in nexus, this includes a
-               % notch filter
-               emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), isMax, maxName{1,1});
-               
-          end
+%           if tf == 0
+%                
+%                %Processing for txt data.
+%                emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), isMax, maxName{1,1});
+%                
+%           else
+%                % Processing for EMG data collected directly in nexus, this includes a
+%                % notch filter
+%                emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), isMax, maxName{1,1});
+%                
+%           end
           
      end
      

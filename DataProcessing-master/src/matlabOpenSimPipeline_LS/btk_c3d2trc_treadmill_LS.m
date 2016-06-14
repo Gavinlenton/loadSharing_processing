@@ -408,7 +408,7 @@ if isfield(data,'fp_data')
      newfilename = [fname(1:end-4) '_grf.mot'];
      
      % WRite the MOT file using MOtoNMS function
-     writeMot_LS(force_data2 ,force_data_out(:,1), [pname filesep newfilename]);
+     writeMot_LS(force_data2 ,force_data_out(:,1), [finalpathname filesep newfilename]);
      
      disp('Done.')
      cd ..\
