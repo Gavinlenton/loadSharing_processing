@@ -182,8 +182,6 @@ for i = 1:length(data.fp_data.GRF_data)
                %              opposite_bodyAssigned = assign_bodies{(aD-1)};
                %         end
                
-               % FIRST FORCE PLATE CONDITIONS
-               
                % IF force plate = first (e.g., 1) and it's the first force assignment the
                % force should always go to right body because trials always start with
                % right heel-strike
@@ -211,58 +209,12 @@ for i = 1:length(data.fp_data.GRF_data)
                          data.GRF.FP(i).(assign_bodies{j}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
                     end
                     
-                    %SECOND FORCE PLATE CONDITIONS
-                    
-                    % If force plate = 2 and it's the first force
-                    % assignment we know that it's the left body toe-off
                elseif i == 2 && j == 1
-                    if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).(assign_bodies{i}).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).(assign_bodies{i}).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).(assign_bodies{i}).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
-                    else % otherwise just assign the raw data
-                         data.GRF.FP(i).(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
-                         data.GRF.FP(i).(assign_bodies{i}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
-                         data.GRF.FP(i).(assign_bodies{i}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
-                    end
                     
-                    % If force plate = 2 and it's the second force
-                    % assignment we know that it's the right body late
-                    % stance
                elseif i == 2 && j == 2
-                    if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).(assign_bodies{j-1}).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).(assign_bodies{j-1}).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).(assign_bodies{j-1}).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
-                    else % otherwise just assign the raw data
-                         data.GRF.FP(i).(assign_bodies{j-1}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
-                         data.GRF.FP(i).(assign_bodies{j-1}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
-                         data.GRF.FP(i).(assign_bodies{j-1}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
-                    end
-                    
-                    % If force plate = 2 and it's the third force
-                    % assignment we know that it's the left body foot
-                    % contact
-               elseif i == 2 && j == 3
-                    if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).(assign_bodies{i}).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).(assign_bodies{i}).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).(assign_bodies{i}).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
-                    else % otherwise just assign the raw data
-                         data.GRF.FP(i).(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
-                         data.GRF.FP(i).(assign_bodies{i}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
-                         data.GRF.FP(i).(assign_bodies{i}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
-                    end
                     
                else
-                    % Display that the force was not assigned
-                    disp(['Force event ' num2str(j) ' on force plate ' num2str(i) ...
-                         ' cannot be assigned to either body. Try adjusting the thresholds to improve detection.'])
                end
-               
-               % UNCOMMENT THIS TO INCLUDE FORCE ASSIGNMENT BASED ON
-               % DISTANCE
-               
                %         if ~isempty(aD)
                %             if length(aD) < 2
                %                 if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
@@ -303,9 +255,8 @@ for i = 1:length(data.fp_data.GRF_data)
                     data.GRF.FP(i).(assign_bodies{b}) = rmfield(data.GRF.FP(i).(assign_bodies{b}),'P');
                end
           end
-     else
-          disp(['There is no GRF data for force plate ', num2str(i), ', please check the trial data']);
+          
      end
-end
+     
      
      

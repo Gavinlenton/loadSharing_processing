@@ -111,12 +111,6 @@ if strcmp(anim,'on')
 end
 
 %%
-% % before the lab is re-ordered, determine force assignment
-% if isfield(data,'fp_data')
-%     data = grf_assign_treadmill(data,data.AssignForce.ApMarkers,data.AssignForce.ApBodies,data.ForceThresh,data.FilterFreq);
-% end
-
-%%
 % we need to reorder the lab coordinate system to match that of the OpenSim
 % system --> SKIP THIS STEP IF LAB COORDINATE SYSTEM IS SAME AS MODEL
 % SYSTEM
@@ -254,7 +248,7 @@ if isfield(data,'fp_data')
           % Modified K to start from first frame and not start from first
           % frame * 10.
           K = (data.Start_Frame):1:(Fp_change*data.End_Frame);
-          
+          dt = 1/data.fp_data.Info(1).frequency;
           
           % add the force, COP and moment data for current plate to the force matrix
           % Needs to loop through both force plates
@@ -287,111 +281,59 @@ if isfield(data,'fp_data')
                     % If plate two append on to end of FP 1 data
                elseif k == 2 && i == 1
                     
-                    % Find when FP 1 values are at max during FP transfer
-                    % between feet
+                    endFrameFP1 = find(data.GRF.FP(1).(bodies{i}).F(K,2) > 1);
+                    startFrameFP2 = find(data.GRF.FP(2).(bodies{i}).F(K,2) > 1);
                     
-                    [pks, locs] = findpeaks(data.GRF.FP(1).(bodies{i}).F(:,2));
-                    val = data.GRF.FP(1).(bodies{i}).F(locs(end),2);
-                    tmp = abs(data.GRF.FP(k).(bodies{i}).F(:,2) - val);
-                    [idx idx1] = min(tmp);
+                    difference = endFrameFP1(end) - startFrameFP2(1);
                     
-                    % Find the value in FP 2 closest to value at end of FP 1
-                    closest = data.GRF.FP(2).(bodies{1}).F(idx1,2);
+                    startCropFrame = endFrameFP1(end) - (difference/2);
                     
-                    % Find when Foot is on FP 2
-                    startFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > closest);
-                    endFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > 1);
-                    
-                    % Calc difference between the two
-                    difference = abs(closest - val);
-                    
-                    if difference < 20
-                         
-                         % Create dummy var so I know length of array
-                         dummy = data.GRF.FP(k).(bodies{i}).F((startFrame(1):endFrame(end)),:);
-                         
-                         % Stitch these forces onto those from Plate 1
-                         force_data_out((locs(end):(locs(end)+length(dummy)-1)), 2:10) = [data.GRF.FP(k).(bodies{i}).F((startFrame(1):endFrame(end)),:),...
-                              data.GRF.FP(k).(bodies{i}).P((startFrame(1):endFrame(end)),:),...
-                              data.GRF.FP(k).(bodies{i}).M((startFrame(1):endFrame(end)),:)];
-                    else
-                         disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
-                         uiwait
-                    end
-                    
-                    % Clean up force near end of first toe-off
-                    toe_offStart = find(force_data_out((500:end),3) < 20);
-                    toe_offEnd = find(data.GRF.FP(k).(bodies{i}).F(K(500:end),2) > 1);
-                    
-                    toe_offIndex = [toe_offStart(1) + 500, toe_offEnd(end) + 500];
-                    
-                    toe_off = [data.GRF.FP(k).(bodies{i}).F((toe_offIndex(1):toe_offIndex(2)),:),...
-                         data.GRF.FP(k).(bodies{i}).P((toe_offIndex(1):toe_offIndex(2)),:),...
-                         data.GRF.FP(k).(bodies{i}).M((toe_offIndex(1):toe_offIndex(2)),:)];
-                    
-                    % Find data from 
-                    toe_off1 = toe_off(20:end, :);
-                    xq = 1:0.5:(toe_offIndex(2)- toe_offIndex(1));  
-                    newToeOff = interp1(toe_off1(:,:), xq, 'linear');    
-                    sampleStart = locs(end)+length(dummy)-1;
-                    sampleEnd = endFrame(end);
-                    sampleLength = sampleEnd - sampleStart;  
-                    force_data_out(sampleStart:sampleEnd-1, 2:10) = newToeOff(1:sampleLength, :); 
-                    dt = 1/data.fp_data.Info(1).frequency;
-                    
-                    % Apply 12 Hz filter to smooth that out
-                    force_data_out(:, 2:end) = matfiltfilt(dt,12,2, force_data_out(:, 2:end));
+                    % Stitch these forces onto those from Plate 1
+                    force_data_out(startCropFrame:end, 2:10) = [data.GRF.FP(k).(bodies{i}).F(startCropFrame:end,:),...
+                         data.GRF.FP(k).(bodies{i}).P(startCropFrame:end,:),...
+                         data.GRF.FP(k).(bodies{i}).M(startCropFrame:end,:)];
                     
                     % If plate two and left foot append onto end of left
                     % foot data
                elseif k == 2 && i == 2
                     
-                    % Same procedure for stitching
+                    % Same procedure for stitching - first define areas to
+                    % stitch
+                    endFrameFP2x = find(data.GRF.FP(2).(bodies{i}).F(K(1):K(500),2) > 1);
+                    endFrameFP2y = find(data.GRF.FP(2).(bodies{i}).F(500:end,2) > 35);
+                    startFrameFP2end = find(data.GRF.FP(1).(bodies{i}).F(K,2) < 1);
                     
-                    [pks, locs] = findpeaks(data.GRF.FP(1).(bodies{i}).F(:,2));
-                    val = data.GRF.FP(1).(bodies{i}).F(locs(end),2);
-                    tmp = abs(data.GRF.FP(k).(bodies{i}).F(:,2) - val);
+                    % Determine difference between end of FP1 and start of
+                    % FP2
+                    differenceFP2 = startFrameFP2end(end) - (endFrameFP2y(1) +500);
                     
-                    % Only get index from second half of data
-                    [idx idx1] = min(tmp((500:end),1));
+                    startCropFrame2 = startFrameFP2end(end) - (differenceFP2/2) -10;
                     
-                    % Add back frames not included in min function
-                    idx1 = idx1 + 499;
+                    % Stitch these forces onto those from Plate 1 for end
+                    % of capture
+                    force_data_out(startCropFrame2:end, 11:19) =...
+                         [data.GRF.FP(k).(bodies{i}).F(startCropFrame2:end,:),...
+                         data.GRF.FP(k).(bodies{i}).P(startCropFrame2:end,:),...
+                         data.GRF.FP(k).(bodies{i}).M(startCropFrame2:end,:)];
                     
-                    % Find the value in FP 2 closest to value at end of FP 1
-                    closest = data.GRF.FP(2).(bodies{i}).F(idx1,2);
+                    % Stitch these forces onto those from Plate 1 for
+                    % beginning of capture
+                    force_data_out(endFrameFP2x(1):endFrameFP2x(end), 11:19) =...
+                         [data.GRF.FP(k).(bodies{i}).F(endFrameFP2x(1):endFrameFP2x(end),:),...
+                         data.GRF.FP(k).(bodies{i}).P(endFrameFP2x(1):endFrameFP2x(end),:),...
+                         data.GRF.FP(k).(bodies{i}).M(endFrameFP2x(1):endFrameFP2x(end),:)];
                     
-                    % Find when Foot is on FP 2
-                    startFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > closest);
-                    endFrame = find(data.GRF.FP(k).(bodies{i}).F(K,2) > 1);
-                    
-                    % Find startFrame at end of trial
-                    startFrameIndex = find(startFrame > 500);
-                    
-                    % Calculate difference between the two
-                    difference = abs(closest - val);
-                    
-                    if difference < 20
-                         
-                         % Create dummy var so I know length of array
-                         dummy = data.GRF.FP(k).(bodies{i}).F((startFrame(startFrameIndex(1)):endFrame(end)),:);
-                         
-                         % Stitch these forces onto those from Plate 1
-                         force_data_out((locs(end):(locs(end)+length(dummy))), 11:19) = [data.GRF.FP(k).(bodies{i}).F((startFrame(startFrameIndex(1)))-1:endFrame(end),:),...
-                              data.GRF.FP(k).(bodies{i}).P((startFrame(startFrameIndex(1)))-1:endFrame(end),:),...
-                              data.GRF.FP(k).(bodies{i}).M((startFrame(startFrameIndex(1)))-1:endFrame(end),:)];
-                         
-                    else
-                         disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
-                         uiwait
-                    end
-                    
+               else
+                    disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
+                    uiwait
                end
                
           end
           
      end
      
+     % Apply 10 Hz filter to smooth stiching out
+     force_data_out(:, 2:end) = matfiltfilt(dt,10,2, force_data_out(:, 2:end));
      
      
      % assign a value of zero to any NaNs
@@ -416,3 +358,4 @@ if isfield(data,'fp_data')
 else disp('No force plate information available.')
 end
 end
+
