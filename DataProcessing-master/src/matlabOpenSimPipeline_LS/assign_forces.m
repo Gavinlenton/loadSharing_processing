@@ -120,6 +120,39 @@ for i = 1:length(data.fp_data.GRF_data)
                on_i(ns+1) = [];
           end
           
+          
+          %  Detect if force assignments were incorrect
+          % (Should always be at least two on and two off events in FP1)
+          if i == 1 && length(on_i) ~= 2
+               disp('Threshold not high enough to detect multiple events, increasing to 50N')
+               % Try increasing threshold
+               thresh = 50;
+               nt = find(Fv>thresh(1));
+               
+               dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
+               on_i = [nt(1); nt(dnt+1)];
+               off_i = [nt(dnt); nt(end)];
+               
+               if (off_i(1)-on_i(1)) < 7
+                    off_i(1) = [];
+                    on_i(1) = [];
+               end
+               
+               if (off_i(end)-on_i(end)) < 7
+                    off_i(end) = [];
+                    on_i(end) = [];
+               end
+               
+               ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.1);
+               if ~isempty(ns)
+                    if ns(end) == length(off_i)
+                         ns(end) = [];
+                    end
+                    off_i(ns) = [];
+                    on_i(ns+1) = [];
+               end
+          end
+          
           % loop through each event (from one value of on_i to its corresponding off_i)
           % and determine which of the bodies is contacting to make this force
           for j = 1:length(on_i)
@@ -231,13 +264,13 @@ for i = 1:length(data.fp_data.GRF_data)
                     % stance
                elseif i == 2 && j == 2
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).(assign_bodies{j-1}).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).(assign_bodies{j-1}).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).(assign_bodies{j-1}).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+                         data.GRF.FP(i).(assign_bodies{1}).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+                         data.GRF.FP(i).(assign_bodies{1}).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+                         data.GRF.FP(i).(assign_bodies{1}).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
                     else % otherwise just assign the raw data
-                         data.GRF.FP(i).(assign_bodies{j-1}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
-                         data.GRF.FP(i).(assign_bodies{j-1}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
-                         data.GRF.FP(i).(assign_bodies{j-1}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
+                         data.GRF.FP(i).(assign_bodies{1}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
+                         data.GRF.FP(i).(assign_bodies{1}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
+                         data.GRF.FP(i).(assign_bodies{1}).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
                     end
                     
                     % If force plate = 2 and it's the third force
@@ -307,5 +340,5 @@ for i = 1:length(data.fp_data.GRF_data)
           disp(['There is no GRF data for force plate ', num2str(i), ', please check the trial data']);
      end
 end
-     
-     
+
+
