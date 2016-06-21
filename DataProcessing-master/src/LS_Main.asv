@@ -404,7 +404,7 @@ for i = 1:length(subjectFolders)
      c3dFile_ROM = pname;
      c3dFilesROM=dir([c3dFile_ROM,'\*.c3d']);
      
-     % Delete files I don't want to analyse
+          % Delete files I don't want to analyse
      c3dFilesROM(strncmp({c3dFilesROM.name}, 'static1', 7)) = [];
      c3dFilesROM(strncmp({c3dFilesROM.name}, 'fast', 4)) = [];
      c3dFilesROM(strncmp({c3dFilesROM.name}, 'slow', 4)) = [];
@@ -415,8 +415,6 @@ for i = 1:length(subjectFolders)
      [anglesJoint] = determineJointAngles(c3dFilesROM);
      
      % Save to .xml
-     xmlFileName = [fname, '.xml'];
-     
-     % Save each session in separate tabs
-     xmlwrite(xmlFileName, angleJoint, ['Session', num2str(i)]);
+     xmlFileName = [pname, '.xml'];
+     xmlwrite(xmlFileName, angleJoint, 'Joint Angle Parameters');
 end
