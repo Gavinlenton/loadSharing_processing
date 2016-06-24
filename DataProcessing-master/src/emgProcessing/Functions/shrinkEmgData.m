@@ -3,7 +3,7 @@ function [interpData] = shrinkEmgData(emgFrames, Channel, actualFrames)
 %   Input the EMG channel data, the number of frames of the EMG data, and
 %   the actual frames that you want to shrink to
 
-interpData = interp1(emgFrames, Channel, actualFrames);
+interpData = interp1(emgFrames, Channel, actualFrames, 'spline');
 
 end
 

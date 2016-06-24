@@ -1,11 +1,17 @@
-% This script will create the appropriate files to run an OpenSim
-% simulation sequence for the Load Sharing Data
+ %% -------------------------------------------------------------%%
+
+% This script will:
+% - Generate the appropriate files to run an OpenSim simulation sequence for the Load Sharing Data
+% - Process EMG data for eventual CEINMS analysis
+% - Process ROM trials and output joint angles
 
 % Please acknowledge Glen Lichtwark from the University of Queensland
 % for the use of his OpenSim pipeline tools
 
 % Written by Gavin Lenton June 2016
 % gavin.lenton@griffithuni.edu.au
+
+ %% ---------------------------------------------------------------%
 
 clear;
 clc;
@@ -18,6 +24,13 @@ subjectFolders={subjectDirs(isub).name}';
 subjectFolders(ismember(subjectFolders,{'.','..'}))=[]; % dynamic subject folders
 subjectName = fName(70:end);
 
+% Select physical folder directory
+physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
+
+% Select MOtoNMS directory
+motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
+          'Select the folder corresponding to your MOtoNMS directory');
+
 %% Loop through all sessions for chosen subject.
 
 for i = 1:length(subjectFolders)
@@ -29,10 +42,6 @@ for i = 1:length(subjectFolders)
      c3dFile_folder = pname;
      c3dFiles=dir([c3dFile_folder,'\*.c3d']);
      txtFiles=dir([c3dFile_folder,'\*.txt']);
-     
-     % Select MOtoNMS directory
-     motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
-          'Select the folder corresponding to your MOtoNMS directory');
      
      %% RUN ACQUISITION INTERFACE IF .XML DOES NOT EXIST THEN GENERATE ONE.
      
@@ -58,43 +67,59 @@ for i = 1:length(subjectFolders)
      mergeEMG = questdlg('Do you need to merge the EMG data with the c3d?',...
           'EMG Merging', 'Yes', 'No', 'No');
      
+     c3dFilesMerge=dir([c3dFile_folder,'\*.c3d']);
+     
+     physFolderName = [physFolder, filesep, subjectName, filesep, subjectFolders{i}];
+     
+     % Delete files I don't want to analyse
+     c3dFilesMerge(strncmp({c3dFilesMerge.name}, 'HF', 2)) = [];
+     c3dFilesMerge(strncmp({c3dFilesMerge.name}, 'Shoulder', 8)) = [];
+     c3dFilesMerge(strncmp({c3dFilesMerge.name}, 'TF', 2)) = [];
+     c3dFilesMerge(strncmp({c3dFilesMerge.name}, 'Static1', 7)) = [];
+     c3dFilesMerge(strncmp({c3dFilesMerge.name}, 'UUA', 3)) = [];
+     
      if strcmp(mergeEMG, 'Yes') == 1
-          
           % Loop through all trials
-          for trial = 1:length(c3dFiles)
+          for trial = 1:length(txtFiles)
                
                % Define input file/s
                inputc3d = c3dFiles(trial,1).name(1:end-4);
                txtFile = txtFiles(trial,1).name(1:end-4);
                
-               if txtFile == [];
+               if isempty(txtFile) == 1;
                     
                     % If no text file exists
-                    disp('txt file does not exist for this trial');
+                    disp('no txt files exist for this trial');
                     
                else
                     
+                    cd(pname);
                     % Ensure processing only occurs when .txt file
                     % corresponds with .c3d file.
-                    if inputc3d(1:end-10) ~= txtFile
+                    if strcmp(inputc3d(1:end-10), txtFile) == 0
                          
                          % Find the correct c3d file to match txt file
                          t = struct2cell(c3dFiles)';
                          index = strfind(t(:,1), txtFile);
                          inputc3d = c3dFiles((find(not(cellfun('isempty', index)))),1).name(1:end-14);
                          
-                         % Run EMG analysis to insert .txt file EMG into c3d
-                         try
-                              emgAsciiAnalysis(inputc3d, txtFile);
-                         catch me
-                              error(['Text file (', txtFile, ') still does not match c3d File (', inputc3d(1:end-10), ')']);
-                              disp('Please ensure ALL txt files are in the same folder as c3d files');
-                              break
-                         end
+                         % Because trial names have _Processed at the end
+                         newInputc3d = [inputc3d, ];
                          
+                         % Check to see if they are now the same
+                         if strcmp(newInputc3d, txtFile) == 0
+                              disp(['Text file (', txtFile, ') still does not match c3d File (', inputc3d, ')']);
+                              disp('Please ensure ALL txt files are in the same folder as c3d files');
+                              
+                         else
+                              % Run EMG analysis to insert .txt file EMG into c3d
+                              emgAsciiAnalysis([newInputc3d, '_Processed.c3d'], [txtFile, '.txt'],...
+                                   physFolderName, c3dFile_folder);
+                         end
                     else
                          % If they are the same just run processing
-                         emgAsciiAnalysis(inputc3d, txtFile);
+                         emgAsciiAnalysis([inputc3d, '.c3d'], [txtFile, '.txt'],...
+                              physFolderName, c3dFile_folder);
                     end
                end
           end
@@ -178,8 +203,6 @@ for i = 1:length(subjectFolders)
           
           % Navigate to InputData folder on C: because I cannot write
           % new c3dfiles to Google Drive folder.
-          physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
-          physFolderName = [physFolder, filesep, subjectName, filesep, subjectFolders{i}];
           cd(physFolderName);
           
           % Insert Events and crop trials into conscutive gait cycles
@@ -217,7 +240,7 @@ for i = 1:length(subjectFolders)
                end
           end
           
-          % Create a times variable with right hee-strike and right toe-off
+          % Create a times variable with right heel-strike and right toe-off
           % to use in emg analysis.
           times = [rightHS, rightTO];
           
@@ -298,7 +321,7 @@ for i = 1:length(subjectFolders)
                               
                               % Processing for EMG data collected directly in nexus, this includes a
                               % notch filter
-                              emgProcessingMaxLS('yes', sessionData, maxName), motoDir);
+                              emgProcessingMaxLS('yes', sessionData, maxName, motoDir);
                               disp('Max trial done, loading for EMG processing...');
                               emgMax = load(emgMaxFile);
                               emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);

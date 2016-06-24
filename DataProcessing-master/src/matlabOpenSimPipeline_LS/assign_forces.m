@@ -60,7 +60,7 @@ if iscell(assign_markers)
 else error('The body and marker assignment lists must be cell arrays');
 end
 
-% examine the force signals for each forcelpate and determine whether any
+% examine the force signals for each forceplate and determine whether any
 % of the markers are close to the COP to indicate that this force should be
 % assigned to the bodies that the marker attaches to
 

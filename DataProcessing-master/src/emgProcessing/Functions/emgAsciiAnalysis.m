@@ -1,4 +1,4 @@
-function [] = emgAsciiAnalysis(inputc3d, txtFile)
+function [] = emgAsciiAnalysis(inputc3d, txtFile, physFolderName, c3dFile_folder)
 %Function to import .c3d file and .txt file and move downsampled EMG into
 %the .c3d file
 %   Import .c3d and .txt file, load the acquisition using btk, downsample
@@ -42,10 +42,10 @@ ChannelData = [Channel1 Channel3 Channel4 Channel6 Channel7 Channel8...
 h = btkReadAcquisition(inputc3d);
 frames = btkGetAnalogFrameNumber(h);
 actualFrames = (0.000:0.001:29.9990)';
+data = btk_loadc3d(inputc3d);
 
 % Some warning message if aquisition frames is different from EMG frames
 if frames < length(actualFrames)
-     warndlg('The number of frames in acquisition has been reduced');
      firstFrame = btkGetFirstFrame(h); % Obtain first and last frame
      lastFrame = btkGetLastFrame(h);
      % BTK uses First/Last so convert to fit routine (e.g., first frame
@@ -60,10 +60,15 @@ end
 
 
 %% Convert first frame to the same number of units as EMG data
+% Initialising some variables
+F = 1000;
 conversion = 3/2;
+emgSamplingTimeStep = (1/F);
 firstConversion = floor(firstFrame * conversion);
-lastConversion = floor(lastFrame * conversion);
-framesConversion = frames * conversion;
+lastConversion = (frames * conversion);
+framesConversion = floor(frames * conversion);
+framesNew = frames-ceil(firstFrame);
+diff2zero = 10 - firstFrame;
 
 %% Shrink EMG data and store in structure
 emg = struct();
@@ -83,24 +88,23 @@ Time = shrinkEmgData2(Times, firstConversion, lastConversion);
 %% Put EMG data into matrix for c3d file
 
 % Initialize
-emgProcessed = zeros(framesConversion,11);
+emgProcessed = [];
 
 for i = 1:9, k = [1,3,4,6,7,8,9,10,11];
      emgData = emg.(channelNames{1,i});
      emgProcessed(:,k(1,i)) = emgData(:);
 end
 
-%%
+%% Create structure of final, interpolated EMG data
 emgFinal = struct();
+% Define analog times
+emgFrames = data.fp_data.Time;
+% emgFrames = (0:emgSamplingTimeStep:(framesNew-diff2zero)/1000)'; 
 
-if lastFrame == frames
-     emgFrames = (firstFrame:1:lastFrame)'; emgFrames = emgFrames ./ 1000;
-else
-     emgFrames = (firstFrame:1:lastFrame + 1)'; emgFrames = emgFrames ./ 1000;
-end
 channelNamesReal = {'Channel1', 'Channel2', 'Channel3', 'Channel4', 'Channel5', 'Channel6','Channel7',...
      'Channel8','Channel9','Channel10','Channel11'};
 
+% Loop through EMG data and interp so it fits with analog data in c3d file.
 for i = 1:11
      emgFinal.(channelNamesReal{1,i}) = shrinkEmgData(Time, emgProcessed(:,i), emgFrames);
 end
@@ -132,9 +136,19 @@ for i = 1:11
      replaceMuscleLabels(h, i+12);
 end
 
-outputName = [inputc3d(1:4), '_EMG.c3d'];
+% Navigate to physical folder and save c3d there
+cd(physFolderName);
+
+outputName = [inputc3d(1:end-4), '_EMG.c3d'];
 btkWriteAcquisition(h, outputName);
 
+% Copy file back to Google Drive
+fileSource = [physFolderName, filesep, outputName];
+copyfile(fileSource, c3dFile_folder)
+
+cd(c3dFile_folder);
+
+disp(['Finished merging EMG from txt file for ', txtFile, 'into ', inputc3d])
 %% Run FFT
 % Uncomment to run FFT and ensure frequency content is not lost from
 % interp1
