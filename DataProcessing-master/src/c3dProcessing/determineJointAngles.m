@@ -1,4 +1,4 @@
-function [anglesJoint] = determineJointAngles(c3dFiles)
+function [anglesJoint] = determineJointAngles(c3dFiles, pname)
 %% JOINT ANGLES DETERMINATION
 %  Imports markers from a vicon nexus c3d file for load shraing ROM trials.
 %  Use these markers to define the angle between specific segments
@@ -16,7 +16,7 @@ function [anglesJoint] = determineJointAngles(c3dFiles)
 for c3dAcq = 1:length(c3dFiles)
      
      % Acquire list of marker data
-     [markersList] = getMarkersFromC3D(c3dFiles{c3dAcq});
+     [markersList] = getMarkersFromC3D(c3dFiles{c3dAcq}, pname);
      
      % Ground FRAME
      ground=[1 0 0 ; 0 1 0 ; 0 0 1];

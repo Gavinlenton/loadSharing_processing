@@ -1,4 +1,4 @@
-function [dataFinal] = assignForceOutputTrcMot(data)
+function [dataFinal, force_data2] = assignForceOutputTrcMot(data)
 %Assign forces to a each foot and use this data to create .trc and .mot
 %files for OpenSim
 %   % Assign force to the feet and generate the .trc and .mot files. Data
@@ -9,7 +9,7 @@ function [dataFinal] = assignForceOutputTrcMot(data)
           %Assign forces to a foot
           dataForcesAssigned = assign_forces(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[30, 0.25],data.FilterFreq);
           %Create the .trc and .mot files
-          dataFinal = btk_c3d2trc_treadmill_LS(dataForcesAssigned,'off');
+          [dataFinal, force_data2] = btk_c3d2trc_treadmill_LS(dataForcesAssigned,'off');
 
 end
 

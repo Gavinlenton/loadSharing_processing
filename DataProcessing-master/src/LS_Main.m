@@ -12,24 +12,41 @@
 % gavin.lenton@griffithuni.edu.au
 
  %% ---------------------------------------------------------------%
-
 clear;
 clc;
 
-% Choose subject folder here
-fName = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\InputData', 'Select the Subject for analysis');
+% Specify folder directories - may need to modify default directories as I
+% set this up to quickly navigate to my folders.
+
+if ismac
+    
+    % Choose subject folder here
+    fName = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/InputData', 'Select the Subject for analysis');
+    % Select physical folder directory
+    physFolder = uigetdir('/Users/s2921887/Documents/', 'Select the input data folder on your physical drive');
+    % Select MOtoNMS directory
+    motoDir = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/',...
+          'Select the folder corresponding to your MOtoNMS directory');
+    
+elseif ispc
+    
+    % Choose subject folder here
+    fName = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\InputData', 'Select the Subject for analysis');
+    % Select physical folder directory
+    physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
+    % Select MOtoNMS directory
+    motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
+          'Select the folder corresponding to your MOtoNMS directory');
+    
+end
+
+% Create directory cell array of session dates for subject chosen
 subjectDirs = dir(fName);
 isub=[subjectDirs(:).isdir];
 subjectFolders={subjectDirs(isub).name}';
 subjectFolders(ismember(subjectFolders,{'.','..'}))=[]; % dynamic subject folders
-subjectName = fName(70:end);
 
-% Select physical folder directory
-physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
-
-% Select MOtoNMS directory
-motoDir = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\',...
-          'Select the folder corresponding to your MOtoNMS directory');
+subjectName = regexp(fName, 'Subject\s\d*', 'match');
 
 %% Loop through all sessions for chosen subject.
 
@@ -43,6 +60,19 @@ for i = 1:length(subjectFolders)
      c3dFiles=dir([c3dFile_folder,'\*.c3d']);
      txtFiles=dir([c3dFile_folder,'\*.txt']);
      
+     %Name of the conditions in the session
+     isubby = [c3dFiles(:).bytes]';
+     bigFiles = find(isubby > 1500000);
+     nameOfConditions = c3dFiles(bigFiles);
+     nameOfConditions(strncmp({nameOfConditions.name}, 'Static1', 7)) = [];
+     nameOfConditions(strncmp({nameOfConditions.name}, 'KneeFJC', 7)) = [];
+     
+     sessionConditions = {};
+     for n = 1:length(nameOfConditions)
+          sessionName = nameOfConditions(n).name(1:end-19);
+          sessionConditions = [sessionConditions, sessionName];
+     end
+     
      %% RUN ACQUISITION INTERFACE IF .XML DOES NOT EXIST THEN GENERATE ONE.
      
      if ~exist(fullfile(pname, 'acquisition.xml'), 'file')
@@ -53,7 +83,7 @@ for i = 1:length(subjectFolders)
           
           % Nav to file directory
           cd([motoDir, filesep, 'src', filesep, 'AcquisitionInterface', filesep]);
-          AcquisitionInterface_LS(subjectName, pname, subjectFolders{i,1})
+          AcquisitionInterface_LS(subjectName, pname, subjectFolders{i,1});
           
      else
           message = [sprintf('acquisition.xml already exist in folder: %s', pname), ',\n continuing with analysis...'];
@@ -104,7 +134,7 @@ for i = 1:length(subjectFolders)
                          inputc3d = c3dFiles((find(not(cellfun('isempty', index)))),1).name(1:end-14);
                          
                          % Because trial names have _Processed at the end
-                         newInputc3d = [inputc3d, ];
+                         newInputc3d = inputc3d;
                          
                          % Check to see if they are now the same
                          if strcmp(newInputc3d, txtFile) == 0
@@ -153,12 +183,15 @@ for i = 1:length(subjectFolders)
      
      % Then individual trials
      for files = 1:length(trialsName)
-          cd(trialsName{files});
-          load('AnalogData.mat')
-          AnalogData.Labels(1:11) = newNames(1:11);
-          % Save file
-          save('AnalogData.mat', 'AnalogData');
-          cd ..\
+          cd(trialsName{files});  
+          % Only run this if analogData exists
+          if exist('AnalogData.mat', 'var')
+               load('AnalogData.mat')
+               AnalogData.Labels(1:11) = newNames(1:11);
+               % Save file
+               save('AnalogData.mat', 'AnalogData');
+          end
+          cd ..
      end
      
      %% LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION
@@ -171,36 +204,50 @@ for i = 1:length(subjectFolders)
      dlg_title = 'Trial for EMG normalisation'; num_lines = 1;
      def = {'KneeFJC'};
      maxName = inputdlg(prompt, dlg_title, num_lines, def);
+     maxName = [maxName{1}, '_Processed'];
      
      % Specify name of max file
-     maxc3dFile_name = [maxName{1,1}, '.c3d'];
+     maxc3dFile_name = [maxName, '.c3d'];
      
-     % Loop through c3d files
-     for t_trial = 1:length(c3dFiles)
+     % Specify name of other max file if it's in there.
+     if strcmp(maxc3dFile_name, 'KneeFJC1_Processed.c3d') == 1
+         maxc3dFileOther = 'KneeFJC2_Processed.c3d'; 
+     else
+          maxc3dFileOther = 'KneeFJC1_Processed.c3d';
+     end
+     
+     % Path to eventually store elaboratedData
+     newPathName = [strrep(pname, 'InputData', 'ElaboratedData'), filesep, 'dynamicElaborations'];
+     
+     % Specify sessionData and dynamic folders
+     sessionData = [newPathName(1:end-19), 'sessionData'];
+     sessionDirs = dir(sessionData);
+     isub=[sessionDirs(:).isdir];
+     dynamicFolders={sessionDirs(isub).name}';
+     dynamicCropFolders={sessionDirs(isub).name}';
+     dynamicFolders = selectWalkingTrials(dynamicFolders, 1); % dynamic subject folders
+     dynamicCropFolders = selectWalkingTrials(dynamicCropFolders, 0); % dynamic subject folders without KneeFJC
+     
+     % Check if EMG was captured in the session
+     % Pick first condition in the session
+     dynamicTrialsName = dynamicCropFolders{1,1};
+     emgCaptured = checkSessionEMG(subjectName, dynamicTrialsName(1:end-15));
+     
+     w = waitbar(0,'Processing your data, be patient!');
+     
+     % Loop through c3d files that aren't ROM trials
+     for t_trial = 1:length(dynamicFolders)
           
           % Load the c3d file using btk
-          c3dFile_name = c3dFiles(t_trial,1).name;
+          c3dFile_name = [dynamicFolders{t_trial,1}, '.c3d'];
           acqLS = btkReadAcquisition([c3dFile_folder, filesep, c3dFile_name]);
           
           % Load data from c3d using Glenn's function
           data = btk_loadc3d([c3dFile_folder, filesep, c3dFile_name]);
           
-          % Check if EMG was captured in the session
-          emgCaptured = checkSessionEMG(subjectName, c3dFile_name(1:end-19));
-          
-          % Create directory to eventually store elaboratedData
-          newPathName = [strrep(pname, 'InputData', 'ElaboratedData'), filesep, 'dynamicElaborations'];
+          %Create directory to store elaboratedData
           mkdir(newPathName, c3dFile_name(1:end-4));
-          
-          % Specify sessionData and dynamic folders
-          sessionData = [newPathName(1:end-19), 'sessionData'];
-          sessionDirs = dir(sessionData);
-          isub=[sessionDirs(:).isdir];
-          dynamicFolders={sessionDirs(isub).name}';
-          dynamicCropFolders={sessionDirs(isub).name}';
-          dynamicFolders(ismember(dynamicFolders,{'.','..'}))=[]; % dynamic subject folders
-          dynamicCropFolders(ismember(dynamicCropFolders,{'.','..', 'KneeFJC2', 'KneeFJC1', 'static1'}))=[];
-          
+ 
           % Navigate to InputData folder on C: because I cannot write
           % new c3dfiles to Google Drive folder.
           cd(physFolderName);
@@ -213,7 +260,7 @@ for i = 1:length(subjectFolders)
           % Function to crop
           if any(walkingTrial) == 1
                [rightHS, rightTO] = cropTrials(acqLS, c3dFile_name,data);
-          end
+          
           
           % Now have to copy the cropped c3d files from C: to Google Drive.
           % Loop through c3d files
@@ -242,47 +289,55 @@ for i = 1:length(subjectFolders)
           
           % Create a times variable with right heel-strike and right toe-off
           % to use in emg analysis.
+          % Make sure HS corresponds with TO in length otherwise error will
+          % be thrown.
+          if length(rightHS) > length (rightTO)
+               rightHS(end) = [];
+          elseif length(rightHS) < length (rightTO)
+               rightTO(end) = [];
+          end
+          
           times = [rightHS, rightTO];
           
+          end
           %% EMG PROCESSING
           
           % Only run EMG processing if EMG was collected
           if  emgCaptured == 1
                
-               %Check to see if  trial will be used as maximum for normalisation.
-               isMaxExist = [];
-               
-               for trialName = 1:length(maxName)
-                    
-                    % Inline function to determine if string exists
-                    cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
-                    cell_array = dynamicFolders;
-                    string = maxName{trialName};
-                    logicalCells = cellfun(cellfind(string), cell_array);
-                    
-                    isMaxExist = [isMaxExist, logicalCells];
-               end
-               
+               % Check to see if  trial will be used as maximum for normalisation.
+               % Inline function to determine if string exists
+               cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
+               cell_array = dynamicFolders;
+               string = maxName;
+               isMaxExist = cellfun(cellfind(string), cell_array);
+              
                % Set isMax based on the trial being a max trial (or not)
                A = ismember(dynamicFolders(any(isMaxExist,2)), c3dFile_name(1:end-4));
-               emgMaxFile = [sessionData, filesep, maxc3dFile_name(1:end-4), filesep, 'maxEMG',...
-                    filesep 'maxEmg.txt'];
+               
+               emgMaxCondition = [sessionData, filesep, maxc3dFile_name(1:end-4)];
+               emgMaxFileLoc = [sessionData, filesep, maxc3dFile_name(1:end-4), filesep, 'maxEMG'];
+               
+               % Create folder to put max EMG if it doesn't exist already
+               if ~isdir(emgMaxFileLoc)
+               mkdir(emgMaxCondition, 'maxEMG');
+               end
+               
+               % File to load emg max(if it exists)
+               [Muscle,emgMax,Trial,Times,Frame] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                
                % --Check to see if EMG data is from txt file or from .c3d to
                % know if we need to apply a notch filter--
                
                % Initialise
                asciiNames = {'Subject 6', 'Subject 8', 'Subject 13', 'Subject 14',...
-                    'Subject 15', 'Subject 16', 'Subject 17', 'Subject 18',...
-                    'Subject 19'}; % Careful because Subjects 18 and 19 contain EMG data from both sources
-               
-               isASCII = [];
+                    'Subject 15', 'Subject 16', 'Subject 17'};
                
                % Loop through subject names known have txt files
-               for subjectName = 1:length(asciiNames)
-                    k = strfind(pname, asciiNames{subjectName});
-                    isASCII = [isASCII, k];
+               for ii = 1:length(asciiNames)
+                    k = regexp(pname, asciiNames);
                end
+               
                tf = isempty(k);
                
                
@@ -291,7 +346,7 @@ for i = 1:length(subjectFolders)
                     isMax = 1;
                     
                     % Check to see if max file already exists
-                    if ~exist(emgMaxFile)
+                    if ~exist(emgMaxFile, 'file')
                          % Load data for max trial so we can process this first
                          emgProcessingMaxLS('no', sessionData, maxc3dFile_name(1:end-4), motoDir);
                          disp('maximum trial finished processing');
@@ -304,7 +359,7 @@ for i = 1:length(subjectFolders)
                     isMax = 0;
                     
                     % Check to see if max file already exists
-                    if ~exist(emgMaxFile)
+                    if ~exist(emgMaxFile, 'file')
                          
                          disp('EMG max does not exist, processing this max trial first...');
                          
@@ -314,7 +369,7 @@ for i = 1:length(subjectFolders)
                               % without notch filter
                               emgProcessingMaxLS('no', sessionData, maxName, motoDir);
                               disp('Max trial done, loading for EMG processing...');
-                              emgMax = load(emgMaxFile);
+                               [Muscle,emgMax,Trial,Times,Frame] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                               emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
                               
                          else
@@ -323,15 +378,19 @@ for i = 1:length(subjectFolders)
                               % notch filter
                               emgProcessingMaxLS('yes', sessionData, maxName, motoDir);
                               disp('Max trial done, loading for EMG processing...');
-                              emgMax = load(emgMaxFile);
+                              [Muscle,emgMax,Trial,Times,Frame] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                               emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
                               
                          end
                          
+                         % If it's the other KneeFJC trial then skip this
+                    elseif strcmp(c3dFile_name, maxc3dFileOther)
+                         disp([c3dFile_name, ' is the other max trial, but we''re using ', maxc3dFile_name]);
+                         
                     else
                          disp('Maximum trial exists, running EMG processing...');
                          % Load max trial data
-                         emgMax = load(emgMaxFile);
+                         [Muscle,emgMax,Trial,Times,Frame] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                          
                          if tf == 0
                               % Run EMG processing for .txt data
@@ -351,91 +410,75 @@ for i = 1:length(subjectFolders)
           else
                disp('No EMG captured in this armour condition, continuing with analysis...');
           end
+          waitbar(t_trial/length(dynamicFolders));
      end
+     close(w);
      
      %% PROCESSING CROPPED TRIALS FOR USE IN OPENSIM
      
      % Re-set folder as that chosen above to include new files
-     c3dFile_folderCropped = pname;
-     c3dFilesCropped=dir([c3dFile_folderCropped,'\*.c3d']);
+     croppedSessionDirs = dir([pname, '\*.c3d']);
+     isub2=[croppedSessionDirs(:).bytes]';
+     % Only include files above 2000000 bytes as these are walking trials
+     a = find(isub2 < 2000000);
      
      % Delete files I don't want to analyse
-     c3dFilesCropped(strncmp({c3dFilesCropped.name}, 'static1', 5)) = [];
-     c3dFilesCropped(strncmp({c3dFilesCropped.name}, 'fast_Processed.c3d', 18)) = [];
-     c3dFilesCropped(strncmp({c3dFilesCropped.name}, 'slow_Processed.c3d', 18)) = [];
-     c3dFilesCropped(strncmp({c3dFilesCropped.name}, 'KneeFJC1.c3d', 10)) = [];
-     c3dFilesCropped(strncmp({c3dFilesCropped.name}, 'KneeFJC2.c3d', 10)) = [];
+     c3dFilesCropped = {croppedSessionDirs(a).name}';
+     c3dFilesCropped = selectWalkingTrials(c3dFilesCropped, 0);
      
      % Run c3d2mat again on cropped trials.
-     
      % Navigate to directory where function is
      cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
      
      % Run modified c3d2mat
-     C3D2MAT_cropped(fName, c3dFilesCropped, c3dFile_folderCropped);
+     C3D2MAT_cropped(fName, c3dFilesCropped, pname);
      
-     % Navigate to sessionData folder and select AnalogDataLabels file
-     cd([strrep(pname, 'InputData', 'ElaboratedData'), filesep, 'sessionData'])
-     [matFileName, matPathName] = uigetfile('*.mat', 'Select AnalogDataLabels.mat file');
-     load(matFileName);
-     
-     % Create cell array with new channel names and file names
-     newNames = {'TA', 'Channel2', 'MG', 'LG', 'Channel5', 'BF', 'VM', 'VL',...
-          'RF', 'Sol', 'MH'};
-     
-     % Load names of trials to change channel names
-     load('trialsName.mat');
-     
-     % Replace analog labels in sessionData first
-     AnalogDataLabels(1:11) = newNames(1:11);
-     save('AnalogDataLabels.mat', 'AnalogDataLabels');
-     
-     % Then individual trials
-     for files = 1:length(trialsName)
-          cd(trialsName{files});
-          load('AnalogData.mat')
-          AnalogData.Labels(1:11) = newNames(1:11);
-          % Save file
-          save('AnalogData.mat', 'AnalogData');
-          cd ..\
-     end
-     
-     % Loop through gait cycle trials
+     %% Loop through gait cycle trials
      for croppedTrials = 1:length(c3dFilesCropped)
           
-          fileName = c3dFilesCropped(croppedTrials,1).name;
+          fileName = c3dFilesCropped{croppedTrials,1};
           
           %Load the cropped acquisition
-          data1 = btk_loadc3d([c3dFile_folderCropped, filesep, fileName], 50);
+          data1 = btk_loadc3d([pname, filesep, fileName], 50);
           
           % Assign force to feet, stitch forces together, and output .trc
           % and .mot files for further analysis.
-          dataFinal = assignForceOutputTrcMot(data1);
+          [dataFinal, force_data2] = assignForceOutputTrcMot(data1);
           
           % Check to see if forces assigned correctly
-          plot(dataFinal.fp_data.Time(:), dataFinal.GRF.FP(1).calcn_r.F(:,2),'r',...
-               dataFinal.fp_data.Time(:), dataFinal.GRF.FP(2).calcn_r.F(:,2),...
-               'k:');
+          f = figure('Name', fileName);
+          plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
+               dataFinal.fp_data.Time(:), force_data2(:,8))
+          xlabel('Time (s)'); ylabel('Force (N)'); title('Vertical GRF');
+          legend('Right foot', 'Left foot');
+          legend boxoff;
           
+          h = uicontrol('Position',[0 0 200 40],'String','Continue',...
+               'Callback','uiresume(gcbf)');
+          fprintf('\nMot file printed, click continue if you''re happy with the output\n');
+          uiwait(gcf, 5);
+          close(f);
+ 
           % Save output for future use
-          save([c3dFile_folderCropped, filesep, fileName(1:end-4), 'Data.mat'], 'dataFinal');
+          save([pname, filesep, fileName(1:end-4), 'Data.mat'], 'dataFinal');
+
+          % Close vars and figure to save memory
+          close(gcf);
+          clearvars dataFinal force_data2
      end
      
      %% ROM TRIALS PROCESSING
      
-     % Re-set folder to include the ROM trias
+     % Re-set folder to include the ROM trials only
      c3dFile_ROM = pname;
      c3dFilesROM=dir([c3dFile_ROM,'\*.c3d']);
      
      % Delete files I don't want to analyse
-     c3dFilesROM(strncmp({c3dFilesROM.name}, 'static1', 7)) = [];
-     c3dFilesROM(strncmp({c3dFilesROM.name}, 'fast', 4)) = [];
-     c3dFilesROM(strncmp({c3dFilesROM.name}, 'slow', 4)) = [];
-     c3dFilesROM(strncmp({c3dFilesROM.name}, 'KneeFJC1.c3d', 12)) = [];
-     c3dFilesROM(strncmp({c3dFilesROM.name}, 'KneeFJC2.c3d', 12)) = [];
+     c3dFilesForROM = {c3dFilesROM.name}';
+     c3dFilesForROM = selectROMTrials(c3dFilesForROM, sessionConditions);
      
      % Output max, min, and range of joint angles
-     [anglesJoint] = determineJointAngles(c3dFilesROM);
+     [anglesJoint] = determineJointAngles(c3dFilesForROM, pname);
      
      % Save to .xml
      xmlFileName = [fname, '.xml'];

@@ -1,10 +1,11 @@
-function [markersList] = getMarkersFromC3D(c3dFile)
+function [markersList] = getMarkersFromC3D(c3dFile, pname)
 %Get markers from c3d file for analysis of ROM
 %   Input ROM c3d file from load sharing data and output the marker data
 %   for joint angle calculation.
 
 % Obtain marker data
-c3dID=btkReadAcquisition(c3dFile);
+markerDataLoc = [pname, filesep, c3dFile];
+c3dID=btkReadAcquisition(markerDataLoc);
 Markers=btkGetMarkers(c3dID);
 
 % Create empty structure for marker data.

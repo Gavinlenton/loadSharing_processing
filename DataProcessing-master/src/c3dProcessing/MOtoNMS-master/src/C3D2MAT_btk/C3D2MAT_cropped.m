@@ -45,10 +45,10 @@ w = waitbar(0,'Elaborating data...Please wait!');
 for k=1:length(c3dFiles)
     
     %correction of the name --> after uniformation it should not be necessary
-    trialsName{k} = regexprep(regexprep((regexprep(c3dFiles(k).name, ' ' , '')), '-',''), '.c3d', '');
+    trialsName{k} = regexprep(regexprep((regexprep(c3dFiles{k}, ' ' , '')), '-',''), '.c3d', '');
     
     %Folders and paths creation
-    c3dFilePathAndName = fullfile (pathName, c3dFiles(k).name);
+    c3dFilePathAndName = fullfile (pathName, c3dFiles{k});
         
    
     %Data Reading    

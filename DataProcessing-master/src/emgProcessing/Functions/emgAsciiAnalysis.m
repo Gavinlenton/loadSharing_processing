@@ -139,7 +139,7 @@ end
 % Navigate to physical folder and save c3d there
 cd(physFolderName);
 
-outputName = [inputc3d(1:end-4), '_EMG.c3d'];
+outputName = inputc3d;
 btkWriteAcquisition(h, outputName);
 
 % Copy file back to Google Drive
@@ -148,7 +148,7 @@ copyfile(fileSource, c3dFile_folder)
 
 cd(c3dFile_folder);
 
-disp(['Finished merging EMG from txt file for ', txtFile, 'into ', inputc3d])
+disp(['Finished merging EMG from txt file ', txtFile, ' into ', inputc3d, ', good job, bro'])
 %% Run FFT
 % Uncomment to run FFT and ensure frequency content is not lost from
 % interp1

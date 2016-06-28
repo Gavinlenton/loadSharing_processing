@@ -10,7 +10,13 @@ function [emgCaptured] = checkSessionEMG(subject, c3dinSession)
 
 load('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\emgExist4Subject.mat')
 
-subjectName = [subject(1:end-2), subject(end)];
+% Find the subject number
+Key   = 'Subject';
+Index = strfind(subject, Key);
+Value = sscanf(subject(Index(1) + length(Key):end), '%g', 1);
+
+% Add onto the subject
+subjectName = ['Subject', num2str(Value)];
 
 emgUsedInSession = emgSubjects.(subjectName).(c3dinSession);
 

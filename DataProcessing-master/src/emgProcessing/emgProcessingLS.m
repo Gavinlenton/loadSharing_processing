@@ -74,10 +74,10 @@ emgLabelsCEINMS = {'tibant_r', 'Channel2', 'gasmed_r', 'gaslat_r', 'Channel5' 'b
      'vaslat_r', 'recfem_r', 'sol_r', 'semimem_r'};
 
 %% Muscle groups
-quadsLabels = {'rf', 'vaslat', 'vasmed'};
-hamsLabels = {'bifem', 'semimem'};
-medialLabels = {'medgas', 'semimem', 'vasmed'};
-lateralLabels = {'latgas', 'bifem', 'vaslat'};
+% quadsLabels = {'rf', 'vaslat', 'vasmed'};
+% hamsLabels = {'bifem', 'semimem'};
+% medialLabels = {'medgas', 'semimem', 'vasmed'};
+% lateralLabels = {'latgas', 'bifem', 'vaslat'};
 
 %% Gait sub-phases as defined in Sturnieks et al 2011
 preContactTime = 0.05; % 50 ms prior to heelstrike
@@ -91,7 +91,7 @@ emgMeasures = {'directedCoContraction', 'totalActivation', 'individualMuscles'};
 musclePairs = {'quadAndHams' , 'flexorsVsExtensors', 'medialToLateralwGastrocs', 'medialToLateralNoGastrocs'};
 
 %% Directories and files
-motoNmsSrcDir = motoDir;
+motoNmsSrcDir = [motoDir, filesep, 'src'];
 % trialsFile = 'C:\Users\s2790936\Desktop\SCOPEX\SCOPEX Trials DJS.xlsm';
 % maxDir = 'C:\Users\s2790936\Desktop\SCOPEXTemp\Baseline'; % Max's
 
@@ -104,7 +104,6 @@ cd(originalPath)
 
 %% Load session data
 analogData = [sessionData, filesep, sessionName]; % Dynamic subject dir
-maxData = [sessionData, filesep, maxc3dFileName]; % Max trial dir
 
 %% Make empty summary structure for end of processing
 for p = 1:length(gaitPhases)
@@ -142,16 +141,12 @@ emgFile1 = fullfile(analogData, suffix);
 % File 1
 try
      emgData1 = load(emgFile1);
-catch me1
+catch
      disp(['No such file ', emgFile1, ' , continuing with analysis'])
 end
 
 %% Initialize some values
-try
      channels = fieldnames(emgData1);
-catch me
-     disp(['No such file ', emgFile1, ' , check the filename'])
-end
 
 %% Condition raw emg signal
      nDataPoints = 1;
@@ -172,7 +167,7 @@ for n = 1:length(emgLabelsInMatFile)
                     try
                          emgData(:,n) = emgData1.(channels{x}).RawData(:,n);
                          break;
-                    catch me
+                    catch
                          tempData = emgData1.(channels{x}).RawData(:,n);
                          if length(tempData) > size(emgData,1)
                               emgData(:,n) = tempData(1:size(emgData,1),:);
@@ -249,7 +244,7 @@ for cycle = 1:length(timePoints)-1
                heelStrike2Time = timePoints(cycle+2,1);
                
                % Error if timePoints index is wrong
-               catch err
+               catch
                
                     disp('No more heel strikes to work with')
                     break
@@ -292,10 +287,11 @@ for cycle = 1:length(timePoints)-1
           AnalogData.RawData(startAt:endAt, 7), AnalogData.RawData(startAt:endAt, 8), ...
           AnalogData.RawData(startAt:endAt, 9), AnalogData.RawData(startAt:endAt, 10), AnalogData.RawData(startAt:endAt,11)];
      
-     % signal dimensions
-     lengthOfSignal = size(dynamicEMGMatrix,1);
-     % define frequency domain
-     f = emgSamplingRate*(0:(lengthOfSignal/2))/lengthOfSignal;
+%      % signal dimensions
+%      lengthOfSignal = size(dynamicEMGMatrix,1);
+     
+%      % define frequency domain
+%      f = emgSamplingRate*(0:(lengthOfSignal/2))/lengthOfSignal;
      
      % Condition the dynamic EMG
      for n = 1:length(emgLabelsInMatFile)
@@ -309,25 +305,27 @@ for cycle = 1:length(timePoints)-1
           % Apply notch filter
           notchedSignal = filter(notchFilter, bandPassOut);
           
-          % Fast fourier transform on the band-passed signal
-          fastFourierBandPassSignal = fft(bandPassOut);
-          
-          % FFT on the notched signal as well
-          fastFourierNotchedSignal = fft(notchedSignal);
-          
-          % Two sided spectrum of FFT non-notched
-          P2 = abs(fastFourierBandPassSignal/lengthOfSignal);
-          P1 = P2(1:round(lengthOfSignal/2)+1);
-          P1(2:end-1) = 2*P1(2:end-1);
-          
-          % Two sided spectrum of FFT notched signal
-          P2n = abs(fastFourierNotchedSignal/lengthOfSignal);
-          P1n = P2n(1:round(lengthOfSignal/2)+1);
-          P1n(2:end-1) = 2*P1n(2:end-1);
-          
-          if ~isequal(length(f), length(P1))
-               f = emgSamplingRate*(0:((lengthOfSignal+1)/2))/(lengthOfSignal+1);
-          end
+        % -----  UNCOMMENT TO RUN FFT ----- %
+        
+%           % Fast fourier transform on the band-passed signal
+%           fastFourierBandPassSignal = fft(bandPassOut);
+%           
+%           % FFT on the notched signal as well
+%           fastFourierNotchedSignal = fft(notchedSignal);
+%           
+%           % Two sided spectrum of FFT non-notched
+%           P2 = abs(fastFourierBandPassSignal/lengthOfSignal);
+%           P1 = P2(1:round(lengthOfSignal/2)+1);
+%           P1(2:end-1) = 2*P1(2:end-1);
+%           
+%           % Two sided spectrum of FFT notched signal
+%           P2n = abs(fastFourierNotchedSignal/lengthOfSignal);
+%           P1n = P2n(1:round(lengthOfSignal/2)+1);
+%           P1n(2:end-1) = 2*P1n(2:end-1);
+%           
+%           if ~isequal(length(f), length(P1))
+%                f = emgSamplingRate*(0:((lengthOfSignal+1)/2))/(lengthOfSignal+1);
+%           end
           
           % Full-wave rectify
           if strcmp(isNotch, 'yes') == 1
@@ -340,7 +338,7 @@ for cycle = 1:length(timePoints)-1
           lowPassOut = lpfilter(fullWaveRectifiedSignal, lowPassCutOff, emgSamplingRate, filterType);
           
           % Find max
-          dynamicTrialScaledEmg(:, n) = lowPassOut/emgMax(1,n);
+          dynamicTrialScaledEmg(:, n) = lowPassOut/emgMax(n,1);
 
           
           % Check if the linear envelope has scaled signal > 1
@@ -520,33 +518,35 @@ for cycle = 1:length(timePoints)-1
                                    end
                               end
                          else % total activation
+                              for y = 1:length(medialPlus)
                               emgMetric(y,:) = lateralPlus(y,:) + medialPlus(y,:);
+                              end
                          end
                          
                     elseif mP == 4 % medial to lateral with no gastrocs
                          emgMetric = zeros(length(medial), 1);
-                         if eM == 1 % directed co-contraction
-                              for y = 1:length(medial)
+                         for y = 1:length(medial)
+                              if eM == 1 % directed co-contraction
                                    if medial(y,:)>lateral(y,:)
                                         emgMetric(y,:) = 1 - (lateral(y,:)/medial(y,:));
                                    else
                                         emgMetric(y,:) = (medial(y,:)/lateral(y,:)) - 1;
                                    end
+                              else % total activation
+                                   emgMetric(y,:) = lateral(y,:) + medial(y,:);
                               end
-                         else % total activation
-                              emgMetric(y,:) = lateral(y,:) + medial(y,:);
                          end
                     end
                     
                     % Passing to structure
                     emgMetrics.(analogData).(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = emgMetric;
-                    subjectEmgMetrics.(analogData).(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = emgMetric;
                end
           end
      end
      save([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs', filesep, ['EMGsMetrics', num2str(cycle), '.mat']], 'emgMetrics')
 end
 
+clearvars -except motoDir
 % %% make means from the individual's stacks
 % type=fieldnames(subjectEmgMetrics.(analogData));
 % for t = 1:length(type)

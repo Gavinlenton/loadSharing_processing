@@ -1,4 +1,4 @@
-function data = btk_c3d2trc_treadmill_LS(varargin)
+function [data, force_data2] = btk_c3d2trc_treadmill_LS(varargin)
 % function btk_c3d2trc_treadmill(file) OR
 % function btk_c3d2trc_treadmill(data)
 %
@@ -352,7 +352,6 @@ if isfield(data,'fp_data')
      % WRite the MOT file using MOtoNMS function
      writeMot_LS(force_data2 ,force_data_out(:,1), [finalpathname filesep newfilename]);
      
-     disp('Done.')
      cd ..\
      
 else disp('No force plate information available.')
