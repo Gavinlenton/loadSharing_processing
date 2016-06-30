@@ -40,7 +40,7 @@ if nargin > 0
                fname = [name ext];
           end
           % load the c3dfile
-          [data.marker_data, data.analog_data, data.fp_data, data.sub_info] = btk_loadc3d([pname, fname], 10);
+          data = btk_loadc3d([pname, fname], 10);
           
      else
           data = varargin{1};
@@ -173,22 +173,24 @@ format_text = [format_text '\n'];
 disp('Writing trc file...')
 
 %Output marker data to an OpenSim TRC file
+indexName = regexp(fname(1:end-4), 'd\d*');
+name = fname(1:indexName);
 
 newfilename = strrep(fname,'c3d','trc');
 newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
-     'dynamicElaborations\', fname(1:14)];
+     'dynamicElaborations', filesep, name];
 
 mkdir(newpathname, fname(1:end-4));
 %Create new folder to store .trc and .mot files
-finalpathname = [newpathname, '\', fname(1:end-4)];
+finalpathname = [newpathname, filesep, name];
 mkdir(newpathname, fname(1:end-4));
 
 cd(finalpathname);
 
-data.TRC_Filename = [finalpathname '\' newfilename];
+data.TRC_Filename = [finalpathname, filesep, newfilename];
 
 %open the file
-fid_1 = fopen([finalpathname '\' newfilename],'w');
+fid_1 = fopen([finalpathname , filesep, newfilename],'w');
 
 % first write the header data
 fprintf(fid_1,'PathFileType\t4\t(X/Y/Z)\t %s\n',newfilename);

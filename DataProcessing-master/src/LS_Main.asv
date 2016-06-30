@@ -1,4 +1,4 @@
-%% -------------------------------------------------------------%%
+ %% -------------------------------------------------------------%%
 
 % This script will:
 % - Generate the appropriate files to run an OpenSim simulation sequence for the Load Sharing Data
@@ -11,8 +11,7 @@
 % Written by Gavin Lenton June 2016
 % gavin.lenton@griffithuni.edu.au
 
-% ---------------------------------------------------------------%
-
+ %% ---------------------------------------------------------------%
 clear;
 clc;
 
@@ -20,31 +19,31 @@ clc;
 % set this up to quickly navigate to my folders.
 
 if ispc
-     
-     % Choose subject folder here
-     fName = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\InputData', 'Select the Subject for analysis');
-     
-     % Select physical folder directory
-     physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
-     
-     % Auto defines motonms directory (may need to change if your folder
-     % structure is different - but it shouldn't be)
-     motoDir = [fName(1:(regexp(fName, '\WInput'))), 'DataProcessing-master', filesep...
-          'src', filesep, 'c3dProcessing', filesep, 'MOtoNMS-master'];
-     
+    
+    % Choose subject folder here
+    fName = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\InputData', 'Select the Subject for analysis');
+    
+    % Select physical folder directory
+    physFolder = uigetdir('C:\Users\s2921887\Documents\', 'Select the input data folder on your physical drive');
+    
+    % Auto defines motonms directory (may need to change if your folder
+    % structure is different - but it shouldn't be)
+    motoDir = [fName(1:(regexp(fName, '\WInput'))), 'DataProcessing-master', filesep...
+     'src', filesep, 'c3dProcessing', filesep, 'MOtoNMS-master'];
+
 else
-     
-     % Choose subject folder here
-     fName = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/InputData', 'Select the Subject for analysis');
-     
-     % Select physical folder directory
-     physFolder = uigetdir('/Users/s2921887/Documents/', 'Select the input data folder on your physical drive');
-     
-     % Auto defines motonms directory (may need to change if your folder
-     % structure is different - but it shouldn't be)
-     motoDir = [fName(1:(regexp(fName, '\WInput'))), 'DataProcessing-master', filesep...
-          'src', filesep, 'c3dProcessing', filesep, 'MOtoNMS-master'];
-     
+    
+    % Choose subject folder here
+    fName = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/InputData', 'Select the Subject for analysis');
+    
+    % Select physical folder directory
+    physFolder = uigetdir('/Users/s2921887/Documents/', 'Select the input data folder on your physical drive');
+    
+    % Auto defines motonms directory (may need to change if your folder
+    % structure is different - but it shouldn't be)
+    motoDir = [fName(1:(regexp(fName, '\WInput'))), 'DataProcessing-master', filesep...
+     'src', filesep, 'c3dProcessing', filesep, 'MOtoNMS-master'];
+    
 end
 
 % Create directory cell array of session dates for chosen subject
@@ -73,14 +72,17 @@ for i = 1:length(subjectFolders)
      if ~exist(fullfile(pname, 'acquisition.xml'), 'file')
           disp('acquisition.xml file does not exist, running AcquisitionInterface...');
           
-          % Nav to file directory and run modified interface function
+          % Run Acquisition Interface for each session to determine subject name,
+          % weight, and height for use in LinScale
+          
+          % Nav to file directory
           cd([motoDir, filesep, 'src', filesep, 'AcquisitionInterface', filesep]);
           AcquisitionInterface_LS(subjectName, pname, subjectFolders{i,1});
           
      else
           % It exists so continue happily
           message = [sprintf('acquisition.xml already exist in folder: %s', pname), ',\n continuing with analysis...'];
-          disp(message)
+          disp(message)  
      end
      
      %% MERGE EMG IF COLLECTED INTO A TXT FILE
@@ -90,10 +92,12 @@ for i = 1:length(subjectFolders)
           'EMG Merging', 'Yes', 'No', 'No');
      
      if strcmp(mergeEMG, 'Yes') == 1
-          % Merge EMG data
-          mergeEmgMain(c3dFiles, txtFiles, physFolderName)
           
+          % Merge EMG data
+         mergeEmgMain(c3dFiles, txtFiles, physFolderName)
+         
      else
+          
           % If not merging then continue with analysis
           disp('EMG not merged with c3d file, continuing with analysis...');
      end
@@ -104,17 +108,13 @@ for i = 1:length(subjectFolders)
      cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
      % Run c3d2mat
      C3D2MAT(fName);
-     % Replace emg analog labels
-     replaceAnalogLabels(pname);
+     replaceAnalogLabels(pname)
      
      %% LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION
      
      % Define all required path names
-     [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
-          sessionData, maxc3dFileOther, maxName] = initialiseForAnalysis(pname);
-     
-     %Create directory to store elaboratedData
-     mkdir(newPathName, c3dFile_name(1:end-4));
+    [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
+     sessionData, maxc3dFileOther, maxName] = initialiseForAnalysis(pname);
      
      % Check if EMG was captured in the session
      % Pick first condition in the session
@@ -126,15 +126,21 @@ for i = 1:length(subjectFolders)
      % Loop through c3d files that aren't ROM trials
      for t_trial = 1:length(dynamicFolders)
           
-          % Load the c3d file and data using btk
+          % Load the c3d file using btk
           c3dFile_name = [dynamicFolders{t_trial,1}, '.c3d'];
           acqLS = btkReadAcquisition([c3dFile_folder, filesep, c3dFile_name]);
+          
+          % Load data from c3d 
           data = btk_loadc3d([c3dFile_folder, filesep, c3dFile_name]);
           
-          %% --- CROP TRIALS --- %%
-          [times] = cropTrialsMain(c3dFile_name, physFolderName, acqLS, dynamicCropFolders);
+          %Create directory to store elaboratedData
+          mkdir(newPathName, c3dFile_name(1:end-4));
           
-          %% --- EMG PROCESSING --- %%
+          % --- Crop trials and output times to use for EMG analysis --- %
+          [times] = cropTrialsMain(c3dFile_name, physFolderName, acqLS, dynamicCropFolders);
+         
+          % --- EMG PROCESSING --- %
+          
           % Only run EMG processing if EMG was collected
           if  emgCaptured == 1
                
@@ -148,9 +154,9 @@ for i = 1:length(subjectFolders)
      end
      close(w);
      
-     %% --- PROCESSING CROPPED TRIALS FOR USE IN OPENSIM --- %%
+     %% PROCESSING CROPPED TRIALS FOR USE IN OPENSIM
      croppedTrialsProcessing(pname)
-     
-     %% --- ROM TRIALS PROCESSING --- %%
+
+     %% ROM TRIALS PROCESSING
      ROMTrialsProcessing(pname, i, sessionConditions)
 end
