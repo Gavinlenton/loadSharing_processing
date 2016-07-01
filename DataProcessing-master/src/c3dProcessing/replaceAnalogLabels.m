@@ -5,7 +5,7 @@ function replaceAnalogLabels(pname)
 
      % Navigate to sessionData folder and select AnalogDataLabels file
      cd([strrep(pname, 'InputData', 'ElaboratedData'), filesep, 'sessionData'])
-     [matFileName, ~] = uigetfile('*.mat', 'Select AnalogDataLabels.mat file');
+     matFileName = 'AnalogDataLabels.mat';
      load(matFileName);
      
      % Create cell array with new channel names and file names

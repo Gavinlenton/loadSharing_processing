@@ -85,7 +85,7 @@ for i = 1:length(subjectFolders)
      % Navigate to directory where function is
      cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
      % Run c3d2mat
-     C3D2MAT(fName);
+     C3D2MAT(fName, c3dFiles, pname);
      % Replace emg analog labels
      replaceAnalogLabels(pname);
      

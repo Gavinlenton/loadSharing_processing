@@ -23,7 +23,7 @@ for trial = 1:length(txtFiles)
                
                % Find the correct c3d file to match txt file
                t = struct2cell(c3dFiles)';
-               index = strfind(t(:,1), txtFile);
+               index = regexpi(t(:,1), txtFile);
                inputc3d = c3dFiles((find(not(cellfun('isempty', index)))),1).name(1:end-14);
                
                % Because trial names have _Processed at the end

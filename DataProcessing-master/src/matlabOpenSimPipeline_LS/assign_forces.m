@@ -98,6 +98,12 @@ for i = 1:length(data.fp_data.GRF_data)
           % miliseconds is considered a new event (change the 0.025 value below
           % to adjust this).
           dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
+          
+          % If dnt is empty then try reducing gap length to 0.010
+          if isempty(dnt)
+               dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.010);
+          end
+          
           on_i = [nt(1); nt(dnt+1)];
           off_i = [nt(dnt); nt(end)];
           
@@ -133,6 +139,7 @@ for i = 1:length(data.fp_data.GRF_data)
                on_i = [nt(1); nt(dnt+1)];
                off_i = [nt(dnt); nt(end)];
                
+               % Check parameters for inconsistencies.
                if (off_i(1)-on_i(1)) < 7
                     off_i(1) = [];
                     on_i(1) = [];
@@ -152,6 +159,61 @@ for i = 1:length(data.fp_data.GRF_data)
                     on_i(ns+1) = [];
                end
           end
+          
+           if i == 2 && length(on_i) ~= 3
+               disp('Not enough events on FP2, modifying parameters')
+               % Try increasing threshold
+               try thresh = 50;
+               nt = find(Fv>thresh(1));
+               dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
+               on_i = [nt(1); nt(dnt+1)];
+               off_i = [nt(dnt); nt(end)];
+               disp('Changed FP thresh');
+               catch
+               end
+               if length(on_i) ~= 3
+                    
+                    % Then try reducing time between events
+                    thresh = 30;
+                    nt = find(Fv>thresh(1));
+                    disp('Changed time between events');
+               
+               try dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
+                         on_i = [nt(1); nt(dnt+1)];
+                         off_i = [nt(dnt); nt(end)];
+               catch
+               end
+               end
+               if length(on_i) ~= 3
+                    % Do both
+                    thresh = 50;
+                    nt = find(Fv>thresh(1));
+                    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
+                    on_i = [nt(1); nt(dnt+1)];
+                    off_i = [nt(dnt); nt(end)];
+                    disp('Changed FP thresh and event timing');
+               end
+           end
+               
+           % Check parameters for inconsistencies.
+           if (off_i(1)-on_i(1)) < 7
+                off_i(1) = [];
+                on_i(1) = [];
+           end
+           
+           if (off_i(end)-on_i(end)) < 7
+                off_i(end) = [];
+                on_i(end) = [];
+           end
+           
+           ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.1);
+           if ~isempty(ns)
+                if ns(end) == length(off_i)
+                     ns(end) = [];
+                end
+                off_i(ns) = [];
+                on_i(ns+1) = [];
+           end
           
           % loop through each event (from one value of on_i to its corresponding off_i)
           % and determine which of the bodies is contacting to make this force
@@ -338,6 +400,7 @@ for i = 1:length(data.fp_data.GRF_data)
           end
      else
           disp(['There is no GRF data for force plate ', num2str(i), ', please check the trial data']);
+          
      end
 end
 

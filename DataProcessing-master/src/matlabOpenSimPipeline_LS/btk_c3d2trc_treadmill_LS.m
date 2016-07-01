@@ -305,8 +305,11 @@ if isfield(data,'fp_data')
                     
                     % Determine difference between end of FP1 and start of
                     % FP2
+                    if ~isempty(endFrameFP2y)
                     differenceFP2 = startFrameFP2end(end) - (endFrameFP2y(1) +500);
-                    
+                    else
+                         differenceFP2 = startFrameFP2end(end);
+                    end
                     startCropFrame2 = startFrameFP2end(end) - (differenceFP2/2) -10;
                     
                     % Stitch these forces onto those from Plate 1 for end
