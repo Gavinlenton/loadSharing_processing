@@ -1,4 +1,4 @@
-function [] = emgProcessingLS(isNotch, sessionData, timePoints, sessionName, emgMax, motoDir)
+function emgProcessingLS(isNotch, sessionData, timePoints, sessionName, emgMax, motoDir)
 %Input if Notch is required (Yes, No), session Data, timePoints from
 %cropping for processing of EMG data, and sessionName (e.g., fast or slow
 %walking). emgMax specifies the maxEMG file used for normalisation.
@@ -104,31 +104,6 @@ cd(originalPath)
 
 %% Load session data
 analogData = [sessionData, filesep, sessionName]; % Dynamic subject dir
-
-%% Make empty summary structure for end of processing
-for p = 1:length(gaitPhases)
-     for eM = 1:length(emgMeasures)
-          if eM ~= 3
-               for mP = 1:length(musclePairs)
-                    emgMetrics.('means').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-                    emgMetrics.('means').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-                    emgMetrics.('stats').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-                    emgMetrics.('stats').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-                    emgMetrics.('stack').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-                    emgMetrics.('stack').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(musclePairs{mP}) = [];
-               end
-          else
-               for iM = 1:length(emgLabelsCEINMS)
-                    emgMetrics.('means').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-                    emgMetrics.('means').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-                    emgMetrics.('stats').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-                    emgMetrics.('stats').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-                    emgMetrics.('stack').('FastWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-                    emgMetrics.('stack').('NormalWalking').(gaitPhases{p}).(emgMeasures{eM}).(emgLabelsCEINMS{iM}) = [];
-               end
-          end
-     end
-end
 
 %% Specify emg.mat file
 
@@ -275,7 +250,11 @@ for cycle = 1:length(timePoints)-1
      
      % Crop time to be from heelStrikeInEMGFrame - preContactTime to
      % heelStrike2InEMGFrame
+     timeEnd = numel(time);
+     
+     if timeEnd > heelStrike2InEMGFrame
      timeGaitCycle = time(heelStrikeInEMGFrame-40):emgSamplingTimeStep:time(heelStrike2InEMGFrame+10);
+     
      
      % Initialise
      dynamicTrialScaledEmg = zeros(length(gaitCycleLength), length(emgLabelsInMatFile));
@@ -544,8 +523,10 @@ for cycle = 1:length(timePoints)-1
           end
      end
      save([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs', filesep, ['EMGsMetrics', num2str(cycle), '.mat']], 'emgMetrics')
-end
+     else
+     end
 
+end
 clearvars -except motoDir
 % %% make means from the individual's stacks
 % type=fieldnames(subjectEmgMetrics.(analogData));

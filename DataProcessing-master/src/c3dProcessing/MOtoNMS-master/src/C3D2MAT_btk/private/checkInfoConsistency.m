@@ -37,18 +37,18 @@ switch tag
             if (isempty(checkLabels)&& isempty(checkType) && isempty(checkCorners) && isempty(checkOrigin))
                 return
             else
-                disp(['Data Inconsistency: ForcePlatformInfo differs among trials (FP ' num2str(i) ')'])
+%                 disp(['Data Inconsistency: ForcePlatformInfo differs among trials (FP ' num2str(i) ')'])
             end
         end
 
     case 'Rates'
         if (isempty(info.VideoFrameRate) || isempty(info.AnalogFrameRate))
-            disp('At least a frame rate empty')
+%             disp('At least a frame rate empty')
         else
             if (info.VideoFrameRate==newInfo.VideoFrameRate && info.AnalogFrameRate==newInfo.AnalogFrameRate)
                 return
             else
-                disp('Data Inconsistency: Rates differs among trials')
+%                 disp('Data Inconsistency: Rates differs among trials')
             end
         end
         
@@ -60,10 +60,10 @@ switch tag
             if (strcmp(info,newInfo))
                 return
             else
-                disp(['Data Inconsistency: ' tag ' differs from the already saved as common session info'])
+%                 disp(['Data Inconsistency: ' tag ' differs from the already saved as common session info'])
             end
             
         else
-            disp(['Warning: Number of ' tag ' is different from the already saved as common session info'])
+%             disp(['Warning: Number of ' tag ' is different from the already saved as common session info'])
         end
 end

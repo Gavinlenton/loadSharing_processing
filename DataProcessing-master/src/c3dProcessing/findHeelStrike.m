@@ -25,8 +25,8 @@ toeOffR = data.marker_data.Markers.SAC1 - data.marker_data.Markers.RMT1;
 % Make sure events correspond with frame correctly. 
 firstFrame = data.marker_data.First_Frame;
 
-HSRight = HSRight + firstFrame;
-TORight = TORight + firstFrame;
+HSRight = (HSRight) + firstFrame;
+TORight = (TORight) + firstFrame;
 
 end
 

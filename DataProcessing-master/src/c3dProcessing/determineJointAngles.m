@@ -1,4 +1,4 @@
-function [anglesJoint] = determineJointAngles(c3dFiles, pname)
+function [jointAngles] = determineJointAngles(c3dFiles, pname)
 %% JOINT ANGLES DETERMINATION
 %  Imports markers from a vicon nexus c3d file for load shraing ROM trials.
 %  Use these markers to define the angle between specific segments
@@ -11,6 +11,7 @@ function [anglesJoint] = determineJointAngles(c3dFiles, pname)
 % (computeCoordinateFramesAndEulerRotations)
 %         - - - - - - - %% - - - - - - - -
 %% ----- VICON Marker positions
+jointAngles = struct();
 
 % Loop through the ROM trials
 for c3dAcq = 1:length(c3dFiles)
@@ -76,13 +77,13 @@ for c3dAcq = 1:length(c3dFiles)
      % THESE VALUES ARE IN DEGREES
      
      % Empty structure for outputs
-     anglesJoint = struct();
+     
      outputs = {'Max', 'Min', 'Range'};
      
-     for k = 1:length(anglesList)
+     for k = 1:length(angles)
           
           % Define angles for analysis
-          anglesData = anglesList{k};
+          anglesData = abs(anglesList.(angles{k}));
           
           % Calculate max, min, and ROM
           maximum = max(anglesData);
@@ -90,9 +91,9 @@ for c3dAcq = 1:length(c3dFiles)
           ROM = range(anglesData);
           
           % Save data to structure
-          anglesJoint.(c3dFiles{c3dAcq}).(anglesList{k}).(outputs{1}) = maximum;
-          anglesJoint.(c3dFiles{c3dAcq}).(anglesList{k}).(outputs{2}) = minimum;
-          anglesJoint.(c3dFiles{c3dAcq}).(anglesList{k}).(outputs{3}) = ROM;
+          jointAngles.(string(1:end-4)).(angles{k}).(outputs{1}) = maximum;
+          jointAngles.(string(1:end-4)).(angles{k}).(outputs{2}) = minimum;
+          jointAngles.(string(1:end-4)).(angles{k}).(outputs{3}) = ROM;
           
      end
 end

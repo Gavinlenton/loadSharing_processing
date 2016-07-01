@@ -1,4 +1,4 @@
-function  ROMTrialsProcessing(pname, subjectNumber, sessionConditions)
+function  ROMTrialsProcessing(pname, sessionConditions, fName)
 %Evaluates the range of motion trials and saves output angles to an xml
 %file
 %   Input the name of directory containing the ROM c3d files and evaluate
@@ -16,11 +16,20 @@ function  ROMTrialsProcessing(pname, subjectNumber, sessionConditions)
      % Output max, min, and range of joint angles
      [anglesJoint] = determineJointAngles(c3dFilesForROM, pname);
      
-     % Save to .xml
-     xmlFileName = [fname, '.xml'];
+     % Save mat file
+     matFileDir = [regexprep(fName, 'Input', 'Elaborated'), filesep, 'ROM'];
+     
+     if ~isdir(matFileDir)
+          mkdir(matFileDir)
+     end
+     
+     % Function to average the three trials
+     [anglesJointMean] = findMeanOfROMTrials(anglesJoint, sessionConditions, matFileDir);
      
      % Save each session in separate tabs
-     xmlwrite(xmlFileName, anglesJoint, ['Session', num2str(subjectNumber)]);
-
+     fileName = 'romData.mat';
+     save([matFileDir, filesep, fileName], 'anglesJointMean', 'anglesJoint');
+     
+     clearvars anglesJointMean anglesJoint matFileDir
 end
 

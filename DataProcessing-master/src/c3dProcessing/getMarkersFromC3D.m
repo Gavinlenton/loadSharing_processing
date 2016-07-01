@@ -14,14 +14,14 @@ markersList = struct();
 % Define the marker trajectories of interest
 markerNames = {'LASI' ,'LPSI', 'LLFC', 'LMFC', 'LMT1', 'LMT5', 'LCAL', 'LLMAL', 'LMMAL',... % LEFT SIDE HIP/LEG
      'RASI' ,'RPSI', 'RLFC', 'RMFC', 'RMT1', 'RMT5', 'RCAL', 'RLMAL', 'RMMAL',... % RIGHT SIDE HIP/LEG
-     'T8', 'CLAV', 'THO3', 'LACR1', 'LPUA1', 'LPUA2', 'LPUA3', 'LLEP', 'LMEP', 'LWRU', 'LWRR', 'LCAR',... % TORSO AND LEFT SIDE ARM
-     'RACR1', 'RPUA1', 'RPUA2', 'RPUA3', 'RLEP', 'RMEP', 'RWRU', 'RWRR', 'RCAR'}; % RIGHT SIDE ARM
+     'T8', 'CLAV', 'THO3', 'LACR1', 'LPUA1', 'LPUA2', 'LPUA3', 'LLEP', 'LMEP', 'LCAR',... % TORSO AND LEFT SIDE ARM
+     'RACR1', 'RPUA1', 'RPUA2', 'RPUA3', 'RLEP', 'RMEP', 'RCAR'}; % RIGHT SIDE ARM
 
 % Loop through all markers and obtain those in c3d from markerNames list.
-for markers = 5:length(markerNames)
+for markers = 1:length(markerNames)
      try
      markersList.(markerNames{markers}) = Markers.(markerNames{markers})(:,1:3);
-     catch me % Catch if marker is not in c3d file and break the for-loop
+     catch % Catch if marker is not in c3d file and break the for-loop
           disp(['Marker ', markerNames{markers},...
                ' does not exist in c3d file, please check ' c3dFile,...
                ' for missing trajectories'])

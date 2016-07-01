@@ -182,12 +182,10 @@ newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
 
 mkdir(newpathname, fname(1:end-4));
 %Create new folder to store .trc and .mot files
-finalpathname = [newpathname, filesep, name];
-mkdir(newpathname, fname(1:end-4));
+finalpathname = [newpathname, filesep, fname(1:end-4)];
+mkdir(finalpathname);
 
 cd(finalpathname);
-
-data.TRC_Filename = [finalpathname, filesep, newfilename];
 
 %open the file
 fid_1 = fopen([finalpathname , filesep, newfilename],'w');

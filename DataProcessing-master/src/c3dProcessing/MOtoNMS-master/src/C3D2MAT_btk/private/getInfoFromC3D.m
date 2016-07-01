@@ -43,7 +43,7 @@ function [Markers, AnalogData, FPdata, Events, ForcePlatformInfo,Rates] = getInf
 %See: http://b-tk.googlecode.com/svn/doc/Matlab/0.1/_warnings_i_d.html for
 %more information
 h=btkReadAcquisition(c3dFilePathAndName);
-disp([c3dFilePathAndName ' has been loaded.']); 
+% disp([c3dFilePathAndName ' has been loaded.']); 
 
 %--------------------------------------------------------------------------
 %                                MARKERS 
@@ -53,7 +53,7 @@ try
     
 catch me
     Markers=[];
-    disp(['WARNING! ' c3dFilePathAndName ': no markers have been stored in mat format. Please, check if this is correct!']);
+%     disp(['WARNING! ' c3dFilePathAndName ': no markers have been stored in mat format. Please, check if this is correct!']);
 end
 
 %--------------------------------------------------------------------------
@@ -64,7 +64,7 @@ if nargout > 1
         AnalogData = getAnalogData(h);
     catch me
         AnalogData = [];
-        disp(['WARNING! ' c3dFilePathAndName ': no analog data have been stored in mat format. Please, check if this is correct!']);
+%         disp(['WARNING! ' c3dFilePathAndName ': no analog data have been stored in mat format. Please, check if this is correct!']);
     end
 end
 
@@ -78,7 +78,7 @@ if nargout > 2
         
     catch me
         FPdata = [];
-        disp(['WARNING! ' c3dFilePathAndName ': no data from force platforms have been stored in mat format. Please, check if this is correct!']); 
+%         disp(['WARNING! ' c3dFilePathAndName ': no data from force platforms have been stored in mat format. Please, check if this is correct!']); 
     end
 end
 
@@ -93,7 +93,7 @@ if nargout > 3
        %writing .MOT file part
     catch me
        ForcePlatformInfo = [];
-       disp(['WARNING! ' c3dFilePathAndName ': no info from force platforms have been stored in mat format. Please, check if this is correct!']); 
+%        disp(['WARNING! ' c3dFilePathAndName ': no info from force platforms have been stored in mat format. Please, check if this is correct!']); 
     end
 end
 
@@ -107,7 +107,7 @@ if nargout > 4
     catch me
         VideoFrameRate= [];
         AnalogFrameRate= [];
-        disp(['WARNING!Rates.mat is empty. Please, check it!']); 
+%         disp(['WARNING!Rates.mat is empty. Please, check it!']); 
         
     end
     %store rates in a unique data structure
@@ -126,7 +126,7 @@ if nargout > 5
         
     catch me
         
-        disp([c3dFilePathAndName ' has no events saved in it'])
+%         disp([c3dFilePathAndName ' has no events saved in it'])
         Events=[];
         
     end

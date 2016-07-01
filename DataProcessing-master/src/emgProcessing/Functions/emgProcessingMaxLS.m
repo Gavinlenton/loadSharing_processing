@@ -1,4 +1,4 @@
-function [] = emgProcessingMaxLS(isNotch, sessionData,  maxc3dFileName, motoDir)
+function emgProcessingMaxLS(isNotch, sessionData,  maxc3dFileName, motoDir)
 % Input if Notch is required (Yes, No), session Data folder, name of max
 % file name, and MOtoNMS directory
 %   The Notch filter will only be applied for data collected directly

@@ -1,4 +1,4 @@
-function  croppedTrialsProcessing(pname)
+function  croppedTrialsProcessing(pname, fName, motoDir)
 %Evaluates the cropped load sharing trials
 %   Input the name of directory containing the c3d files and evaluate
 %   the files to generate .mot and .trc files for analysis in OpenSim.
@@ -33,25 +33,25 @@ function  croppedTrialsProcessing(pname)
           [dataFinal, force_data2] = assignForceOutputTrcMot(data1);
           
           % Check to see if forces assigned correctly
-          f = figure('Name', fileName);
-          plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
-               dataFinal.fp_data.Time(:), force_data2(:,8))
-          xlabel('Time (s)'); ylabel('Force (N)'); title('Vertical GRF');
-          legend('Right foot', 'Left foot');
-          legend boxoff;
-          
-          uicontrol('Position',[0 0 200 40],'String','Continue',...
-               'Callback','uiresume(gcbf)');
-          fprintf('\nMot file printed, click continue if you''re happy with the output\n');
-          uiwait(gcf, 5);
-          close(f);
+%           f = figure('Name', fileName);
+%           plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
+%                dataFinal.fp_data.Time(:), force_data2(:,8))
+%           xlabel('Time (s)'); ylabel('Force (N)'); title('Vertical GRF');
+%           legend('Right foot', 'Left foot');
+%           legend boxoff;
+%           
+%           uicontrol('Position',[0 0 200 40],'String','Continue',...
+%                'Callback','uiresume(gcbf)');
+%           fprintf('\nMot file printed, click continue if you''re happy with the output\n');
+%           uiwait(gcf, 5);
+%           close(f);
  
           % Save output for future use
-          save([pname, filesep, fileName(1:end-4), 'Data.mat'], 'dataFinal');
+          save([pname, filesep, fileName(1:end-4), '.mat'], 'dataFinal');
 
           % Close vars and figure to save memory
           close(gcf);
-          clearvars dataFinal force_data2
+          clearvars dataFinal force_data2 data1
      end
 
 end

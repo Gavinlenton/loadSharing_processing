@@ -143,6 +143,6 @@ if nFchannels > 0  %if FPdata are present
     
 else  %Biodex trials for example
     FPdata=[];
-    disp('Force Platform Channels empty')
+%     disp('Force Platform Channels empty')
 end
 

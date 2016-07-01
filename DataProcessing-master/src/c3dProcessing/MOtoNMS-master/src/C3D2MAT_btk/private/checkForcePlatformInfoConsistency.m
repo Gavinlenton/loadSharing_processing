@@ -33,7 +33,7 @@ for i=1:nPlatforms
     if (isempty(checkLabels)&& isempty(checkType) && isempty(checkCorners) && isempty(checkOrigin))
         return
     else
-        disp('Data Inconsistency: ForcePlatformInfo differs among trials')
+%         disp('Data Inconsistency: ForcePlatformInfo differs among trials')
     end
 end
 

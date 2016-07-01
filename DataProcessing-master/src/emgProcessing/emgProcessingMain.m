@@ -1,4 +1,4 @@
-function emgProcessingMain(c3dFile_name, maxc3dFile_name, maxc3dFileOther, sessionData, maxName, motoDir)
+function emgProcessingMain(pname, c3dFile_name, maxc3dFile_name, maxc3dFileOther, sessionData, maxName, motoDir, dynamicFolders, times)
 %Main function to process Load Sharing EMG data
 %   Input the relevant directories and process EMG depending on whether max
 %   data exists, if current file is a max file, and output the EMG mot
@@ -15,11 +15,12 @@ isMaxExist = cellfun(cellfind(string), cell_array);
 isMax = ismember(dynamicFolders(any(isMaxExist,2)), c3dFile_name(1:end-4));
 
 emgMaxCondition = [sessionData, filesep, maxc3dFile_name(1:end-4)];
-emgMaxFileLoc = [sessionData, filesep, maxc3dFile_name(1:end-4), filesep, 'maxEMG'];
+emgMaxFileLoc = [emgMaxCondition, filesep, 'maxEMG'];
+emgMaxFile = [emgMaxFileLoc, filesep, 'maxEMG.txt'];
 
 % Create folder to put max EMG if it doesn't exist already
 if ~isdir(emgMaxFileLoc)
-     mkdir(emgMaxCondition, 'maxEMG');
+     mkdir(emgMaxFileLoc);
 end
 
 % --Check to see if EMG data is from txt file or from .c3d to
@@ -44,7 +45,7 @@ if any(isMax(:) == 1)
      if ~exist(emgMaxFile, 'file')
           % Load data for max trial so we can process this first
           emgProcessingMaxLS('no', sessionData, maxc3dFile_name(1:end-4), motoDir);
-          disp('maximum trial finished processing');
+          disp('Maximum trial finished processing');
      else
           disp('Maximum trial has already been analysed for this session, continuing with analysis...');
      end
@@ -63,7 +64,7 @@ else
                % without notch filter
                emgProcessingMaxLS('no', sessionData, maxName, motoDir);
                disp('Max trial done, loading for EMG processing...');
-               [~,emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+               [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
                
           else
@@ -74,7 +75,7 @@ else
                disp('Max trial done, loading for EMG processing...');
                
                % Load Max file
-               [~,emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+               [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
                
                % Then process
                emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
@@ -89,7 +90,7 @@ else
           disp('Maximum trial exists, running EMG processing...');
           
           % Load max trial data
-          [~,emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+          [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
           
           if tf == 0
                % Run EMG processing for .txt data
@@ -104,5 +105,6 @@ else
           disp(' EMG Processing complete');
      end
 end
+clearvars
 end
 

@@ -18,5 +18,10 @@ for n = 1:length(nameOfConditions)
      sessionConditions = [sessionConditions, sessionName];
 end
 
+% Delete duplicates
+wd=sessionConditions';
+[~,idx]=unique(  strcat(wd(:,1)));
+sessionConditions=wd(idx,:)';
+
 end
 

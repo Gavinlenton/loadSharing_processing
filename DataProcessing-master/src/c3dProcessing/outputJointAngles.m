@@ -18,7 +18,7 @@ for n=1:size(Pelvis_Rot,3)
      Ground(:,:,n)=ground;
 end
 
-[PelTilt, PelList , PelRot]=computeISBAngles(Pelvis_Rot,Ground);
+[PelRot, PelList , PelTilt]=computeISBAngles(Pelvis_Rot,Ground);
 
 % Lumbar ---% VICON DATA
 TorsoOrigin=(markersList.CLAV+markersList.T8)/2;
@@ -26,7 +26,9 @@ LowerTorsoOrigin=(PelO+Sac)/2;
 % create Transform
 Torso_Rot=createSegmentDCMYX( TorsoOrigin, LowerTorsoOrigin , markersList.CLAV, markersList.T8);
 
-[LumbarExtension, LumbarBend, LumbarRotation]=computeISBAngles(Torso_Rot, Pelvis_Rot);
+% Torso flexion calculated wrt ground because pelvis is not super reliable
+% in deep trunk flexion.
+[LumbarRotation, LumbarBend, LumbarExtension]=computeISBAngles(Torso_Rot, Ground);
 
 % Right Thigh --- % VICON DATA
 % Define the Transform
@@ -39,18 +41,6 @@ RightThigh_Rot=createSegmentDCMYZ( markersList.RASI,markersList.RLFC, markersLis
 RightTibia_Rot=createSegmentDCMYZ( markersList.RLEP, markersList.RLMAL, markersList.RLMAL, markersList.RMMAL);
 
 [RKnee_Flex, RKnee_Add, RKnee_Rot]=computeISBAngles(RightTibia_Rot, RightThigh_Rot);
-
-% Left Foot --- % Vicon
-% Use the foot rig - set lcal height to the same as midfoot
-% Set LMT1 X and Y to LMT5
-LMidFoot=(markersList.LMT5+markersList.LMT1)/2;
-VirtLCAL=markersList.LCAL;
-VirtLCAL(2)=LMidFoot(2);
-VirtLMT1=markersList.LMT1;
-VirtLMT1(1)=markersList.LMT5(1); VirtLMT1(2)=markersList.LMT5(2);
-LeftFoot_Rot=createSegmentDCMZX(VirtLMT1, markersList.LMT5, LMidFoot, VirtLCAL);
-
-[LFoot_Flex, LFoot_ProSup, LFoot_Rot]=computeISBAngles(LeftFoot_Rot, LeftTibia_Rot);
 
 % Right Foot -- % Vicon
 % Use the foot rig - set rcal height to the same as midfoot
@@ -67,7 +57,7 @@ RightFoot_Rot=createSegmentDCMZX(markersList.RMT5, VirtRMT1, RMidFoot, VirtRCAL)
 % Left arm -- % Vicon
 LUAavg=(markersList.LPUA1+markersList.LPUA3)/2;
 % create Transform
-LUArm_Rot=createSegmentDCMYX(markersList.LACR1, markersList.LLEP, LPUA2, LUAavg );
+LUArm_Rot=createSegmentDCMYX(markersList.LACR1, markersList.LLEP, markersList.LPUA2, LUAavg );
 
 [LShld_Flex, LShld_Add, LShld_Rot ]=computeISBAngles(LUArm_Rot, Torso_Rot);
 
@@ -77,28 +67,6 @@ RUAavg=(markersList.RPUA1+markersList.RPUA3)/2;
 RUArm_Rot=createSegmentDCMYX(markersList.RACR1, markersList.RLEP, markersList.RPUA2, RUAavg);
 
 [RShld_Flex, RShld_Add, RShld_Rot ]=computeISBAngles(RUArm_Rot, Torso_Rot);
-
-% Left Forearm -- % Vicon
-LFArm_Rot=createSegmentDCMYZ(markersList.LLEP, markersList.LWRU, markersList.LWRU, markersList.LWRR);
-
-[LElb_Flex, LElb_Add, LElb_Rot]=computeISBAngles(LFArm_Rot, LUArm_Rot);
-
-% Right Forearm -- % Vicon
-RFArm_Rot=createSegmentDCMYZ(markersList.RLEP, markersList.RWRU, markersList.RWRR, markersList.RWRU);
-
-[RElb_Flex, RElb_Add, RElb_Rot]=computeISBAngles(RFArm_Rot, RUArm_Rot);
-
-% Left WRIST -- % Vicon
-% Define Rotations
-LHand_Rot=createSegmentDCMYZ(markersList.LCAR, markersList.LWRU, markersList.LWRU, markersList.LWRR);
-
-[LWrist_Flex, LWrist_Add, LWrist_Rot]=computeISBAngles(LHand_Rot, LFArm_Rot);
-
-% Right WRIST -- % Vicon
-% Define Rotations
-RHand_Rot=createSegmentDCMYZ(markersList.RCAR, markersList.LWRU,  markersList.RWRR, markersList.RWRU);
-
-[RWrist_Flex, RWrist_Add, RWrist_Rot]=computeISBAngles(RHand_Rot, RFArm_Rot);
 
 % Create structure with all angles of interest
 % Loop through all angles of interest.
@@ -389,18 +357,18 @@ for n = 1:sizeOfStack
      
      if c(3,2,n) < 1
           if c(3,2,n) > -1
-               flex(n) = atan2d(-c(1,2,n), c(2,2,n)); % theta Z
-               add(n) = asind(c(3,2,n)); % theta X
-               int(n) = atan2d(-c(3,1,n), c(3,3,n)); % theta Y
+               int(n) = atan2d(-c(1,2,n), c(2,2,n)); % theta Z
+               flex(n) = asind(c(3,2,n)); % theta X
+               add(n) = atan2d(-c(3,1,n), c(3,3,n)); % theta Y
           else % c(3,2) = -1
-               flex(n) = -atan2d(c(1,2,n), c(1,1,n));
-               add(n) = rad2deg(-pi/2);
-               int(n) = 0;
+               int(n) = -atan2d(c(1,2,n), c(1,1,n));
+               flex(n) = rad2deg(-pi/2);
+               add(n) = 0;
           end
      else % c32 = +1
-          flex(n) = atan2d(c(1,3,n), c(1,1,n));
-          add(n) = rad2deg(pi/2);
-          int(n) = o;
+          int(n) = atan2d(c(1,3,n), c(1,1,n));
+          flex(n) = rad2deg(pi/2);
+          add(n) = 0;
      end
 end
 end

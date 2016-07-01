@@ -44,7 +44,7 @@ for i=1: length(infoSet)
             eval(['checkInfoConsistency(' tag ', new' tag ', infoLabels{i})']);
         end
     else
-        disp([tag ' empty'])
+%         disp([tag ' empty'])
     end
 end
 

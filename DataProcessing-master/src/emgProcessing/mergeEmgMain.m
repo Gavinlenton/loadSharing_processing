@@ -1,4 +1,4 @@
-function mergeEmgMain(c3dFiles, txtFiles, physFolderName)
+function mergeEmgMain(pname, c3dFiles, txtFiles, physFolderName)
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -37,12 +37,12 @@ for trial = 1:length(txtFiles)
                else
                     % Run EMG analysis to insert .txt file EMG into c3d
                     emgAsciiAnalysis([newInputc3d, '_Processed.c3d'], [txtFile, '.txt'],...
-                         physFolderName, c3dFile_folder);
+                         physFolderName, pname);
                end
           else
                % If they are the same just run processing
                emgAsciiAnalysis([inputc3d, '.c3d'], [txtFile, '.txt'],...
-                    physFolderName, c3dFile_folder);
+                    physFolderName, pname);
           end
      end
 end

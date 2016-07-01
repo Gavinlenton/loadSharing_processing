@@ -1,4 +1,4 @@
-function [varargout] = importMaxEMGFile(filename, startRow, endRow)
+function [MaxEMGvalue] = importMaxEMGFile(filename, startRow, endRow)
 %IMPORTFILE Import numeric data from a text file as column vectors.
 %   [MUSCLE,MAXEMGVALUE,TRIAL,TIMES,FRAME] = IMPORTFILE(FILENAME) Reads
 %   data from text file FILENAME for the default selection.
@@ -63,11 +63,4 @@ MaxEMGvalue = dataArray{:, 2};
 Trial = dataArray{:, 3};
 Times = dataArray{:, 4};
 Frame = dataArray{:, 5};
-
-outputStructure = struct('Muscle', Muscle, 'MaxEMGvalue', MaxEMGvalue,...
-     'Trial', Trial, 'Times', Times, 'Frame', Frame);
-
-for ii = 1:nargout
-   varargout{ii} = outputStructure.(ii);  
-end
 
