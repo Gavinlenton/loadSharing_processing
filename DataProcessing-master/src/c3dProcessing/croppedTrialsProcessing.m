@@ -4,7 +4,7 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
 %   the files to generate .mot and .trc files for analysis in OpenSim.
 
   % Re-set folder as that chosen above to include new files
-     croppedSessionDirs = dir([pname, '\*.c3d']);
+     croppedSessionDirs = dir([pname, filesep, '*.c3d']);
      isub2=[croppedSessionDirs(:).bytes]';
      % Only include files above 2000000 bytes as these are walking trials
      a = isub2 < 2000000;

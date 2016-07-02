@@ -7,29 +7,40 @@ function  ROMTrialsProcessing(pname, sessionConditions, fName)
 
      % Re-set folder to include the ROM trials only
      c3dFile_ROM = pname;
-     c3dFilesROM=dir([c3dFile_ROM,'\*.c3d']);
+     c3dFilesROM=dir([c3dFile_ROM, filesep, '*.c3d']);
      
      % Delete files I don't want to analyse
      c3dFilesForROM = {c3dFilesROM.name}';
      c3dFilesForROM = selectROMTrials(c3dFilesForROM, sessionConditions);
-     
-     % Output max, min, and range of joint angles
-     [anglesJoint] = determineJointAngles(c3dFilesForROM, pname);
-     
-     % Save mat file
+    
+     % Define mat file name
      matFileDir = [regexprep(fName, 'Input', 'Elaborated'), filesep, 'ROM'];
+     fileName = 'romData.mat';
      
      if ~isdir(matFileDir)
           mkdir(matFileDir)
      end
      
+     % Output max, min, and range of joint angles
+     [anglesJoints] = determineJointAngles(c3dFilesForROM, pname);
+     
      % Function to average the three trials
-     [anglesJointMean] = findMeanOfROMTrials(anglesJoint, sessionConditions, matFileDir);
+     [anglesJointMeans] = findMeanOfROMTrials(anglesJoints, sessionConditions, matFileDir);
      
-     % Save each session in separate tabs
-     fileName = 'romData.mat';
-     save([matFileDir, filesep, fileName], 'anglesJointMean', 'anglesJoint');
-     
+     if exist([matFileDir, filesep, fileName], 'file');
+         ROM =  load([matFileDir, filesep, fileName]);
+          
+          % Save each session in separate tabs
+          for tt = 1:length(sessionConditions)
+               session = sessionConditions{tt};
+               ROM.anglesJointMeans.(session) = anglesJointMeans.(session);
+          end
+          
+          save([matFileDir, filesep, fileName], 'anglesJointMean', 'anglesJoints');
+     else
+          
+          save([matFileDir, filesep, fileName], 'anglesJointMeans', 'anglesJoints');
+     end
      clearvars anglesJointMean anglesJoint matFileDir
 end
 

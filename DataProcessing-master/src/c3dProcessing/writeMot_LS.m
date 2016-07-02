@@ -1,20 +1,20 @@
 function [] = writeMot_LS(grfOpenSim,time,fname)
 %
 % The file is part of matlab MOtion data elaboration TOolbox for
-% NeuroMusculoSkeletal applications (MOtoNMS). 
+% NeuroMusculoSkeletal applications (MOtoNMS).
 % Copyright (C) 2012-2014 Alice Mantoan, Monica Reggiani
 %
-% MOtoNMS is free software: you can redistribute it and/or modify it under 
-% the terms of the GNU General Public License as published by the Free 
+% MOtoNMS is free software: you can redistribute it and/or modify it under
+% the terms of the GNU General Public License as published by the Free
 % Software Foundation, either version 3 of the License, or (at your option)
 % any later version.
 %
 % Matlab MOtion data elaboration TOolbox for NeuroMusculoSkeletal applications
 % is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-% without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+% without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 % PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 %
-% You should have received a copy of the GNU General Public License along 
+% You should have received a copy of the GNU General Public License along
 % with MOtoNMS.  If not, see <http://www.gnu.org/licenses/>.
 %
 % Alice Mantoan, Monica Reggiani
@@ -31,7 +31,7 @@ motData = zeros(nRows, nCols);
 % Write time array to data matrix.
 motData(:, 1) = time;
 
-motData(:, 2:end) = grfOpenSim;          
+motData(:, 2:end) = grfOpenSim;
 
 % Generate column labels for forces, COPs, and vertical torques taking into
 % account that the number of force platforms may change
@@ -45,9 +45,7 @@ label=generateMotLabels_LS(nFP); %depends on the number of FP
 % Open file for writing.
 fid = fopen(fname, 'wt');
 
-fprintf('\n------------------------------------------');
-fprintf('\n      Printing mot file     ');
-fprintf('\n------------------------------------------');
+fprintf('\n    --Printing mot file--   ');
 
 if fid == -1
     error(['unable to open ', fname])
@@ -65,13 +63,13 @@ fprintf(fid, 'time');
 fprintf(fid,'\t');
 
 for i = 1:nCols-1,
-	fprintf(fid, '%20s\t', label{i});
+    fprintf(fid, '%20s\t', label{i});
 end
 
 % Write data.
 for i = 1:nRows
-    fprintf(fid, '\n'); 
-	for j = 1:nCols
+    fprintf(fid, '\n');
+    for j = 1:nCols
         if j == 1
             fprintf(fid,'%g\t', motData(i));
         else

@@ -205,7 +205,7 @@ fclose(fid_1);
 
 disp('Done.')
 
-cd ..\
+cd ..
 %%
 % Write motion file containing GRFs
 
@@ -355,7 +355,7 @@ if isfield(data,'fp_data')
      % WRite the MOT file using MOtoNMS function
      writeMot_LS(force_data2 ,force_data_out(:,1), [finalpathname filesep newfilename]);
      
-     cd ..\
+     cd ..
      
 else disp('No force plate information available.')
 end

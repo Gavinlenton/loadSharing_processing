@@ -381,8 +381,8 @@ for cycle = 1:length(timePoints)-1
           %                end
           
           if ~exist([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs'], 'dir')
-               mkdir([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs\Envelope']);
-               mkdir([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs\Raw']);
+               mkdir([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs', filesep, 'Envelope']);
+               mkdir([sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs', filesep, 'Raw']);
           end
           
           %                savefig(figure(1), [sessionData(1:end-11) , filesep, 'dynamicElaborations',  filesep, analogData, filesep, 'EMGs', filesep, char(emgLabelsInMatFile{n}), '.fig']);
@@ -396,7 +396,7 @@ for cycle = 1:length(timePoints)-1
      
      % Print the scaled EMG envelopes to .mot format for future
      % CEINMS use.
-     emgMotDir = [sessionData(1:end-11) , 'dynamicElaborations', filesep, analogData];
+     emgMotDir = [sessionData(1:end-11) , 'dynamicElaborations', filesep, analogData, filesep, 'EMGs', filesep];
      printEMGmot_LS(emgMotDir,timeGaitCycle',dynamicTrialScaledEmg, emgLabelsInMatFile, emgPrintTag, cycle);
      
      % GAIT CYCLE ANALYSIS

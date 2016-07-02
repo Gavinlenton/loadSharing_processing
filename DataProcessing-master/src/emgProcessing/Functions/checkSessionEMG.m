@@ -1,4 +1,4 @@
-function [emgCaptured] = checkSessionEMG(subject, c3dinSession)
+function [emgCaptured] = checkSessionEMG(subject, c3dinSession, rootDir)
 %checkEMG Summary of this function goes here
 %   Input the subject and session name to determine if EMG exists for that
 %   session. Function will return a 1 for yes and 0 for no. i indicates the
@@ -8,7 +8,7 @@ function [emgCaptured] = checkSessionEMG(subject, c3dinSession)
 % Dates change so be careful of that, check that the sessions are loaded in
 % chronological order
 
-load('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\emgExist4Subject.mat')
+load([rootDir, 'emgExist4Subject.mat']);
 
 % Find the subject number
 subject = cell2mat(subject);

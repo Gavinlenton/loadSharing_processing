@@ -34,9 +34,10 @@ for i = 1:length(subjectFolders)
      % Initialise and define directories
      pname = [fName, filesep, subjectFolders{i}];
      c3dFile_folder = pname;
-     c3dFiles=dir([c3dFile_folder,'\*.c3d']);
-     txtFiles=dir([c3dFile_folder,'\*.txt']);
+     c3dFiles=dir([c3dFile_folder, filesep, '*.c3d']);
+     txtFiles=dir([c3dFile_folder, filesep, '*.txt']);
      physFolderName = [physFolder, filesep, subjectName{1}, filesep, subjectFolders{i}];
+     rootDir = fName(1:regexp(fName, '\WI'));
      [sessionConditions] = conditionNames(c3dFiles);
      
      %% RUN ACQUISITION INTERFACE
@@ -97,7 +98,7 @@ for i = 1:length(subjectFolders)
      
      % Check if EMG was captured in the session with first condition
      dynamicTrialsName = dynamicCropFolders{1,1};
-     emgCaptured = checkSessionEMG(subjectName, dynamicTrialsName(1:end-15));
+     emgCaptured = checkSessionEMG(subjectName, dynamicTrialsName(1:end-15), rootDir);
      
      w = waitbar(0,'Processing your data, be patient!');
      
