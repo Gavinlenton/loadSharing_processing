@@ -5,8 +5,21 @@
 % <https://simtk.org/home/bops>
 % Please acknowledge the authors of BOPS when using this script.
 
-%% Define BasePath where dynamicElaboration outputs are
-BasePath=uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection', 'Select Elaborated Data Folder');
+%% Define BasePath with dynamicElaboration outputs and BOPS folder
+
+if ispc
+    % Select dynElab folder
+    BasePath=uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection', 'Select Elaborated Data Folder');
+    % Select BOPS-master folder
+    folderBOPS = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\DataProcessing-master\src',...
+         'Select the BOPS processing folder');
+else
+    % Select dynElab folder
+    BasePath=uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection', 'Select Elaborated Data Folder');
+    % Select BOPS-master folder
+    folderBOPS = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/DataProcessing-master/src',...
+         'Select the BOPS-master folder');
+end
 
 % Define subject names
 subsdir=dir(BasePath);
@@ -16,9 +29,7 @@ for xx=1:length(subsdir)
      subjectNames(ismember(subjectNames,{'.','..'})) = [];
 end
 
-% Select BOPS folder
-folderBOPS = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\DataProcessing-master\src',...
-     'Select the BOPS processing folder');
+
 
 % Loop through subjects
 

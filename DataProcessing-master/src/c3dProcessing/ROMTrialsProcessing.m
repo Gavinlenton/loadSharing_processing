@@ -24,22 +24,23 @@ function  ROMTrialsProcessing(pname, sessionConditions, fName)
      % Output max, min, and range of joint angles
      [anglesJoints] = determineJointAngles(c3dFilesForROM, pname);
      
-     % Function to average the three trials
-     [anglesJointMeans] = findMeanOfROMTrials(anglesJoints, sessionConditions, matFileDir);
-     
      if exist([matFileDir, filesep, fileName], 'file');
-         ROM =  load([matFileDir, filesep, fileName]);
-          
+         load([matFileDir, filesep, fileName]);
+     
+     % Function to average the three trials
+     [anglesJointMean] = findMeanOfROMTrials(anglesJoints, sessionConditions, matFileDir);
+    
           % Save each session in separate tabs
           for tt = 1:length(sessionConditions)
                session = sessionConditions{tt};
-               ROM.anglesJointMeans.(session) = anglesJointMeans.(session);
+               anglesJointMeans.(session) = anglesJointMean.(session);
           end
-          
-          save([matFileDir, filesep, fileName], 'anglesJointMean', 'anglesJoints');
+
+          save([matFileDir, filesep, fileName], 'anglesJointMeans');
      else
-          
-          save([matFileDir, filesep, fileName], 'anglesJointMeans', 'anglesJoints');
+         
+          [anglesJointMeans] = findMeanOfROMTrials(anglesJoints, sessionConditions, matFileDir);
+          save([matFileDir, filesep, fileName], 'anglesJointMeans');
      end
      clearvars anglesJointMean anglesJoint matFileDir
 end

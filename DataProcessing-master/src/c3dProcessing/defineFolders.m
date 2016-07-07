@@ -22,7 +22,7 @@ else
      fName = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/InputData', 'Select the Subject for analysis');
      
      % Select physical folder directory
-     physFolder = uigetdir('/Users/s2921887/Documents/', 'Select the input data folder on your physical drive');
+     physFolder = uigetdir('/Users/s2921887/Documents/PhD_Griffith/', 'Select the input data folder on your physical drive');
      
      % Auto defines motonms directory (may need to change if your folder
      % structure is different - but it shouldn't be)

@@ -40,5 +40,5 @@ switch method
         error('SJC Method missing')
 end
 
-disp('LSJC and RSJC have been computed')
+% disp('LSJC and RSJC have been computed')
 

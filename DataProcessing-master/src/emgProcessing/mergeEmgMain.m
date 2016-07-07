@@ -9,7 +9,7 @@ for trial = 1:length(txtFiles)
      inputc3d = c3dFiles(trial,1).name(1:end-4);
      txtFile = txtFiles(trial,1).name(1:end-4);
      
-     if isempty(txtFile) == 1;
+     if isempty(txtFile)
           
           % If no text file exists
           disp('no txt files exist for this trial');
@@ -32,8 +32,8 @@ for trial = 1:length(txtFiles)
                % Check to see if they are now the same
                if strcmp(newInputc3d, txtFile) == 0
                     disp(['Text file (', txtFile, ') still does not match c3d File (', inputc3d, ')']);
-                    disp('Please ensure ALL txt files are in the same folder as c3d files');
-                    
+                    disp('Please ensure name of txt file is consistent with pre-defined structure');
+                    break
                else
                     % Run EMG analysis to insert .txt file EMG into c3d
                     emgAsciiAnalysis([newInputc3d, '_Processed.c3d'], [txtFile, '.txt'],...

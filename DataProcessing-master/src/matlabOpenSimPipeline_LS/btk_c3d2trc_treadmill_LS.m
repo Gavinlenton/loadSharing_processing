@@ -256,7 +256,7 @@ if isfield(data,'fp_data')
                
                % reorder data so lab coordinate system to match that of the OpenSim
                % system
-               
+                if ~isempty(fieldnames(data.GRF.FP(k).(bodies{i})))
                data.GRF.FP(k).(bodies{i}).P =  [data.GRF.FP(k).(bodies{i}).P(:,2)/p_sc ...
                     data.GRF.FP(k).(bodies{i}).P(:,3)/p_sc data.GRF.FP(k).(bodies{i}).P(:,1)/p_sc];
                data.GRF.FP(k).(bodies{i}).F =  [data.GRF.FP(k).(bodies{i}).F(:,2) ...
@@ -273,7 +273,8 @@ if isfield(data,'fp_data')
                end
                
                % If plate one for either body then assign normally (i.e.,
-               % concat horz)
+               % concat horz).
+               
                if k ==1
                     force_data_out = [force_data_out, data.GRF.FP(k).(bodies{i}).F(K,:)...
                          data.GRF.FP(k).(bodies{i}).P(K,:) data.GRF.FP(k).(bodies{i}).M(K,:)];
@@ -301,7 +302,14 @@ if isfield(data,'fp_data')
                     % stitch
                     endFrameFP2x = find(data.GRF.FP(2).(bodies{i}).F(K(1):K(500),2) > 1);
                     endFrameFP2y = find(data.GRF.FP(2).(bodies{i}).F(500:end,2) > 35);
+                    
+                    % Condition statement to address if FP1 is empty for
+                    % left foot.
+                    if ~isempty(fieldnames(data.GRF.FP(1).(bodies{i})))
                     startFrameFP2end = find(data.GRF.FP(1).(bodies{i}).F(K,2) < 1);
+                    else
+                        startFrameFP2end = 1;
+                    end
                     
                     % Determine difference between end of FP1 and start of
                     % FP2
@@ -310,7 +318,7 @@ if isfield(data,'fp_data')
                     else
                          differenceFP2 = startFrameFP2end(end);
                     end
-                    startCropFrame2 = startFrameFP2end(end) - (differenceFP2/2) -10;
+                    startCropFrame2 = startFrameFP2end(end) - (differenceFP2/2) -20;
                     
                     % Stitch these forces onto those from Plate 1 for end
                     % of capture
@@ -330,7 +338,9 @@ if isfield(data,'fp_data')
                     disp('The FP difference is greater than 20, this means the FP stitching will not be correct');
                     uiwait
                end
-               
+               else
+                   fprintf('GRF data does not exist for trial %s', fname); 
+               end
           end
           
      end
@@ -349,8 +359,16 @@ if isfield(data,'fp_data')
      force_data2(:,13:15) = force_data_out(:,8:10);
      force_data2(:,16:18) = force_data_out(:,17:19);
      
-     % Specify new file name
-     newfilename = [fname(1:end-4) '_grf.mot'];
+     if any(isempty(fieldnames(data.GRF.FP(k).(bodies{i}))))
+     
+     % Specify new file name if there is missing data name so I know to
+     % check data
+     newfilename = [fname(1:end-4) '_grf_NFU.mot'];
+     
+     else
+         % Otherwise name normally
+         newfilename = [fname(1:end-4) '_grf.mot'];
+     end
      
      % WRite the MOT file using MOtoNMS function
      writeMot_LS(force_data2 ,force_data_out(:,1), [finalpathname filesep newfilename]);

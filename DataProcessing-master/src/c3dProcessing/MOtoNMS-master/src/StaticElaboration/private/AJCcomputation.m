@@ -40,5 +40,5 @@ switch method
         error('AJC Method missing')
 end
 
-disp('LAJC and RAJC have been computed')
+% disp('LAJC and RAJC have been computed')
 

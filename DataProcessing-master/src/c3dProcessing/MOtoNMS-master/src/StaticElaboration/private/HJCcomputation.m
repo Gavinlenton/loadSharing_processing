@@ -42,4 +42,4 @@ switch method
 end
 
 
-disp('LHJC and RHJC have been computed')
+% disp('LHJC and RHJC have been computed')

@@ -5,16 +5,15 @@
 % - Process EMG data and output excitations in MOT format
 % - Process ROM trials and output joint angles
 
-% Please acknowledge Glen Lichtwark from the University of Queensland
-% for the use of his OpenSim pipeline tools
+% Please acknowledge Glen Lichtwark from the University of Queensland and
+% Alice Mantoan from Universita di Padua for the use of their OpenSim pipeline tools
 
 % Written by Gavin Lenton June 2016
 % gavin.lenton@griffithuni.edu.au
 
-% ---------------------------------------------------------------%
+%% --------------------------------------------------------------- %%
 
-clear;
-clc;
+clear; clc; close all;
 
 % Specify folder directories based on system used - may need to modify default directories as I
 % set this up to quickly navigate to my folders.
@@ -27,7 +26,7 @@ else
      [fName, physFolder, motoDir, subjectFolders, subjectName] = defineFolders(2);
 end
 
-%% Loop through all sessions for chosen subject.
+%% --- MAIN DATA ANALYSIS --- %%
 
 for i = 1:length(subjectFolders)
      
@@ -40,7 +39,7 @@ for i = 1:length(subjectFolders)
      rootDir = fName(1:regexp(fName, '\WI'));
      [sessionConditions] = conditionNames(c3dFiles);
      
-     %% RUN ACQUISITION INTERFACE
+     %% --- RUN ACQUISITION INTERFACE --- %%
      
      % If the acqusition xml does not exist then generate one
      if ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i == 1
@@ -66,22 +65,18 @@ for i = 1:length(subjectFolders)
          fprintf('acquisition.xml already exist in folder: %s, \n Continuing with analysis... \n', pname);
      end
      
-     %% MERGE EMG IF COLLECTED INTO A TXT FILE
+     %% --- MERGE EMG IF COLLECTED INTO A TXT FILE --- %%
      
-     % Prompt asking if EMG data needs merging.
-     mergeEMG = questdlg('Do you need to merge the EMG data with the c3d?',...
-          'EMG Merging', 'Yes', 'No', 'No');
-     
-     if strcmp(mergeEMG, 'Yes') == 1
-          % Merge EMG data
+     % Search inputData folder for txt files
+     if ~isempty(fieldnames(txtFiles))
+          % Merge EMG data if txt files exist
           mergeEmgMain(pname, c3dFiles, txtFiles, physFolderName)
-          
      else
           % If not merging then continue with analysis
-          disp('EMG not merged with c3d file, continuing with analysis...');
+          disp('No text files exist in this session, continuing with analysis...');
      end
      
-     %% RUN MOtoNMS C3D2BTK AND RENAME EMG CHANNELS
+     %% --- RUN MOtoNMS C3D2BTK AND RENAME EMG CHANNELS --- %%
      
      % Navigate to directory where function is
      cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
@@ -90,7 +85,7 @@ for i = 1:length(subjectFolders)
      % Replace emg analog labels
      replaceAnalogLabels(pname);
      
-     %% LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION
+     %% --- LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION --- %%
      
      % Define all required path names
      [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
@@ -102,7 +97,8 @@ for i = 1:length(subjectFolders)
      
      w = waitbar(0,'Processing your data, be patient!');
      
-     % Loop through c3d files that aren't ROM trials
+     %% --- LOOP THROUGH DYNAMIC TRIALS --- %%
+     
      for t_trial = 1:length(dynamicFolders)
           
           % Load the c3d file and data using btk
@@ -115,10 +111,12 @@ for i = 1:length(subjectFolders)
           mkdir(newPathName, c3dFile_name(1:end-4));
           end
           
-          % --- CROP TRIALS --- %%
+          %% --- CROP TRIALS --- %%
+          
           times = cropTrialsMain(pname, c3dFile_name, physFolderName, acqLS, dynamicCropFolders, data);
           
-          % --- EMG PROCESSING --- %%
+          %% --- EMG PROCESSING --- %%
+          
           % Only run EMG processing if EMG was collected
           if  emgCaptured == 1
                
@@ -134,13 +132,18 @@ for i = 1:length(subjectFolders)
           % Clear for next trial
           clearvars acqLS data
           waitbar(t_trial/length(dynamicFolders));
+          
      end
      close(w);
      
      %% --- PROCESSING CROPPED TRIALS FOR USE IN OPENSIM --- %%
+     
      croppedTrialsProcessing(pname, fName, motoDir);
      
      %% --- ROM TRIALS PROCESSING --- %%
+     
      ROMTrialsProcessing(pname, sessionConditions, fName);
      
+     % Clear for next session
+     clearvars -except fName motoDir physFolder subjectFolders subjectName
 end

@@ -47,7 +47,13 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
 %           close(f);
  
           % Save output for future use
-          save([pname, filesep, fileName(1:end-4), '.mat'], 'dataFinal');
+          outputDir = [pname, filesep, 'matData'];
+          
+          if ~isdir(outputDir)
+              mkdir(outputDir);
+          end
+          
+          save([outputDir, filesep, fileName(1:end-4), '.mat'], 'dataFinal');
 
           % Close vars and figure to save memory
           close(gcf);

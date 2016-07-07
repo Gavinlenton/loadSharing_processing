@@ -124,7 +124,7 @@ else
   else
     try
       DOMnode = xmlread(xmlfile);
-z    catch, ME
+    catch, ME
       error('Failed to read XML file %s: \n%s',xmlfile, getReport(ME));
     end
   end

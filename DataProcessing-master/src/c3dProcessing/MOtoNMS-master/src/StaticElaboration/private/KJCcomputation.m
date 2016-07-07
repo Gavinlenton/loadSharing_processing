@@ -40,4 +40,4 @@ switch method
         error('KJC Method missing')
 end
 
-disp('LKJC and RKJC have been computed')
+% disp('LKJC and RKJC have been computed')

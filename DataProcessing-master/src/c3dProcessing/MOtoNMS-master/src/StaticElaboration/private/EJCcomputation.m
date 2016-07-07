@@ -40,5 +40,5 @@ switch method
         error('EJC Method missing')
 end
 
-disp('LEJC and REJC have been computed')
+% disp('LEJC and REJC have been computed')
 

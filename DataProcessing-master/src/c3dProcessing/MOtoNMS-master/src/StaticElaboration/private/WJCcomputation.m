@@ -40,5 +40,5 @@ switch method
         error('WJC Method missing')
 end
 
-disp('LWJC and RWJC have been computed')
+% disp('LWJC and RWJC have been computed')
 
