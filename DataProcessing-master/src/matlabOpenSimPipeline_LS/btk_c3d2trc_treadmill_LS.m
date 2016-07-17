@@ -232,7 +232,7 @@ if isfield(data,'fp_data')
           data.fp_data.GRF_data(i).M =  data.fp_data.GRF_data(i).M/p_sc;
           
           % do some cleaning of the COP before and after contact
-          b = find(abs(diff(data.fp_data.GRF_data(i).P(:,3)))>0);
+          b = find(abs(diff(data.fp_data.GRF_data(i).P(:,2)))>0);
           if ~isempty(b)
                for j = 1:3
                     data.fp_data.GRF_data(i).P(1:b(1),j) = data.fp_data.GRF_data(i).P(b(1)+1,j);
@@ -279,7 +279,7 @@ if isfield(data,'fp_data')
                     force_data_out = [force_data_out, data.GRF.FP(k).(bodies{i}).F(K,:)...
                          data.GRF.FP(k).(bodies{i}).P(K,:) data.GRF.FP(k).(bodies{i}).M(K,:)];
                     
-                    % If plate two append on to end of FP 1 data
+                    % If plate two and right foot append on to end of FP 1 data
                elseif k == 2 && i == 1
                     
                     endFrameFP1 = find(data.GRF.FP(1).(bodies{i}).F(K,2) > 1);
@@ -300,6 +300,7 @@ if isfield(data,'fp_data')
                     
                     % Same procedure for stitching - first define areas to
                     % stitch
+                    
                     endFrameFP2x = find(data.GRF.FP(2).(bodies{i}).F(K(1):K(500),2) > 1);
                     endFrameFP2y = find(data.GRF.FP(2).(bodies{i}).F(500:end,2) > 35);
                     
@@ -345,9 +346,12 @@ if isfield(data,'fp_data')
           
      end
      
-     % Apply 10 Hz filter to smooth stiching out
-     force_data_out(:, 2:end) = matfiltfilt(dt,10,2, force_data_out(:, 2:end));
-     
+     % Apply 10 Hz filter to smooth stiching out - don't want to filter the
+     % COP here.
+     force_data_out(:, 2:4) = matfiltfilt(dt,10,2, force_data_out(:, 2:4));
+     force_data_out(:, 8:10) = matfiltfilt(dt,10,2, force_data_out(:, 8:10));
+     force_data_out(:, 11:13) = matfiltfilt(dt,10,2, force_data_out(:, 11:13));
+     force_data_out(:, 17:19) = matfiltfilt(dt,10,2, force_data_out(:, 17:19));
      
      % assign a value of zero to any NaNs
      force_data_out(logical(isnan(force_data_out))) = 0;

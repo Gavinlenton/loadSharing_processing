@@ -1,4 +1,4 @@
-function []= writetrc(markers,MLabels,VideoFrameRate,FullFileName)   
+function []= writetrc_LS(markers,MLabels,VideoFrameRate,FullFileName)   
 %
 % The file is part of matlab MOtion data elaboration TOolbox for
 % NeuroMusculoSkeletal applications (MOtoNMS). 
@@ -28,22 +28,22 @@ time=markers(:,1);
 DataStartFrame=time(1)*VideoFrameRate+1;
 
 %add frame column
-frameArray=[(time(1)*VideoFrameRate+1):round(time(end)*VideoFrameRate+1)]';
-
-markers=[frameArray markers];
+% frameArray=[(time(1)*VideoFrameRate+1):round(time(end)*VideoFrameRate+1)]';
+% 
+% markers=[frameArray markers];
 
 nFrames=size(markers,1);
 ncol=size(markers,2);
 nMarkers=length(MLabels);
 
 fid = fopen(FullFileName,'wt');
-fprintf('\n    --- Printing marker trajectory file ---    \n');
+fprintf('\n ---  Printing marker trajectory file  --- \n');
 
 % Print header information
 fprintf(fid,'PathFileType\t4\t(X/Y/Z)\t%s\n',FullFileName);
 fprintf(fid,'DataRate\tCameraRate\tNumFrames\tNumMarkers\tUnits\tOrigDataRate\tDataStartFrame\n');
 fprintf(fid, '%g\t%g\t%d\t%d\t%s\t%g\t%d\n', ...
-    VideoFrameRate, VideoFrameRate, nFrames, nMarkers, 'mm', VideoFrameRate, DataStartFrame);
+    VideoFrameRate, VideoFrameRate, nFrames, nMarkers, 'm', VideoFrameRate, DataStartFrame);
 fprintf(fid,'Frame#\tTime');
 for i = 1:nMarkers
     fprintf(fid,'\t%s\t\t%s',MLabels{i});
@@ -68,3 +68,4 @@ for i= 1:nFrames
 end
 
 fclose(fid);
+clear

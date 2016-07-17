@@ -1,0 +1,320 @@
+Loaded model Subject 14_Scaled_Pose_OptMusc_opt_N12.osim from file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_Scaled_Pose_OptMusc.osim
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed1\NA_fast_Processed1.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed1\NA_fast_Processed1.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.198s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed10\NA_fast_Processed10.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed10\NA_fast_Processed10.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 1.951s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed11\NA_fast_Processed11.trc (84 markers, 102 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed11\NA_fast_Processed11.trc (84 markers, 102 frames)
+InverseKinematicsTool completed 101 frames in 2.106s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed12\NA_fast_Processed12.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed12\NA_fast_Processed12.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.029s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed13\NA_fast_Processed13.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed13\NA_fast_Processed13.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.231s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed14\NA_fast_Processed14.trc (84 markers, 102 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed14\NA_fast_Processed14.trc (84 markers, 102 frames)
+InverseKinematicsTool completed 101 frames in 2.247s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed15\NA_fast_Processed15.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed15\NA_fast_Processed15.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.501s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed16\NA_fast_Processed16.trc (84 markers, 102 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed16\NA_fast_Processed16.trc (84 markers, 102 frames)
+InverseKinematicsTool completed 101 frames in 2.481s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed17\NA_fast_Processed17.trc (84 markers, 100 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed17\NA_fast_Processed17.trc (84 markers, 100 frames)
+InverseKinematicsTool completed 99 frames in 2.09s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed18\NA_fast_Processed18.trc (84 markers, 104 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed18\NA_fast_Processed18.trc (84 markers, 104 frames)
+InverseKinematicsTool completed 103 frames in 2.09s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed19\NA_fast_Processed19.trc (84 markers, 103 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed19\NA_fast_Processed19.trc (84 markers, 103 frames)
+InverseKinematicsTool completed 102 frames in 2.106s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed2\NA_fast_Processed2.trc (84 markers, 100 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed2\NA_fast_Processed2.trc (84 markers, 100 frames)
+InverseKinematicsTool completed 99 frames in 2.169s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed20\NA_fast_Processed20.trc (84 markers, 103 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed20\NA_fast_Processed20.trc (84 markers, 103 frames)
+InverseKinematicsTool completed 102 frames in 2.153s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed21\NA_fast_Processed21.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed21\NA_fast_Processed21.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.122s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed22\NA_fast_Processed22.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed22\NA_fast_Processed22.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.262s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed23\NA_fast_Processed23.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0
+Running tool .
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed23\NA_fast_Processed23.trc (84 markers, 101 frames)
+InverseKinematicsTool completed 100 frames in 2.356s
+
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\dynamicElaborations\NA_fast_Processed\NA_fast_Processed24\NA_fast_Processed24.trc (84 markers, 101 frames)
+               MODEL: Subject 14_Scaled_Pose_OptMusc_opt_N12.osim
+         coordinates: 56
+              forces: 94
+           actuators: 94
+             muscles: 94
+            analyses: 0
+              probes: 0
+              bodies: 26
+              joints: 25
+         constraints: 0
+             markers: 83
+         controllers: 0
+  contact geometries: 0
+misc modelcomponents: 0

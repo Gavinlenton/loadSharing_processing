@@ -7,19 +7,14 @@
 
 %% Define BasePath with dynamicElaboration outputs and BOPS folder
 
-if ispc
-    % Select dynElab folder
-    BasePath=uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection', 'Select Elaborated Data Folder');
-    % Select BOPS-master folder
-    folderBOPS = uigetdir('Z:\s2921887\Google Drive\Load Sharing Main Data Collection\DataProcessing-master\src',...
-         'Select the BOPS processing folder');
-else
-    % Select dynElab folder
-    BasePath=uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection', 'Select Elaborated Data Folder');
-    % Select BOPS-master folder
-    folderBOPS = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/DataProcessing-master/src',...
-         'Select the BOPS-master folder');
-end
+addpath('Z:\s2921887\Google Drive\LS_main_data_collection\DataProcessing-master\src\openSimAnalysis');
+tmp = matlab.desktop.editor.getActive;
+cd(fileparts(tmp.Filename));
+
+% Select dynElab folder
+BasePath=uigetdir('..\..\..\', 'Select Elaborated Data Folder');
+% Select BOPS-master folder
+folderBOPS = uigetdir('.\', 'Select the BOPS processing folder');
 
 % Define subject names
 subsdir=dir(BasePath);
@@ -28,8 +23,6 @@ for xx=1:length(subsdir)
      subjectNames = {subsdir(isub).name}';
      subjectNames(ismember(subjectNames,{'.','..'})) = [];
 end
-
-
 
 % Loop through subjects
 
@@ -42,39 +35,42 @@ for nS = 1:length(subjectNames)
      SessionDirs = dir(fName);
      isub=[SessionDirs(:).isdir];
      sessionFolders={SessionDirs(isub).name}';
-     sessionFolders(ismember(sessionFolders,{'.','..'}))=[]; % dynamic subject folders
+     sessionFolders(ismember(sessionFolders,{'.','..', 'ROM'}))=[]; % dynamic subject folders
+     
+     clearvars subsdir isub
      
      % Loop through sessions for subject
      for sD = 1:length(sessionFolders)
           
           sessionName = [fName, filesep, sessionFolders{sD}];
           
-          % Select the .osim model file
-          [genericModelID,genericModelPath]=uigetfile([sessionName, filesep,...
-               'staticElaborations', filesep, '*.osim'],...
-               'Select scaled OpenSim model for analysis');
-          model_file=[genericModelPath genericModelID];
-          
-          % Then create var for trials names
-          trialsDirs = dir([fName, filesep, sessionFolders{sD}, filesep, 'dynamicElaborations']);
-          isub=[SessionDirs(:).isdir];
+          % Create var for trials names
+          trialsDirs = dir([sessionName, filesep, 'dynamicElaborations']);
+          isub=[trialsDirs(:).isdir];
           trialsFolders={trialsDirs(isub).name}';
-          trialsFolders(ismember(trialsFolders,{'.','..'}))=[]; % dynamic trials folders
+          trialsFolders(ismember(trialsFolders,{'.','..', 'KneeFJC1_Processed', 'KneeFJC2_Processed'}))=[]; % dynamic trials folders
           
+          % Need to select a different model for each conditions, so this
+          % needs to loop only for fast and slow walking trial
           % Loop through trials (should be fast and slow walking)
           for tD = 1:length(trialsFolders)
                
-               % Select input directory
+               % Define input directory
                inputDir = [fName, filesep, sessionFolders{sD}, filesep,...
                     'dynamicElaborations', filesep, trialsFolders{tD}];
+               
+               % Select the .osim model file for that condition
+               [genericModelID,genericModelPath]=uigetfile([sessionName, filesep,...
+                    'staticElaborations', filesep, '*.osim'],...
+                    'Select scaled OpenSim model for analysis');
+               model_file=[genericModelPath genericModelID];
                
                % Navigate to folder where BOPS is;
                cd([folderBOPS, filesep, 'src']);
                
-               
                %% INVERSE KINEMATICS and INVERSE DYNAMICS
                
-               % If statement to check if what files you're running ID on (this is
+               % If statement to check files you're running are for ID as well (this is
                % because Matlab keeps crashing...)
                
                idOption = questdlg('Are you running ID on same trials as IK?',...

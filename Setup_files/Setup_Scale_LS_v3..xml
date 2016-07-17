@@ -210,7 +210,7 @@
 		<!--Notes for the subject.-->
 		<notes>Unassigned</notes>
 		<!--Specifies the name of the unscaled model (.osim) and the marker set.-->
-		<GenericModelMaker name="FullBodyModel_LS_Main">
+		<GenericModelMaker>
 			<!--Model file (.osim) for the unscaled model.-->
 			<model_file>Unassigned</model_file>
 			<!--Set of model markers used to scale the model. Scaling is done based on distances between model markers compared to the same distances between the corresponding experimental markers.-->
@@ -289,10 +289,6 @@
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
 									<markers> T8 CLAV</markers>
 								</MarkerPair>
-								<MarkerPair>
-									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> THO3 CLAV</markers>
-								</MarkerPair>
 							</objects>
 							<groups />
 						</MarkerPairSet>
@@ -339,7 +335,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RSJC REJC</markers>
+									<markers> RPUA1 RLEP</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -363,7 +359,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LSJC LEJC</markers>
+									<markers> LPUA1 LLEP</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -387,7 +383,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> REJC RWJC</markers>
+									<markers> RLEP RWRR</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -415,7 +411,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LEJC LWJC</markers>
+									<markers> LLEP LWRR</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -443,7 +439,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RWJC RCAR</markers>
+									<markers> RWRR RCAR</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -467,7 +463,7 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LWJC LCAR</markers>
+									<markers> LWRR LCAR</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -627,11 +623,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RMFC RAJC</markers>
+									<markers> RMFC RLMAL</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RLFC RAJC</markers>
+									<markers> RLFC RLMAL</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -771,11 +767,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LMFC LAJC</markers>
+									<markers> LMFC LLMAL</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LLFC LAJC</markers>
+									<markers> LLFC LLMAL</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -1334,7 +1330,7 @@
 			<!--Name of the motion file (.mot) written after marker relocation (optional).-->
 			<output_motion_file>Unassigned</output_motion_file>
 			<!--Output OpenSim model file (.osim) after scaling and maker placement.-->
-			<output_model_file>LSMain_Scaled</output_model_file>
+			<output_model_file>Unassigned</output_model_file>
 			<!--Output marker set containing the new marker locations after markers have been placed.-->
 			<output_marker_file>Unassigned</output_marker_file>
 			<!--Maximum amount of movement allowed in marker data when averaging frames of the static trial. A negative value means there is not limit.-->

@@ -45,7 +45,7 @@ label=generateMotLabels_LS(nFP); %depends on the number of FP
 % Open file for writing.
 fid = fopen(fname, 'wt');
 
-fprintf('\n    --Printing mot file--   ');
+fprintf('\n  ---  Printing mot file  ---   ');
 
 if fid == -1
     error(['unable to open ', fname])

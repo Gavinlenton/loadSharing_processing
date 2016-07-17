@@ -19,7 +19,7 @@ if systemUsed == 1
      
 else
      % Choose subject folder here
-     fName = uigetdir('/Users/s2921887/Google Drive/Load Sharing Main Data Collection/InputData', 'Select the Subject for analysis');
+     fName = uigetdir('/Users/s2921887/Google Drive/LS_main_data_collection/InputData', 'Select the Subject for analysis');
      
      % Select physical folder directory
      physFolder = uigetdir('/Users/s2921887/Documents/PhD_Griffith/', 'Select the input data folder on your physical drive');

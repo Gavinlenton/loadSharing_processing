@@ -18,34 +18,38 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
      cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
      
      % Run modified c3d2mat
-     C3D2MAT_cropped(fName, c3dFilesCropped, pname);
+%    C3D2MAT_cropped(fName, c3dFilesCropped, pname);
      
+% 	 % Figure properties
+% 	 cmap = colormap(parula(300));
+% 	 legendLabels=regexprep(c3dFilesCropped, '_', ' ');
+
      %% Loop through gait cycle trials
-     for croppedTrials = 1:length(c3dFilesCropped)
+     for croppedTrialNum = 1:length(c3dFilesCropped)
           
-          fileName = c3dFilesCropped{croppedTrials,1};
+          fileName = c3dFilesCropped{croppedTrialNum,1};
           
           %Load the cropped acquisition
           data1 = btk_loadc3d([pname, filesep, fileName], 50);
           
           % Assign force to feet, stitch forces together, and output .trc
           % and .mot files for further analysis.
-          [dataFinal, force_data2] = assignForceOutputTrcMot(data1);
+          
+          [dataFinal, force_data2] = assignForceOutputTrcMot(data1, croppedTrialNum);
           
           % Check to see if forces assigned correctly
-%           f = figure('Name', fileName);
-%           plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
-%                dataFinal.fp_data.Time(:), force_data2(:,8))
-%           xlabel('Time (s)'); ylabel('Force (N)'); title('Vertical GRF');
-%           legend('Right foot', 'Left foot');
-%           legend boxoff;
-%           
-%           uicontrol('Position',[0 0 200 40],'String','Continue',...
-%                'Callback','uiresume(gcbf)');
-%           fprintf('\nMot file printed, click continue if you''re happy with the output\n');
-%           uiwait(gcf, 5);
-%           close(f);
- 
+% 		  plotColor = cmap(round(1+5.5*(croppedTrials-1)),:);
+% 		  
+% 		  plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
+% 			  dataFinal.fp_data.Time(:), force_data2(:,8), 'Color', plotColor)
+% 		  hold on
+% 		  
+% 		  xlabel('Time (s)')
+% 		  ylabel('Force (N)')
+% 		  title('Vertical GRF')
+% 		  legend(legendLabels, 'Location', 'eastoutside')
+% 		  legend boxoff
+
           % Save output for future use
           outputDir = [pname, filesep, 'matData'];
           
@@ -55,9 +59,8 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
           
           save([outputDir, filesep, fileName(1:end-4), '.mat'], 'dataFinal');
 
-          % Close vars and figure to save memory
-          close(gcf);
-          clearvars dataFinal force_data2 data1
+          % Close vars to save memory
+          clearvars dataFinal force_data2 data1 fileName outputDir
      end
 
 end

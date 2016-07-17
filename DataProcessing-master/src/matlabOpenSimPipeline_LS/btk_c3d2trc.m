@@ -312,25 +312,26 @@ if isfield(data,'fp_data')
 
 newfilename = [fname(1:end-4) '_grf.mot'];
 
-pname = 'C:\Users\s2921887\Documents';
-
 data.GRF_Filename = [pname newfilename];
 
-fid_2 = fopen([pname filesep newfilename],'w');
+% Re-arrange so data matches MOtoNMS convention
 
-% write the header information
-fprintf(fid_2,'%s\n',newfilename);
-fprintf(fid_2,'version=1\n');
-fprintf(fid_2,'nRows=%d\n', length(fp_time));  % total # of datacolumns
-fprintf(fid_2,'nColumns %d\n',size(force_data_out,2)); % number of datarows
-fprintf(fid_2,'inDegrees=yes\n'); % range of time data
-fprintf(fid_2,'endheader\n');
-fprintf(fid_2,force_header);
 
-% write the data
-fprintf(fid_2,force_format,force_data_out');
-
-fclose(fid_2);
+% fid_2 = fopen([pname filesep newfilename],'w');
+% 
+% % write the header information
+% fprintf(fid_2,'%s\n',newfilename);
+% fprintf(fid_2,'version=1\n');
+% fprintf(fid_2,'nRows=%d\n', length(fp_time));  % total # of datacolumns
+% fprintf(fid_2,'nColumns %d\n',size(force_data_out,2)); % number of datarows
+% fprintf(fid_2,'inDegrees=yes\n'); % range of time data
+% fprintf(fid_2,'endheader\n');
+% fprintf(fid_2,force_header);
+% 
+% % write the data
+% fprintf(fid_2,force_format,force_data_out');
+% 
+% fclose(fid_2);
 
 disp('Done.')
 else disp('No force plate information available.')

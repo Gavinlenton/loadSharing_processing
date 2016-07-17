@@ -84,3 +84,246 @@ Wrote model file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\Elab
 Wrote scale file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_linearScaled.xml for model LS_023
 Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_linearScaled.osim
 Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_linearScaled.osim
+Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_Generic.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 2: Scaling generic model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Measurement 'head'
+	pair 0 (LFHD, LBHD): model = 0.152097, experimental = 0.161575
+	pair 1 (RFHD, RBHD): model = 0.152232, experimental = 0.133677
+	overall scale factor = 0.970218
+Measurement 'torso_height'
+	pair 0 (RHJC, CLAV): model = 0.607045, experimental = 0.513104
+	pair 1 (LHJC, CLAV): model = 0.607045, experimental = 0.510931
+	overall scale factor = 0.84346
+Measurement 'torso_breadth'
+	pair 0 (T8, CLAV): model = 0.224475, experimental = 0.203085
+	pair 1 (THO3, CLAV): model = 0.140246, experimental = 0.156339
+	overall scale factor = 1.00973
+Measurement 'torso_width'
+	pair 0 (RACR1, LACR1): model = 0.355381, experimental = 0.269515
+	overall scale factor = 0.758381
+Measurement 'Rhumerus'
+	pair 0 (RSJC, REJC): model = 0.30623, experimental = 0.310641
+	overall scale factor = 1.0144
+Measurement 'Lhumerus'
+	pair 0 (LSJC, LEJC): model = 0.310992, experimental = 0.306297
+	overall scale factor = 0.984903
+Measurement 'R_radius_ulna'
+	pair 0 (REJC, RWJC): model = 0.293585, experimental = 0.257157
+	overall scale factor = 0.875918
+Measurement ' L_radius_ulna'
+	pair 0 (LEJC, LWJC): model = 0.288681, experimental = 0.253026
+	overall scale factor = 0.876491
+Measurement 'R_hand'
+	pair 0 (RWJC, RCAR): model = 0.0639062, experimental = 0.0774787
+	overall scale factor = 1.21238
+Measurement 'L_hand'
+	pair 0 (LWJC, LCAR): model = 0.0699214, experimental = 0.0779929
+	overall scale factor = 1.11544
+Measurement 'pelvis_w'
+	pair 0 (RASI, LASI): model = 0.313598, experimental = 0.207686
+	pair 1 (RPSI, LPSI): model = 0.120919, experimental = 0.0722524
+	overall scale factor = 0.629899
+Measurement 'pelvis_d'
+	pair 0 (RPSI, RASI): model = 0.20382, experimental = 0.161439
+	pair 1 (LPSI, LASI): model = 0.211634, experimental = 0.153441
+	overall scale factor = 0.758549
+Measurement 'RFemurXY'
+	pair 0 (RHJC, RMFC): model = 0.4464, experimental = 0.419837
+	pair 1 (RHJC, RLFC): model = 0.441066, experimental = 0.414211
+	overall scale factor = 0.939804
+Measurement 'RFemurZ'
+	pair 0 (RMFC, RLFC): model = 0.101585, experimental = 0.0903684
+	overall scale factor = 0.889584
+Measurement 'RTibiaY'
+	pair 0 (RMFC, RAJC): model = 0.443778, experimental = 0.390673
+	pair 1 (RLFC, RAJC): model = 0.448527, experimental = 0.406467
+	overall scale factor = 0.89328
+Measurement 'RTibiaZ'
+	pair 0 (RMMAL, RLMAL): model = 0.0895794, experimental = 0.0702016
+	overall scale factor = 0.783681
+Measurement 'RFoot'
+	pair 0 (RCAL, RMT1): model = 0.237418, experimental = 0.207932
+	pair 1 (RCAL, RMT5): model = 0.204937, experimental = 0.192303
+	overall scale factor = 0.90708
+Measurement 'LFemurXY'
+	pair 0 (LHJC, LMFC): model = 0.444983, experimental = 0.424955
+	pair 1 (LHJC, LLFC): model = 0.444944, experimental = 0.413906
+	overall scale factor = 0.942616
+Measurement 'LFemurZ'
+	pair 0 (LMFC, LLFC): model = 0.0994584, experimental = 0.0808402
+	overall scale factor = 0.812804
+Measurement 'LTibiaY'
+	pair 0 (LMFC, LAJC): model = 0.445755, experimental = 0.39013
+	pair 1 (LLFC, LAJC): model = 0.445761, experimental = 0.40359
+	overall scale factor = 0.890304
+Measurement 'LTibiaZ'
+	pair 0 (LLMAL, LMMAL): model = 0.0909492, experimental = 0.076356
+	overall scale factor = 0.839546
+Measurement 'LFoot'
+	pair 0 (LCAL, LMT5): model = 0.19861, experimental = 0.198649
+	pair 1 (LCAL, LMT1): model = 0.234728, experimental = 0.214683
+	overall scale factor = 0.9574
+Wrote model file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim from model LS_023
+Wrote scale file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.xml for model LS_023
+Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded model LS_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (79 markers, 261 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (79 markers, 261 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (frames 36 to 47)
+Deleted 15 unused markers from model LS_023
+Frame at (t=0):	total squared error = 0.0221888, marker error: RMS=0.0244887, max=0.0546096 (LCAL)
+Moved markers in model LS_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc
+Wrote model file Subject 14_optmkrpos.osim from model LS_023
+Wrote marker file Subject 14_markeradjustment.xml from model LS_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_Generic.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 2: Scaling generic model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Measurement 'head'
+	pair 0 (LFHD, LBHD): model = 0.152097, experimental = 0.161575
+	pair 1 (RFHD, RBHD): model = 0.152232, experimental = 0.133677
+	overall scale factor = 0.970218
+Measurement 'torso_height'
+	pair 0 (RHJC, CLAV): model = 0.615998, experimental = 0.513104
+	pair 1 (LHJC, CLAV): model = 0.615598, experimental = 0.510931
+	overall scale factor = 0.83147
+Measurement 'torso_breadth'
+	pair 0 (T8, CLAV): model = 0.227768, experimental = 0.203085
+	pair 1 (THO3, CLAV): model = 0.137081, experimental = 0.156339
+	overall scale factor = 1.01606
+Measurement 'torso_width'
+	pair 0 (RSJC, LSJC): model = 0.349451, experimental = 0.266866
+	overall scale factor = 0.763674
+Measurement 'Rhumerus'
+	pair 0 (RSJC, REJC): model = 0.354022, experimental = 0.310641
+	overall scale factor = 0.877464
+Measurement 'Lhumerus'
+	pair 0 (LSJC, LEJC): model = 0.35238, experimental = 0.306297
+	overall scale factor = 0.869224
+Measurement 'R_radius_ulna'
+	pair 0 (REJC, RWJC): model = 0.28827, experimental = 0.257157
+	overall scale factor = 0.892067
+Measurement ' L_radius_ulna'
+	pair 0 (LEJC, LWJC): model = 0.288388, experimental = 0.253026
+	overall scale factor = 0.877382
+Measurement 'R_hand'
+	pair 0 (RWJC, RCAR): model = 0.0671908, experimental = 0.0774787
+	overall scale factor = 1.15311
+Measurement 'L_hand'
+	pair 0 (LWJC, LCAR): model = 0.0698797, experimental = 0.0779929
+	overall scale factor = 1.1161
+Measurement 'pelvis_w'
+	pair 0 (RASI, LASI): model = 0.311211, experimental = 0.207686
+	pair 1 (RPSI, LPSI): model = 0.120919, experimental = 0.0722524
+	overall scale factor = 0.632439
+Measurement 'pelvis_d'
+	pair 0 (RPSI, RASI): model = 0.208652, experimental = 0.161439
+	pair 1 (LPSI, LASI): model = 0.211634, experimental = 0.153441
+	overall scale factor = 0.749379
+Measurement 'RFemurXY'
+	pair 0 (RHJC, RMFC): model = 0.4464, experimental = 0.419837
+	pair 1 (RHJC, RLFC): model = 0.439123, experimental = 0.414211
+	overall scale factor = 0.941882
+Measurement 'RFemurZ'
+	pair 0 (RMFC, RLFC): model = 0.100644, experimental = 0.0903684
+	overall scale factor = 0.897901
+Measurement 'RTibiaY'
+	pair 0 (RMFC, RAJC): model = 0.415108, experimental = 0.390673
+	pair 1 (RLFC, RAJC): model = 0.420347, experimental = 0.406467
+	overall scale factor = 0.954057
+Measurement 'RTibiaZ'
+	pair 0 (RMMAL, RLMAL): model = 0.0896115, experimental = 0.0702016
+	overall scale factor = 0.7834
+Measurement 'RFoot'
+	pair 0 (RCAL, RMT1): model = 0.237226, experimental = 0.207932
+	pair 1 (RCAL, RMT5): model = 0.204614, experimental = 0.192303
+	overall scale factor = 0.908174
+Measurement 'LFemurXY'
+	pair 0 (LHJC, LMFC): model = 0.444983, experimental = 0.424955
+	pair 1 (LHJC, LLFC): model = 0.444944, experimental = 0.413906
+	overall scale factor = 0.942616
+Measurement 'LFemurZ'
+	pair 0 (LMFC, LLFC): model = 0.0994584, experimental = 0.0808402
+	overall scale factor = 0.812804
+Measurement 'LTibiaY'
+	pair 0 (LMFC, LAJC): model = 0.418013, experimental = 0.39013
+	pair 1 (LLFC, LAJC): model = 0.416325, experimental = 0.40359
+	overall scale factor = 0.951354
+Measurement 'LTibiaZ'
+	pair 0 (LLMAL, LMMAL): model = 0.0908925, experimental = 0.076356
+	overall scale factor = 0.84007
+Measurement 'LFoot'
+	pair 0 (LCAL, LMT5): model = 0.19861, experimental = 0.198649
+	pair 1 (LCAL, LMT1): model = 0.234728, experimental = 0.214683
+	overall scale factor = 0.9574
+Wrote model file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim from model LoadSharing_023
+Wrote scale file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.xml for model LoadSharing_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (frames 36 to 47)
+Deleted 7 unused markers from model LoadSharing_023
+Frame at (t=0):	total squared error = 0.0365525, marker error: RMS=0.0233572, max=0.0784361 (LTH2)
+Moved markers in model LoadSharing_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc
+Wrote model file Subject 14_optmkrpos.osim from model LoadSharing_023
+Wrote marker file Subject 14_markeradjustment.xml from model LoadSharing_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (frames 36 to 47)
+Deleted 7 unused markers from model LoadSharing_023
+Frame at (t=0):	total squared error = 0.03926, marker error: RMS=0.0249635, max=0.0721799 (LTH2)
+Moved markers in model LoadSharing_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc
+Wrote model file Subject 14_optmkrpos.osim from model LoadSharing_023
+Wrote marker file Subject 14_markeradjustment.xml from model LoadSharing_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (frames 36 to 47)
+Deleted 7 unused markers from model LoadSharing_023
+Frame at (t=0):	total squared error = 0.0302316, marker error: RMS=0.0212419, max=0.0482662 (LTH1)
+Moved markers in model LoadSharing_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc
+Wrote model file Subject 14_optmkrpos.osim from model LoadSharing_023
+Wrote marker file Subject 14_markeradjustment.xml from model LoadSharing_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (frames 36 to 47)
+Deleted 7 unused markers from model LoadSharing_023
+Frame at (t=0):	total squared error = 0.0107569, marker error: RMS=0.0126709, max=0.0228693 (LTH1)
+Moved markers in model LoadSharing_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc
+Wrote model file Subject 14_optmkrpos.osim from model LoadSharing_023
+Wrote marker file Subject 14_markeradjustment.xml from model LoadSharing_023
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_optmkrpos.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_Scaled_Pose_OptMusc.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_optmkrpos.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_Scaled_Pose_OptMusc.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_optmkrpos.osim
+Loaded model LoadSharing_023 from file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (79 markers, 261 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (79 markers, 261 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc (frames 36 to 47)
+Deleted 15 unused markers from model LoadSharing_023
+Frame at (t=0):	total squared error = 0.0564822, marker error: RMS=0.027816, max=0.0673661 (T8)
+Moved markers in model LoadSharing_023 to match locations in marker file Z:\s2921887\Google Drive\Load Sharing Main Data Collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_SORD15\StaticCal\Static1_SORD15.trc
+Wrote model file Subject 14_optmkrpos.osim from model LoadSharing_023
+Wrote marker file Subject 14_markeradjustment.xml from model LoadSharing_023

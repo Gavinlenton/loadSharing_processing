@@ -21,6 +21,10 @@ clear; clc; close all;
 if ispc
      % For PC use
     [fName, physFolder, motoDir, subjectFolders, subjectName] = defineFolders(1);
+	addpath('Z:\s2921887\Google Drive\LS_main_data_collection\DataProcessing-master\src');
+	addpath('Z:\s2921887\Google Drive\LS_main_data_collection\DataProcessing-master\src\c3dProcessing');
+	addpath('Z:\s2921887\Google Drive\LS_main_data_collection\DataProcessing-master\src\emgProcessing');
+	addpath('Z:\s2921887\Google Drive\LS_main_data_collection\DataProcessing-master\src\matlabOpenSimPipeline_LS');
 else
      % Mac or Linux
      [fName, physFolder, motoDir, subjectFolders, subjectName] = defineFolders(2);
