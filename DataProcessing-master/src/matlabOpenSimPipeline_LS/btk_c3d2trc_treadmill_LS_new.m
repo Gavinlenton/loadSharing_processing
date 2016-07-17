@@ -210,7 +210,7 @@ if isfield(data,'fp_data')
 		force_data_filtered(a4,col1+16) = lpfilter(force_data_out(a4,col1+16),filt_freq,dt, 'damped', 10);
 		
 		% COP front
-		force_data_filtered(a(1)+1:a(end)+5, col1+4) = lpfilter(force_data_out(a(1)+1:a(end)+5, col1+4), 6,dt, 'butter', 2);
+		force_data_filtered(a(1)+1:a(end)+4, col1+4) = lpfilter(force_data_out(a(1)+1:a(end)+4, col1+4), 6,dt, 'butter', 2);
 		% COP rear
 		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 6,dt, 'butter', 2);
 	end
@@ -240,24 +240,51 @@ if isfield(data,'fp_data')
 	force_data2(:,13:15) = forceData(:,8:10);
 	force_data2(:,16:18) = forceData(:,17:19);
 	
-	% Define path and file names
-	filenum = varargin{3};
+	%% Find where force on left leg is zeroing and fix
+	salame = find(force_data2(600:end, 8) == 0) + 599;
+	
+	% Only fix if there's a zero value
+	if ~isempty(salame)
+		if length(salame) > 1
+			% If there's more than 1 frame zeroed then apply interp
+			for columnM = 1:3
+				force_data2(salame(1):salame(end), columnM+6) = (force_data2(salame(1)-1, columnM+6)...
+					+ force_data2(salame(end)+1, columnM+6))/2;
+				force_data2(salame(1):salame(end), columnM+15) = (force_data2(salame(1)-1, columnM+15)...
+					+ force_data2(salame(end)+1, columnM+15))/2;
+			end
+			% Loop through columns and fix by taking mean of previous and
+			% following frame
+		else
+			for columnF = 1:3
+				force_data2(salame, columnF+6) = (force_data2(salame-1, columnF+6)...
+					+ force_data2(salame+1, columnF+6))/2;
+				force_data2(salame, columnF+15) = (force_data2(salame-1, columnF+15)...
+					+ force_data2(salame+1, columnF+15))/2;
+			end
+		end
+	end
+	
+	%% Define path and file names
 	indexName = regexp(fname(1:end-4), 'd\d*');
-	fileNameTRC = [fname(1:indexName), num2str(filenum), '.trc'];
+	fileNameTRC = [fname(1:end-4), '.trc'];
 	fileNameGRF = regexprep(fileNameTRC, '.trc', '_grf.mot');
 	
 	% Define path name to new folder
 	newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
 		'dynamicElaborations', filesep, fileNameTRC(1:indexName)];
 	
+	% Final path name to store .trc and .mot files
+	finalpathname = [newpathname, filesep, fileNameTRC(1:end-4)];
+	
 	if any(isempty(fieldnames(data.GRF.FP(i))))
 		% Specify new file name if there is missing data name so I know to
 		% check data
-		disp('Trial is missing data so GRFs not printed')
+		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_data2(loc1(1):loc1(end), 2) < 100)
+	elseif any(force_data2(loc1(1):loc1(end), 2) < 70)
 		% If there is issue with force assignment then don't print name
-		disp('Trial has dodgy data so not printing GRFs');
+		disp('Trial has dodgy data, not printing GRFs');
 		
 	else
 		
@@ -267,7 +294,11 @@ if isfield(data,'fp_data')
 			mkdir(newpathname);
 		end
 		
-		fullFileNameGRF = [newpathname, filesep, fileNameGRF];
+		%Create new folder to store individual .trc and .mot files
+		mkdir(finalpathname);
+		
+		fullFileNameGRF = [finalpathname, filesep, fileNameGRF];
+		
 		% Write the MOT file using MOtoNMS function
 		writeMot_LS(force_data2 ,forceData(:,1), fullFileNameGRF);
 	end
@@ -280,7 +311,7 @@ end
 %% Write trc file containing marker data
 
 % Only print trc if the GRF was printed
-if exist(newpathname, 'dir')
+if exist(finalpathname, 'dir')
 	
 	% initialise the matrix that contains the data as a frame number and time row
 	data_out = [nframe; data.time'];
@@ -324,11 +355,7 @@ if exist(newpathname, 'dir')
 		markersData(:,col) = data_out_filtered(:,col);
 	end
 	
-	% %Create new folder to store individual .trc and .mot files
-	% finalpathname = [newpathname, filesep, filenameTRC(1:end-4)];
-	% mkdir(finalpathname);
-	
-	fullFileNameTRC = [newpathname filesep fileNameTRC];
+	fullFileNameTRC = [finalpathname filesep fileNameTRC];
 	
 	% Marker labels names
 	MLabels = markers;
@@ -339,5 +366,6 @@ if exist(newpathname, 'dir')
 else
 	% if dir does not exist then grf file was not printed, which means we
 	% don't want the kinematics printed.
-	fprintf('GRF was dodgy for trial %s, so not printing .trc', trcFileName)
+	fprintf('GRF was dodgy for trial %s, so not printing\n', fileNameTRC);
+	force_data2 = [];
 end

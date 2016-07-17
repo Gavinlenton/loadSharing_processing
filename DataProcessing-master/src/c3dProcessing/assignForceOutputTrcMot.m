@@ -1,4 +1,4 @@
-function [dataFinal, force_data2] = assignForceOutputTrcMot(data, croppedTrialNum)
+function [dataFinal, force_data2] = assignForceOutputTrcMot(data)
 %Assign forces to a each foot and use this data to create .trc and .mot
 %files for OpenSim
 %   % Assign force to the feet and generate the .trc and .mot files. Data
@@ -15,7 +15,7 @@ function [dataFinal, force_data2] = assignForceOutputTrcMot(data, croppedTrialNu
           %Create the .trc and .mot files
 %           [dataFinal, force_data2] = btk_c3d2trc_treadmill_LS(dataForcesAssigned,'off');
           
-          [dataFinal, force_data2] = btk_c3d2trc_treadmill_LS_new(dataForcesAssigned2,'off', croppedTrialNum);
+          [dataFinal, force_data2] = btk_c3d2trc_treadmill_LS_new(dataForcesAssigned2,'off');
           
           % Alternative if things aren't working
 %           [dataFinal] = btk_c3d2trc(dataForcesAssigned,'off');
