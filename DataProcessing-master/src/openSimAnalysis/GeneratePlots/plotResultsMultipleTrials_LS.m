@@ -39,7 +39,9 @@ for k=1:length(trialsList)
 	results = file.data./subject_weight;
 	
 	% Extract max, min, and range from each data set
-	%%EDITT THIS LATER
+	maxResult = 
+	minResult = 
+	rangeResult = 
 	
 	for j =1: length(coord_idx)
 		

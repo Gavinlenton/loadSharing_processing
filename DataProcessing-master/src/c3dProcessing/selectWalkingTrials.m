@@ -12,6 +12,8 @@ function [dynamicCropFolder] = selectWalkingTrials(c3dFolder, isKneeFJC)
      c3dFolder(strncmp(c3dFolder, 'UUA', 3)) = [];
      c3dFolder(strncmp(c3dFolder, '.', 1)) = [];
      c3dFolder(strncmp(c3dFolder, '..', 2)) = [];
+	 c3dFolder(strncmp(c3dFolder, 'maxEMG', 6)) = [];
+	 c3dFolder(strncmp(c3dFolder, 'emgMax', 6)) = [];
      
      if isKneeFJC ==0
      c3dFolder(strncmp(c3dFolder, 'KneeFJC', 7)) = [];

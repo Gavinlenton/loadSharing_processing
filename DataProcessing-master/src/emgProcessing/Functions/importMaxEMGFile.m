@@ -60,7 +60,4 @@ fclose(fileID);
 
 Muscle = dataArray{:, 1};
 MaxEMGvalue = dataArray{:, 2};
-Trial = dataArray{:, 3};
-Times = dataArray{:, 4};
-Frame = dataArray{:, 5};
 

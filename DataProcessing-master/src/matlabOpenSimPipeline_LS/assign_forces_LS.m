@@ -48,7 +48,7 @@ if ~isfield(data,'fp_data')
           'that contains force plate data - see btk_loadc3d']);
 end
 
-% check that the is one assigned marker for each assigned body
+% check that there is one assigned marker for each assigned body
 if iscell(assign_markers)
      if iscell(assign_bodies)
           if length(assign_markers) ~= length(assign_bodies)
@@ -65,7 +65,7 @@ end
 % assigned to the bodies that the marker attaches to
 
 % define the ratio of force sampling frequency to marker sampling frequency
-F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; %assume same sampling frequency on all plates!!!
+% F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; %assume same sampling frequency on all plates!!!
 dt = 1/data.fp_data.Info(1).frequency;
 
      % initilise the first lot of force arrays (this will grow as different
@@ -129,72 +129,89 @@ for i = 1:length(data.fp_data.GRF_data)
           
           %  Detect if force assignments were incorrect
           % (Should always be at least two on and two off events in FP1)
-          if i == 1 && length(on_i) ~= 2
-               disp('Threshold not high enough to detect multiple events, increasing to 50N')
-               % Try increasing threshold
-               thresh = 50;
-               nt = find(Fv>thresh(1));
-               
-               dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
-               on_i = [nt(1); nt(dnt+1)];
-               off_i = [nt(dnt); nt(end)];
-               
-               % Check parameters for inconsistencies.
-               if (off_i(1)-on_i(1)) < 7
-                    off_i(1) = [];
-                    on_i(1) = [];
-               end
-               
-               if (off_i(end)-on_i(end)) < 7
-                    off_i(end) = [];
-                    on_i(end) = [];
-               end
-               
-               ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.1);
-               if ~isempty(ns)
-                    if ns(end) == length(off_i)
-                         ns(end) = [];
-                    end
-                    off_i(ns) = [];
-                    on_i(ns+1) = [];
-               end
-          end
-          
-           if i == 2 && length(on_i) ~= 3
-               disp('Not enough events on FP2, modifying parameters')
-               % Try increasing threshold
-               try thresh = 50;
-               nt = find(Fv>thresh(1));
-               dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
-               on_i = [nt(1); nt(dnt+1)];
-               off_i = [nt(dnt); nt(end)];
-               disp('Changed FP thresh');
-               catch
-               end
-               if length(on_i) ~= 3
-                    
-                    % Then try reducing time between events
-                    thresh = 30;
-                    nt = find(Fv>thresh(1));
-                    disp('Changed time between events');
-               
-               try dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
-                         on_i = [nt(1); nt(dnt+1)];
-                         off_i = [nt(dnt); nt(end)];
-               catch
-               end
-               end
-               if length(on_i) ~= 3
-                    % Do both
-                    thresh = 50;
-                    nt = find(Fv>thresh(1));
-                    dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
-                    on_i = [nt(1); nt(dnt+1)];
-                    off_i = [nt(dnt); nt(end)];
-                    disp('Changed FP thresh and event timing');
-               end
-           end
-               
+		  if i == 1 && length(on_i) ~= 2
+			  disp('Threshold not high enough to detect multiple events, increasing to 50N')
+			  % Try increasing threshold
+			  thresh = 50;
+			  nt = find(Fv>thresh(1));
+			  
+			  dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
+			  on_i = [nt(1); nt(dnt+1)];
+			  off_i = [nt(dnt); nt(end)];
+			  
+			  % Check parameters for inconsistencies.
+			  if (off_i(1)-on_i(1)) < 7
+				  off_i(1) = [];
+				  on_i(1) = [];
+			  end
+			  
+			  if (off_i(end)-on_i(end)) < 7
+				  off_i(end) = [];
+				  on_i(end) = [];
+			  end
+			  
+			  ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.1);
+			  if ~isempty(ns)
+				  if ns(end) == length(off_i)
+					  ns(end) = [];
+				  end
+				  off_i(ns) = [];
+				  on_i(ns+1) = [];
+			  end
+		  end
+		  
+		  if i == 2 && length(on_i) ~= 3
+			  disp('Not enough events on FP2, modifying parameters')
+			  % Try increasing threshold
+			  try thresh = 50;
+				  nt = find(Fv>thresh(1));
+				  dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
+				  on_i = [nt(1); nt(dnt+1)];
+				  off_i = [nt(dnt); nt(end)];
+				  disp('Changed FP thresh');
+			  catch
+			  end
+			  if length(on_i) ~= 3
+				  
+				  % Then try reducing time between events
+				  thresh = 30;
+				  nt = find(Fv>thresh(1));
+				  disp('Changed time between events');
+				  
+				  try dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
+					  on_i = [nt(1); nt(dnt+1)];
+					  off_i = [nt(dnt); nt(end)];
+				  catch
+				  end
+			  end
+			  if length(on_i) ~= 3
+				  % Do both
+				  thresh = 50;
+				  nt = find(Fv>thresh(1));
+				  try
+					  dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
+					  on_i = [nt(1); nt(dnt+1)];
+					  off_i = [nt(dnt); nt(end)];
+					  disp('Changed FP thresh and event timing');
+				  catch
+				  end
+			  end
+			  
+			  % Try again and reduce time between events to 1 frame
+			  if length(on_i) ~= 3
+				  % Do both
+				  thresh = 50;
+				  nt = find(Fv>thresh(1));
+				  try
+					  dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.001);
+					  on_i = [nt(1); nt(dnt+1)];
+					  off_i = [nt(dnt); nt(end)];
+					  disp('Changed FP thresh and event timing AGAIN');
+				  catch
+				  end
+			  end
+		  end
+		  
            % Check parameters for inconsistencies.
            if (off_i(1)-on_i(1)) < 7
                 off_i(1) = [];

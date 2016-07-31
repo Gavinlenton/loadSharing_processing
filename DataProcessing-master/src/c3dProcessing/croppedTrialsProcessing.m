@@ -18,11 +18,11 @@ c3dFilesCropped = selectWalkingTrials(c3dFilesCropped, 0);
 cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
 
 % Run modified c3d2mat
-%    C3D2MAT_cropped(fName, c3dFilesCropped, pname);
+   C3D2MAT_cropped(fName, c3dFilesCropped, pname);
 
 % 	 % Figure properties
-cmap = colormap(parula(350));
-legendLabels=regexprep(c3dFilesCropped, '_', ' ');
+% cmap = colormap(parula(350));
+% legendLabels=regexprep(c3dFilesCropped, '_', ' ');
 
 %% Loop through gait cycle trials
 for croppedTrialNum = 1:length(c3dFilesCropped)
@@ -39,19 +39,19 @@ for croppedTrialNum = 1:length(c3dFilesCropped)
 	
 	if ~isempty(force_data2)
 		
-		% Check to see if forces assigned correctly
-		plotColor = cmap(round(1+1.5*(croppedTrialNum-1)),:);
-		
-		plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
-			dataFinal.fp_data.Time(:), force_data2(:,8), 'Color', plotColor)
-		hold on
-		
-		xlabel('Time (s)')
-		ylabel('Force (N)')
-		title('Vertical GRF')
-		legend(legendLabels, 'Location', 'eastoutside')
-		legend boxoff
-		
+		% Uncomment to check to see if forces assigned correctly
+% 		plotColor = cmap(round(1+1.5*(croppedTrialNum-1)),:);
+% 		
+% 		plot(dataFinal.fp_data.Time(:), force_data2(:,2),...
+% 			dataFinal.fp_data.Time(:), force_data2(:,8), 'Color', plotColor)
+% 		hold on
+% 		
+% 		xlabel('Time (s)')
+% 		ylabel('Force (N)')
+% 		title('Vertical GRF')
+% 		legend(legendLabels, 'Location', 'eastoutside')
+% 		legend boxoff
+% 		
 		% Save output for future use
 		outputDir = [pname, filesep, 'matData'];
 		

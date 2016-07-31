@@ -5,7 +5,7 @@ function [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
 %   Input the pathname to determine max EMG trial name, path names, and
 %   dynamic folder names
 
-% Prompt to choose the files for EMG normalisation
+% Choose the files for EMG normalisation
 % SQUAT TRIAL = KFJC1/2
 
 % Path to eventually store elaboratedData

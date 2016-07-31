@@ -1,4 +1,4 @@
-function emgProcessingMain(pname, c3dFile_name, maxc3dFile_name, maxc3dFileOther, sessionData, maxName, motoDir, dynamicFolders, times)
+function emgProcessingMain(pname, c3dFile_name, sessionData, motoDir, dynamicFolders, times)
 %Main function to process Load Sharing EMG data
 %   Input the relevant directories and process EMG depending on whether max
 %   data exists, if current file is a max file, and output the EMG mot
@@ -6,16 +6,15 @@ function emgProcessingMain(pname, c3dFile_name, maxc3dFile_name, maxc3dFileOther
 
 % Check to see if  trial will be used as maximum for normalisation.
 % Inline function to determine if string exists
-cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
-cell_array = dynamicFolders;
-string = maxName;
-isMaxExist = cellfun(cellfind(string), cell_array);
+% cellfind = @(string)(@(cell_contents)(strcmp(string, cell_contents)));
+% cell_array = dynamicFolders;
+% string = maxName;
+% isMaxExist = cellfun(cellfind(string), cell_array);
 
-% Set isMax based on the trial being a max trial (or not)
-isMax = ismember(dynamicFolders(any(isMaxExist,2)), c3dFile_name(1:end-4));
+% % Set isMax based on the trial being a max trial (or not)
+% isMax = ismember(dynamicFolders(any(isMaxExist,2)), c3dFile_name(1:end-4));
 
-emgMaxCondition = [sessionData, filesep, maxc3dFile_name(1:end-4)];
-emgMaxFileLoc = [emgMaxCondition, filesep, 'maxEMG'];
+emgMaxFileLoc = [sessionData, filesep, 'emgMax'];
 emgMaxFile = [emgMaxFileLoc, filesep, 'maxEMG.txt'];
 
 % Create folder to put max EMG if it doesn't exist already
@@ -37,74 +36,126 @@ end
 
 tf = isempty(k);
 
-
-% Use isMax comparison to see if EMG processing will be performed
-if any(isMax(:) == 1)
-     
-     % Check to see if max file already exists
-     if ~exist(emgMaxFile, 'file')
-          % Load data for max trial so we can process this first
-          emgProcessingMaxLS('no', sessionData, maxc3dFile_name(1:end-4), motoDir);
-          disp('Maximum trial finished processing');
-     else
-          disp('Maximum trial has already been analysed for this session, continuing with analysis...');
-     end
-     
-     
+if tf == 0
+	
+	if ~exist(emgMaxFile, 'file')
+		
+		% Load data for max trial so we can process this first
+		% without notch filter
+		emgProcessingMaxMultiple('no', sessionData, dynamicFolders, motoDir);
+		disp('Max processing done, loading for EMG processing...');
+		
+		% Only run on waking trials - not kneeFJC trials
+		if ~strcmp(c3dFile_name(1:4), 'Knee')
+		[emgMax] = importMaxEMGFile(emgMaxFile);
+		emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+		end
+	
+	else
+		% Load max trial value and process
+		if ~strcmp(c3dFile_name(1:4), 'Knee')
+		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+		end
+	end
+	
 else
-     
-     % Check to see if max file already exists
-     if ~exist(emgMaxFile, 'file')
-          
-          disp('EMG max does not exist, processing this max trial first...');
-          
-          if tf == 0
-               
-               % Load data for max trial so we can process this first
-               % without notch filter
-               emgProcessingMaxLS('no', sessionData, maxName, motoDir);
-               disp('Max trial done, loading for EMG processing...');
-               [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
-               emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
-               
-          else
-               
-               % Processing for EMG data collected directly in nexus, this includes a
-               % notch filter
-               emgProcessingMaxLS('yes', sessionData, maxName, motoDir);
-               disp('Max trial done, loading for EMG processing...');
-               
-               % Load Max file
-               [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
-               
-               % Then process
-               emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
-               
-          end
-          
-          % If it's the other KneeFJC trial then skip this
-     elseif strcmp(c3dFile_name, maxc3dFileOther)
-          disp([c3dFile_name, ' is the other max trial, but we''re using ', maxc3dFile_name]);
-          
-     else
-          disp('Maximum trial exists, running EMG processing...');
-          
-          % Load max trial data
-          [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
-          
-          if tf == 0
-               % Run EMG processing for .txt data
-               emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
-               
-          else
-               % Processing for EMG data collected directly in nexus, this includes a
-               % notch filter
-               emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
-          end
-          
-          disp(' EMG Processing complete');
-     end
-end
-clearvars
+	
+	% If not ASCII file then we need to apply notch filter
+	if ~exist(emgMaxFile, 'file')
+		
+		% Load data for max trial so we can process this first
+		% with notch filter
+		emgProcessingMaxMultiple('yes', sessionData, dynamicFolders, motoDir);
+		disp('Max processing done, loading for EMG processing...');
+		
+		if ~strcmp(c3dFile_name(1:4), 'Knee')
+		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+		end
+		
+	else
+		% Load max trial value and process
+		if ~strcmp(c3dFile_name(1:4), 'Knee')
+		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+		end
+	end
+	
 end
 
+disp(' EMG Processing complete');
+
+clearvars
+
+% 
+% % Use isMax comparison to see if EMG processing will be performed
+% if any(isMax(:) == 1)
+%      
+%      % Check to see if max file already exists
+%      if ~exist(emgMaxFile, 'file')
+%           % Load data for max trial so we can process this first
+%           emgProcessingMaxLS('no', sessionData, maxc3dFile_name(1:end-4), motoDir);
+%           disp('Maximum trial finished processing');
+%      else
+%           disp('Maximum trial has already been analysed for this session, continuing with analysis...');
+%      end
+%      
+%      
+% else
+%      
+%      % Check to see if max file already exists
+%      if ~exist(emgMaxFile, 'file')
+%           
+%           disp('EMG max does not exist, processing this max trial first...');
+%           
+%           if tf == 0
+%                
+%                % Load data for max trial so we can process this first
+%                % without notch filter
+%                emgProcessingMaxLS('no', sessionData, maxName, motoDir);
+%                disp('Max trial done, loading for EMG processing...');
+%                [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+%                emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+%                
+%           else
+%                
+%                % Processing for EMG data collected directly in nexus, this includes a
+%                % notch filter
+%                emgProcessingMaxLS('yes', sessionData, maxName, motoDir);
+%                disp('Max trial done, loading for EMG processing...');
+%                
+%                % Load Max file
+%                [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+%                
+%                % Then process
+%                emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+%                
+%           end
+%           
+%           % If it's the other KneeFJC trial then skip this
+%      elseif strcmp(c3dFile_name, maxc3dFileOther)
+%           disp([c3dFile_name, ' is the other max trial, but we''re using ', maxc3dFile_name]);
+%           
+%      else
+%           disp('Maximum trial exists, running EMG processing...');
+%           
+%           % Load max trial data
+%           [emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+%           
+%           if tf == 0
+%                % Run EMG processing for .txt data
+%                emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+%                
+%           else
+%                % Processing for EMG data collected directly in nexus, this includes a
+%                % notch filter
+%                emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+%           end
+%           
+%           disp(' EMG Processing complete');
+%      end
+% end
+% clearvars
+% end
+% 

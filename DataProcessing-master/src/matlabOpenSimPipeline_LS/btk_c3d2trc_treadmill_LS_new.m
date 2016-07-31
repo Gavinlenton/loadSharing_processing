@@ -114,6 +114,77 @@ for i = 1:nmarkers
 		data.marker_data.Markers.(markers{i})(:,3) data.marker_data.Markers.(markers{i})(:,1)]/p_sc;
 end
 
+%% Write trc file containing marker data
+
+% initialise the matrix that contains the data as a frame number and time row
+data_out = [nframe; data.time'];
+
+% each of the data columns (3 per marker) will be in floating format with a
+% tab delimiter - also add to the data matrix
+for i = 1:nmarkers
+	
+	% add 3 rows of data for the X Y Z coordinates of the current marker
+	% first check for NaN's and fill with a linear interpolant - warn the
+	% user of the gaps
+	clear m
+	m = find(isnan(data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),1))>0);
+	if ~isempty(m);
+		clear t d
+		disp(['Warning -' markers{i} ' data missing in parts. Frames ' num2str(m(1)) '-'  num2str(m(end))])
+		t = time;
+		t(m) = [];
+		d = data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:);
+		d(m,:) = [];
+		data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:) = interp1(t,d,time,'linear','extrap');
+	end
+	data_out = [data_out; data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:)'];
+end
+
+% Assign marker info to markersData
+markersData = data_out';
+
+% Apply filter here
+data_out_filtered = zeros(size(markersData));
+
+% Sampling freq
+Fs = 1/data.marker_data.Info.frequency;
+
+% Filter freq
+Fc = 8;
+
+% Apply 2nd order Butterworth filt with two passes.
+for col = 3:length(data_out)
+	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter', 2);
+	markersData(:,col) = data_out_filtered(:,col);
+end
+
+%% Define path and file names
+indexName = regexp(fname(1:end-4), 'd\d*');
+fileNameTRC = [fname(1:end-4), '.trc'];
+fileNameGRF = regexprep(fileNameTRC, '.trc', '_grf.mot');
+
+% Define path name to new folder
+newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
+	'dynamicElaborations', filesep, fileNameTRC(1:indexName)];
+
+
+
+% Final path name to store .trc and .mot files
+finalpathname = [newpathname, filesep, fileNameTRC(1:end-4)];
+
+% Add folder for the condition and walking speed in session
+if ~exist(finalpathname, 'dir')
+	mkdir(finalpathname);
+end
+
+fullFileNameTRC = [finalpathname filesep fileNameTRC];
+
+% Marker labels names
+MLabels = markers;
+
+% Write the trc file
+writetrc_LS(markersData,MLabels,data.marker_data.Info.frequency,fullFileNameTRC);
+
 %% Write motion file containing GRFs
 
 if isfield(data,'fp_data')
@@ -196,7 +267,6 @@ if isfield(data,'fp_data')
 	dt = 1/data.fp_data.Info(1).frequency;
 	
 	force_data_filtered = zeros(size(force_data_out));
-	forceData = force_data_out;
 	
 	% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
 	for col1 = 1:3
@@ -210,7 +280,11 @@ if isfield(data,'fp_data')
 		force_data_filtered(a4,col1+16) = lpfilter(force_data_out(a4,col1+16),filt_freq,dt, 'damped', 10);
 		
 		% COP front
+		if a(end) ~= length(fp_time1)
 		force_data_filtered(a(1)+1:a(end)+4, col1+4) = lpfilter(force_data_out(a(1)+1:a(end)+4, col1+4), 6,dt, 'butter', 2);
+		else
+			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), 6,dt, 'butter', 2);
+		end
 		% COP rear
 		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 6,dt, 'butter', 2);
 	end
@@ -224,21 +298,23 @@ if isfield(data,'fp_data')
 	force_data_filtered(a4, 17:19) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 17:19));
 	
 	% Clean up COP
+	if a(end) ~= length(fp_time1)
 	force_data_filtered(a(1)+1:a(end)+5, 5:7) = matfiltfilt(dt,8,2, force_data_filtered(a(1)+1:a(end)+5, 5:7));
+	else
+		force_data_filtered(a(1)+1:a(end), 5:7) = matfiltfilt(dt,8,2, force_data_filtered(a(1)+1:a(end), 5:7));
+	end
 	force_data_filtered(a(1):a(1)+1, 7) = 0;
 	force_data_filtered(a2, 14:16) = matfiltfilt(dt,8,2, force_data_filtered(a2, 14:16));
 	
-	
-	forceData(:,2:19) = force_data_filtered(:,2:19);
 	% assign a value of zero to any NaNs
-	forceData(logical(isnan(force_data_filtered))) = 0;
+	force_data_filtered(logical(isnan(force_data_filtered))) = 0;
 	
 	% Re-arrange so data matches MOtoNMS convention
-	force_data2 = forceData(:, 2:19);
+	force_data2 = force_data_filtered(:, 2:19);
 	
-	force_data2(:,7:12) = forceData(:,11:16);
-	force_data2(:,13:15) = forceData(:,8:10);
-	force_data2(:,16:18) = forceData(:,17:19);
+	force_data2(:,7:12) = force_data_filtered(:,11:16);
+	force_data2(:,13:15) = force_data_filtered(:,8:10);
+	force_data2(:,16:18) = force_data_filtered(:,17:19);
 	
 	%% Find where force on left leg is zeroing and fix
 	salame = find(force_data2(600:end, 8) == 0) + 599;
@@ -265,107 +341,31 @@ if isfield(data,'fp_data')
 		end
 	end
 	
-	%% Define path and file names
-	indexName = regexp(fname(1:end-4), 'd\d*');
-	fileNameTRC = [fname(1:end-4), '.trc'];
-	fileNameGRF = regexprep(fileNameTRC, '.trc', '_grf.mot');
-	
-	% Define path name to new folder
-	newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
-		'dynamicElaborations', filesep, fileNameTRC(1:indexName)];
-	
-	% Final path name to store .trc and .mot files
-	finalpathname = [newpathname, filesep, fileNameTRC(1:end-4)];
+	%% Print MOT
 	
 	if any(isempty(fieldnames(data.GRF.FP(i))))
 		% Specify new file name if there is missing data name so I know to
 		% check data
 		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_data2(loc1(1):loc1(end), 2) < 70)
-		% If there is issue with force assignment then don't print name
-		disp('Trial has dodgy data, not printing GRFs');
+	elseif any(force_data2(loc1(1):loc1(end), 2) < 50)
+		% If there is issue with force assignment then print with modified
+		% name
+		disp('Trial has dodgy data, printing with modified filename');
+		fullFileNameGRF = [finalpathname, filesep, fileNameGRF(1:end-4), '_NFU.mot'];
+		% Write the MOT file using MOtoNMS function
+		writeMot_LS(force_data2 ,force_data_out(:,1), fullFileNameGRF);
 		
 	else
 		
-		% Otherwise name normally
-		% Add folder for the condition and walking speed in session
-		if ~exist(newpathname, 'dir')
-			mkdir(newpathname);
-		end
-		
-		%Create new folder to store individual .trc and .mot files
-		mkdir(finalpathname);
-		
+		% Otherwise name and print normally
 		fullFileNameGRF = [finalpathname, filesep, fileNameGRF];
 		
 		% Write the MOT file using MOtoNMS function
-		writeMot_LS(force_data2 ,forceData(:,1), fullFileNameGRF);
+		writeMot_LS(force_data2 ,force_data_out(:,1), fullFileNameGRF);
 	end
 	
 	cd ..
 	
 else disp('No force plate information available.')
-end
-
-%% Write trc file containing marker data
-
-% Only print trc if the GRF was printed
-if exist(finalpathname, 'dir')
-	
-	% initialise the matrix that contains the data as a frame number and time row
-	data_out = [nframe; data.time'];
-	
-	% each of the data columns (3 per marker) will be in floating format with a
-	% tab delimiter - also add to the data matrix
-	for i = 1:nmarkers
-		
-		% add 3 rows of data for the X Y Z coordinates of the current marker
-		% first check for NaN's and fill with a linear interpolant - warn the
-		% user of the gaps
-		clear m
-		m = find(isnan(data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),1))>0);
-		if ~isempty(m);
-			clear t d
-			disp(['Warning -' markers{i} ' data missing in parts. Frames ' num2str(m(1)) '-'  num2str(m(end))])
-			t = time;
-			t(m) = [];
-			d = data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:);
-			d(m,:) = [];
-			data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:) = interp1(t,d,time,'linear','extrap');
-		end
-		data_out = [data_out; data.marker_data.Markers.(markers{i})((data.Start_Frame:data.End_Frame),:)'];
-	end
-	
-	% Assign marker info to markersData
-	markersData = data_out';
-	
-	% Apply filter here
-	data_out_filtered = zeros(size(markersData));
-	
-	% Sampling freq
-	Fs = 1/data.marker_data.Info.frequency;
-	
-	% Filter freq
-	Fc = 8;
-	
-	% Apply 2nd order Butterworth filt with two passes.
-	for col = 3:length(data_out)
-		data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter', 2);
-		markersData(:,col) = data_out_filtered(:,col);
-	end
-	
-	fullFileNameTRC = [finalpathname filesep fileNameTRC];
-	
-	% Marker labels names
-	MLabels = markers;
-	
-	% Write the trc file
-	writetrc_LS(markersData,MLabels,data.marker_data.Info.frequency,fullFileNameTRC);
-	
-else
-	% if dir does not exist then grf file was not printed, which means we
-	% don't want the kinematics printed.
-	fprintf('GRF was dodgy for trial %s, so not printing\n', fileNameTRC);
-	force_data2 = [];
 end
