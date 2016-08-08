@@ -81,7 +81,8 @@ for i = 1:length(data.fp_data.GRF_data)
      % filter the force and determine when the foot is in contact with the
      % ground - this is not the same filtering as is done on the final data
      % and is required to be able to determine the contact periods
-     Fv = matfiltfilt(1/data.fp_data.Info(1).frequency,filter_freq,2,data.fp_data.GRF_data(i).F(:,3));
+%      Fv = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(:,3));
+	 Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3),filter_freq,dt, 'damped');
      
      % if this is a cyclic movement, then it is best to make the baseline
      % zero as this improves capacity for detecting events
@@ -230,8 +231,11 @@ for i = 1:length(data.fp_data.GRF_data)
                 end
                 off_i(ns) = [];
                 on_i(ns+1) = [];
-           end
+		   end
           
+		   FP(i).On = on_i;
+		   FP(i).Off = off_i;
+		   
           % loop through each event (from one value of on_i to its corresponding off_i)
           % and determine which of the bodies is contacting to make this force
           for j = 1:length(on_i)
@@ -239,60 +243,8 @@ for i = 1:length(data.fp_data.GRF_data)
                % define the current period of interest
                a = on_i(j):off_i(j);
                
-               % Change FP index to marker data index
-               %         aa = ceil((on_i(j))/F:(off_i(j))/F);
-               
-               % DON'T NEED TO CALCULATE DISTANCE IF TRIALS ALWAYS START WITH
-               % RIGHT HS
-               
                % FP 1 = R/L
                % FP 2 = L/R/L
-               
-               %         for b = 1:length(assign_markers)
-               %             % loop through each of the bodies that need assigning to forces
-               %             % and determine the median distance between the markers defining
-               %             % body and the COP
-               %
-               %             % Calculate the mean position over the frames that correspond
-               %             % with motion capture data.
-               %             m = [];
-               %
-               %             for long = 1:10:length(a)
-               %                  try
-               %                  meanCOP = mean(data.fp_data.GRF_data(i).P([a(long):a(long+9)], :));
-               %                  catch ME
-               %                       if (strcmp(ME.identifier, 'MATLAB:badsubscript'))
-               %                            meanCOP = mean(data.fp_data.GRF_data(i).P([a(long):a(end)], :));
-               %                       else
-               %                            rethrow(ME)
-               %                       end
-               %                  end
-               %                  m = [m; meanCOP];
-               %             end
-               %
-               %             % Define the distance between COP and markers for left and
-               %             % right side
-               %            D(b) = nanmedian(dist_markers(m,[data.marker_data.Markers.(assign_markers{b})(aa,1) ...
-               %                 data.marker_data.Markers.(assign_markers{b})(aa,2) ...
-               %                 zeros(size(data.marker_data.Markers.(assign_markers{b})(aa,1)))])/1000);
-               %
-               %         end
-               
-               % determine which marker is within the threshold distance defined
-               
-               %         aD = find(D<thresh(2));
-               
-               % if a marker is below the threshold, assign the force event to
-               % that body for the current force plate
-               
-               % COndition statement to select the opposite body from the COP
-               % assignment. THis is to use for automatic selection when both
-               % markers fall within threshold.
-               %         if aD == 1
-               %         opposite_bodyAssigned = assign_bodies{(aD+1)};
-               %         else
-               %              opposite_bodyAssigned = assign_bodies{(aD-1)};
-               %         end
                
                % FIRST FORCE PLATE CONDITIONS
                
@@ -301,9 +253,16 @@ for i = 1:length(data.fp_data.GRF_data)
                % right heel-strike
                if i == 1 && j == 1
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						
+						% OLD FILTERING HERE
+%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+%                          data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+%                          data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+
                     else % otherwise just assign the raw data
                          data.GRF.FP(i).(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
                          data.GRF.FP(i).(assign_bodies{i}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
@@ -311,12 +270,18 @@ for i = 1:length(data.fp_data.GRF_data)
                     end
                     
                     % If force plate  = 1 and it's the second force assignment we always
-                    % know it will be for the second (e.g., left) body.
+                    % know it will be for the second (i.e., left) body.
                elseif i == 1 && j == 2
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(j).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(j).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(j).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						data.GRF.FP(j).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(j).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(j).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						
+						% OLD FILTERING HERE
+%                          data.GRF.FP(j).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+%                          data.GRF.FP(j).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+%                          data.GRF.FP(j).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+
                     else % otherwise just assign the raw data
                          data.GRF.FP(i).(assign_bodies{j}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
                          data.GRF.FP(i).(assign_bodies{j}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
@@ -329,9 +294,15 @@ for i = 1:length(data.fp_data.GRF_data)
                     % assignment we know that it's the left body toe-off
                elseif i == 2 && j == 1
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						
+						% OLD FILTER HERE
+%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+%                          data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+%                          data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+
                     else % otherwise just assign the raw data
                          data.GRF.FP(i).(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
                          data.GRF.FP(i).(assign_bodies{i}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
@@ -343,9 +314,31 @@ for i = 1:length(data.fp_data.GRF_data)
                     % stance
                elseif i == 2 && j == 2
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(1).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(1).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(1).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+					
+						% Add the GRF from first and second plated during
+						% transition period.
+						data.GRF.FP(1).F(a,:) = lpfilter([(data.fp_data.GRF_data(i).F(a(1):FP(1).On(2)-1,:)+...
+							data.fp_data.GRF_data(1).F(a(1):FP(1).On(2)-1,:));...
+							data.fp_data.GRF_data(i).F(FP(1).On(2):a(end),:)],filter_freq,dt, 'damped');
+					
+						data.GRF.FP(1).M(a,:) = lpfilter([(data.fp_data.GRF_data(i).M(a(1):FP(1).On(2)-1,:)+...
+							data.fp_data.GRF_data(1).M(a(1):FP(1).On(2)-1,:));...
+							data.fp_data.GRF_data(i).M(FP(1).On(2):a(end),:)],filter_freq,dt, 'damped');
+						
+						% COP stitching remains the same
+						data.fp_data.GRF_data(i).P(:,:) = lpfilter(data.fp_data.GRF_data(i).P(:,:),filter_freq,dt, 'damped');
+						data.fp_data.GRF_data(1).P(:,:) = lpfilter(data.fp_data.GRF_data(1).P(:,:),filter_freq,dt, 'damped');
+						data.fp_data.GRF_data(i).P(1:a(end)-20,:) = lpfilter(data.fp_data.GRF_data(i).P(1:a(end)-20,:),6,dt, 'butter');
+						data.fp_data.GRF_data(1).P(1:a(end)-20,:) = lpfilter(data.fp_data.GRF_data(1).P(1:a(end)-20,:),6,dt, 'butter');
+						
+						% Locate first peak in COP as this is when I want
+						% to stitch it.
+						[pks, locCOPPeak] = findpeaks(data.fp_data.GRF_data(2).P(:,2), 'MinPeakDistance', 300);	
+						data.GRF.FP(1).P(locCOPPeak(1):a(end),:) = data.fp_data.GRF_data(i).P(locCOPPeak(1):a(end),:);
+						
+%                          data.GRF.FP(1).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+%                          data.GRF.FP(1).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+%                          data.GRF.FP(1).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
                     else % otherwise just assign the raw data
                          data.GRF.FP(i).(assign_bodies{1}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
                          data.GRF.FP(i).(assign_bodies{1}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
@@ -353,13 +346,18 @@ for i = 1:length(data.fp_data.GRF_data)
                     end
                     
                     % If force plate = 2 and it's the third force
-                    % assignment we know that it's the left body foot
-                    % contact
+                    % assignment we know that it's the left body stance
                elseif i == 2 && j == 3
                     if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-                         data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-                         data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-                         data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						
+						
+%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
+%                          data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
+%                          data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						 
                     else % otherwise just assign the raw data
                          data.GRF.FP.(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
                          data.GRF.FP.(assign_bodies{i}).M(a,:) = data.fp_data.GRF_data(i).M(a,:);

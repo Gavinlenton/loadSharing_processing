@@ -6,7 +6,7 @@ function plotMoments(sessionName, model_file)
 %   Multiple trials can be plotted on the same figure for each DOF
 
 % Folder where the IK Results files are stored
-IDresultsDir = uigetdir('..\', 'Select folder with INVERSE DYNAMICS results to use');
+IDresultsDir = uigetdir(sessionName, 'Select folder with INVERSE DYNAMICS results to use');
 
 % Generate list of trials
 trials=dir(IDresultsDir);
@@ -16,6 +16,7 @@ for k = 3:length(trials)
      trialsList{j}=trials(k).name;
      j = j + 1;
 end
+trialsList(ismember(trialsList,{'Figures','IDMetrics.mat'}))=[];
 
 % Be selective if you want to
 [trialsIndex,~] = listdlg('PromptString','Select trials to plot:',...
@@ -34,6 +35,7 @@ end
 acquisitionFolder = [regexprep(sessionName, 'ElaboratedData', 'InputData'), filesep];
 acquisitionInfo=xml_read(fullfile(acquisitionFolder, 'acquisition.xml'));
 subject_weight = acquisitionInfo.Subject.Weight;
+subject_name = acquisitionInfo.Subject.Code;
 
 % Plot multiple trials
 IDfilename='inverse_dynamics.sto';
@@ -56,6 +58,6 @@ xaxislabel = '% Gait Cycle';
 % Plot multiple results on a figure per DOF
 % The moments plotted from OpenSim are the inverse of what is typically
 % seen, you can choose to invert the results if desired.
-plotResultsMultipleTrials_LS(IDresultsDir, inputTrials, IDfilename, xaxislabel, momentsToPlot, subject_weight)
+plotResultsMultipleTrials_LS(IDresultsDir, inputTrials, IDfilename, xaxislabel, momentsToPlot, subject_weight, subject_name)
 
 

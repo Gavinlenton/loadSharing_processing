@@ -1,4 +1,4 @@
-function []=plotResultsMultipleTrials_LS(resultsPath, trialsList, filename,x, Yquantities, subject_weight, varargin)
+function []=plotResultsMultipleTrials_LS(resultsPath, trialsList, filename,x, Yquantities, varargin)
 % Function to plot results from multiple trials
 
 % This file is part of Batch OpenSim Processing Scripts (BOPS).
@@ -23,6 +23,10 @@ function []=plotResultsMultipleTrials_LS(resultsPath, trialsList, filename,x, Yq
 %%
 
 close all
+
+subject_weight = varargin{1};
+subject_name = regexprep(varargin{2}, ' ', '_');
+
 %Load data
 for k=1:length(trialsList)
 	
@@ -34,15 +38,17 @@ for k=1:length(trialsList)
 	else
 		Yquantities=file.colheaders(2:end); %take all columns except time
 		coord_idx=[2:size(file.colheaders,2)];
-	end
+     end
 	
-	results = file.data./subject_weight;
-	
+	results = file.data;
+     results(:, 2:end) = results(:, 2:end)./subject_weight;
+
+     
 	% Extract max, min, and range from each data set
-	maxResult = 
-	minResult = 
-	rangeResult = 
-	
+	maxResult(k,:) = max(results(:, 2:end));
+	minResult(k,:) = min(results(:, 2:end));
+	rangeResult(k,:) = maxResult(k,:)-minResult(k,:);
+     
 	for j =1: length(coord_idx)
 		
 		coordCol=coord_idx(j);
@@ -55,19 +61,38 @@ for k=1:length(trialsList)
 	
 end
 
+headers = file.colheaders(:, 2:end);
+
+% Put the metrics in a structure
+for dof = 1:length(headers)
+     ID_metrics.(subject_name).(headers{dof}).max = mean(maxResult(:, dof));
+     ID_metrics.(subject_name).(headers{dof}).min = mean(minResult(:, dof));
+     ID_metrics.(subject_name).(headers{dof}).range = mean(rangeResult(:, dof));
+end
+
+% Path names to save data
 if strcmp(filename,'Torques.sto')
 	figurePath=[resultsPath filesep 'Figures' filesep 'Torques' filesep];
 else
 	figurePath=[resultsPath filesep 'Figures' filesep];
 end
 
+metricsPath = [resultsPath filesep];
+
+% Make directories
 if exist(figurePath,'dir') ~= 7
-	mkdir(figurePath);
+     mkdir(figurePath);
+end
+
+if exist(metricsPath,'dir') ~= 7
+     mkdir(metricsPath);
 end
 
 %Save data in mat format
 save([figurePath, 'plottedData'], 'y')
+save([metricsPath, 'IDMetrics.mat'], 'ID_metrics');
 
+% Settings for plot
 plotLabels=regexprep(Yquantities, '_', ' ');
 legendLabels=regexprep(trialsList, '_', ' ');
 cmap = colormap(parula(180));

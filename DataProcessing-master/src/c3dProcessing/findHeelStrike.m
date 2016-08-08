@@ -4,7 +4,7 @@ function [HSRight, TORight] = findHeelStrike(data)
 %   Run through the marker data and identify the peaks in which the heel
 %   marker is the furthest distance from the sacrum marker. 
 %   NOTE - need to perform this function for both the left and right leg
-%   separately. 
+%   separately if you want both legs
 
 % Find heel-strike
 maxDistanceR = (data.marker_data.Markers.RCAL - data.marker_data.Markers.SAC1);
@@ -25,7 +25,7 @@ toeOffR = data.marker_data.Markers.SAC1 - data.marker_data.Markers.RMT1;
 % Make sure events correspond with frame correctly. 
 firstFrame = data.marker_data.First_Frame;
 
-HSRight = (HSRight) + firstFrame;
+HSRight = (HSRight) + firstFrame + 1;
 TORight = (TORight) + firstFrame;
 
 end

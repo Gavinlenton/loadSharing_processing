@@ -1,4 +1,4 @@
-function [data, force_data2] = btk_c3d2trc_treadmill_LS_new(varargin)
+function [data, force_dataMoto] = btk_c3d2trc_treadmill_LS_new(varargin)
 % function btk_c3d2trc_treadmill(file) OR
 % function btk_c3d2trc_treadmill(data)
 %
@@ -143,7 +143,7 @@ end
 % Assign marker info to markersData
 markersData = data_out';
 
-% Apply filter here
+% Apply filter 
 data_out_filtered = zeros(size(markersData));
 
 % Sampling freq
@@ -255,7 +255,6 @@ if isfield(data,'fp_data')
 	% Apply 10 Hz filter to smooth stiching out - don't want to filter the
 	% COP here.
 	
-	
 	% Clean up data at beginning and end
 	a = find(force_data_out(:,5) > 0);
 	a2 = find(force_data_out(300:end,14) > 0) + 299;
@@ -291,52 +290,58 @@ if isfield(data,'fp_data')
 	
 	% Butterworth filter to smooth out FP cropping
 	b_filt_freq = 8;
-	[pks, loc1] = findpeaks(force_data_filtered(:,3));
-	force_data_filtered(a3(1):a3(end)+5, 2:4) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a3(1):a3(end)+5, 2:4));
-	force_data_filtered(a3(1):a3(end)+5, 8:10) = matfiltfilt(dt,b_filt_freq,2, force_data_filtered(a3(1):a3(end)+5, 8:10));
-	force_data_filtered(a4, 11:13) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 11:13));
-	force_data_filtered(a4, 17:19) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 17:19));
+	[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
+	
+	force_data_filtered(a3(1):a3(end)+5, 2:4) = lpfilter(force_data_filtered(a3(1):a3(end)+5, 2:4),b_filt_freq,dt, 'butter');	
+	force_data_filtered(a3(1):a3(end)+5, 8:10) = lpfilter(force_data_filtered(a3(1):a3(end)+5, 8:10),b_filt_freq,dt, 'butter');
+	force_data_filtered(a4, 11:13) = lpfilter(force_data_filtered(a4, 11:13),b_filt_freq,dt, 'butter');
+	force_data_filtered(a4, 17:19) = lpfilter(force_data_filtered(a4, 17:19),b_filt_freq,dt, 'butter');
+	
+% 	force_data_filtered(a3(1):a3(end)+5, 2:4) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a3(1):a3(end)+5, 2:4));
+% 	force_data_filtered(a3(1):a3(end)+5, 8:10) = matfiltfilt(dt,b_filt_freq,2, force_data_filtered(a3(1):a3(end)+5, 8:10));
+% 	force_data_filtered(a4, 11:13) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 11:13));
+% 	force_data_filtered(a4, 17:19) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 17:19));
 	
 	% Clean up COP
 	if a(end) ~= length(fp_time1)
-	force_data_filtered(a(1)+1:a(end)+5, 5:7) = matfiltfilt(dt,8,2, force_data_filtered(a(1)+1:a(end)+5, 5:7));
+		force_data_filtered(a(1)+1:a(end)+5, 5:7) = lpfilter(force_data_filtered(a(1)+1:a(end)+5, 5:7),4,dt, 'butter');
 	else
-		force_data_filtered(a(1)+1:a(end), 5:7) = matfiltfilt(dt,8,2, force_data_filtered(a(1)+1:a(end), 5:7));
+		force_data_filtered(a(1)+1:a(end), 5:7) = lpfilter(force_data_filtered(a(1)+1:a(end), 5:7),2,dt, 'butter');
 	end
 	force_data_filtered(a(1):a(1)+1, 7) = 0;
-	force_data_filtered(a2, 14:16) = matfiltfilt(dt,8,2, force_data_filtered(a2, 14:16));
+	force_data_filtered(a2, 14:16) = lpfilter(force_data_filtered(a2, 14:16),4,dt, 'butter');
 	
 	% assign a value of zero to any NaNs
 	force_data_filtered(logical(isnan(force_data_filtered))) = 0;
 	
 	% Re-arrange so data matches MOtoNMS convention
-	force_data2 = force_data_filtered(:, 2:19);
+	force_dataMoto = force_data_filtered(:, 2:19);
 	
-	force_data2(:,7:12) = force_data_filtered(:,11:16);
-	force_data2(:,13:15) = force_data_filtered(:,8:10);
-	force_data2(:,16:18) = force_data_filtered(:,17:19);
+	force_dataMoto(:,7:12) = force_data_filtered(:,11:16);
+	force_dataMoto(:,13:15) = force_data_filtered(:,8:10);
+	force_dataMoto(:,16:18) = force_data_filtered(:,17:19);
 	
 	%% Find where force on left leg is zeroing and fix
-	salame = find(force_data2(600:end, 8) == 0) + 599;
+	dodgyFP = find(force_dataMoto(600:end, 8) == 0) + 599;
 	
 	% Only fix if there's a zero value
-	if ~isempty(salame)
-		if length(salame) > 1
+	if ~isempty(dodgyFP)
+		if length(dodgyFP) > 1
 			% If there's more than 1 frame zeroed then apply interp
 			for columnM = 1:3
-				force_data2(salame(1):salame(end), columnM+6) = (force_data2(salame(1)-1, columnM+6)...
-					+ force_data2(salame(end)+1, columnM+6))/2;
-				force_data2(salame(1):salame(end), columnM+15) = (force_data2(salame(1)-1, columnM+15)...
-					+ force_data2(salame(end)+1, columnM+15))/2;
+				force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+6) = (force_dataMoto(dodgyFP(1)-1, columnM+6)...
+					+ force_dataMoto(dodgyFP(end)+1, columnM+6))/2;
+				force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+15) = (force_dataMoto(dodgyFP(1)-1, columnM+15)...
+					+ force_dataMoto(dodgyFP(end)+1, columnM+15))/2;
 			end
 			% Loop through columns and fix by taking mean of previous and
 			% following frame
 		else
 			for columnF = 1:3
-				force_data2(salame, columnF+6) = (force_data2(salame-1, columnF+6)...
-					+ force_data2(salame+1, columnF+6))/2;
-				force_data2(salame, columnF+15) = (force_data2(salame-1, columnF+15)...
-					+ force_data2(salame+1, columnF+15))/2;
+				force_dataMoto(dodgyFP, columnF+6) = (force_dataMoto(dodgyFP-1, columnF+6)...
+					+ force_dataMoto(dodgyFP+1, columnF+6))/2;
+				force_dataMoto(dodgyFP, columnF+15) = (force_dataMoto(dodgyFP-1, columnF+15)...
+					+ force_dataMoto(dodgyFP+1, columnF+15))/2;
 			end
 		end
 	end
@@ -348,13 +353,13 @@ if isfield(data,'fp_data')
 		% check data
 		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_data2(loc1(1):loc1(end), 2) < 50)
+	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 50)
 		% If there is issue with force assignment then print with modified
 		% name
 		disp('Trial has dodgy data, printing with modified filename');
 		fullFileNameGRF = [finalpathname, filesep, fileNameGRF(1:end-4), '_NFU.mot'];
 		% Write the MOT file using MOtoNMS function
-		writeMot_LS(force_data2 ,force_data_out(:,1), fullFileNameGRF);
+		writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
 		
 	else
 		
@@ -362,7 +367,7 @@ if isfield(data,'fp_data')
 		fullFileNameGRF = [finalpathname, filesep, fileNameGRF];
 		
 		% Write the MOT file using MOtoNMS function
-		writeMot_LS(force_data2 ,force_data_out(:,1), fullFileNameGRF);
+		writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
 	end
 	
 	cd ..

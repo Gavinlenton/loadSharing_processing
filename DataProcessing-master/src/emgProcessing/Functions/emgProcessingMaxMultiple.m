@@ -228,11 +228,13 @@ for files = 1:length(maxc3dFileNames)
 	end
 end
 
+% Initialise
 emgMaxFinal = zeros(1, length(emgLabelsInMatFile));
+emgMaxLoc = zeros(1, length(emgLabelsInMatFile));
 
 % Assign maximum for each muscle to the output file
 for muscle = 1:length(emgMaxFinal)
-	emgMaxFinal(1, muscle) = max(emgMaxAll(:, muscle));
+	[emgMaxFinal(1, muscle), emgMaxLoc(1, muscle)] = max(emgMaxAll(:, muscle));
 end
 
 % Print max emg to MotoNMS sessionData directory.
@@ -242,11 +244,13 @@ if ~isdir(printDir)
 end
 nEMGChannels=length(emgLabelsInMatFile);
 fid = fopen([printDir filesep 'maxEmg.txt'], 'w');
-fprintf(fid,'Muscle\tMaxEMGvalue\n');
+fprintf(fid,'Muscle\tMaxEMGvalue\tTrial\n');
 
+% Loop through and print max values to file, also included trial max is
+% from
 for i=1:nEMGChannels
 	MaxEMGLabel = char(emgLabelsInMatFile{i});
-	fprintf(fid,'%s\t%6.4e\n', MaxEMGLabel, emgMaxFinal(1,i));
+	fprintf(fid,'%s\t%6.4e\t%s\n', MaxEMGLabel, emgMaxFinal(1,i), maxc3dFileNames{emgMaxLoc(i)});
 end
 
 

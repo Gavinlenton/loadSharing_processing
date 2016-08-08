@@ -10,18 +10,17 @@ function [rightHS, rightTO] = cropTrials(acqLS, c3dFile_name, data)
 
 for ii = 1:length(rightHS)-1
      
-     % Clone acquisition
-     acq_newLS = btkCloneAcquisition(acqLS);
-          
-          % Crop the new acquisition based on time between heel strikes
-          numFrames = rightHS(ii+1,:) - rightHS(ii,:);
-          btkCropAcquisition(acq_newLS, rightHS(ii), numFrames);
-
-          %Write the new acquisition
-          filename = [c3dFile_name(1:end-4), num2str(ii), '.c3d'];
-          btkWriteAcquisition(acq_newLS, filename);
+	% Clone acquisition
+	acq_newLS = btkCloneAcquisition(acqLS);
+	
+	% Crop the new acquisition based on time between heel strikes
+	numFrames = rightHS(ii+1,:) - rightHS(ii,:);
+	btkCropAcquisition(acq_newLS, rightHS(ii), numFrames);
+	
+	%Write the new acquisition
+	filename = [c3dFile_name(1:end-4), num2str(ii), '.c3d'];
+	btkWriteAcquisition(acq_newLS, filename);
          
-     
 end
 
 end

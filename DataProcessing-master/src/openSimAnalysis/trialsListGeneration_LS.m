@@ -26,11 +26,11 @@ trials=dir(inputDir);
 j=1;
 
 for k=3:length(trials)
-
-    if (trials(k).isdir==1 && strcmp(trials(k).name,'Figures')==0 && strcmp(trials(k).name,'maxemg')==0)		
-		if exist([inputDir, trials(k), '_grf.mot'], 'file')
-        trialsList{j}=trials(k).name;
-        j=j+1;
-		end
-    end
+     
+     if (trials(k).isdir==1 && strcmp(trials(k).name,'Figures')==0 && strcmp(trials(k).name,'maxemg')==0 && strcmp(trials(k).name,'EMGs')==0)
+          if exist([inputDir, filesep, trials(k).name, filesep, trials(k).name, '_grf.mot'], 'file')
+               trialsList{j}=trials(k).name;
+               j=j+1;
+          end
+     end
 end

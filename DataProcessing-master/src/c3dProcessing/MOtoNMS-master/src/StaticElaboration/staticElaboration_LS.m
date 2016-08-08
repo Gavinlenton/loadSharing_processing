@@ -18,8 +18,8 @@ function  staticElabPath = staticElaboration_LS(subjectNames, motoDir, BasePath)
 %% Structure for path names creation
 
 for i = 1:length(subjectNames)
-     subjectName = subjectNames{i}(~isspace(subjectNames{i}))
-     staticElabPath.(subjectName) = struct()
+     subjectNameWOSpace = subjectNames{i}(~isspace(subjectNames{i}));
+     staticElabPath.(subjectNameWOSpace) = struct();
 end
 
 for nS = length(subjectNames)
@@ -31,7 +31,7 @@ for nS = length(subjectNames)
      SessionDirs = dir([BasePath, filesep, subjectNames{nS}]);
      isub=[SessionDirs(:).isdir];
      sessionFolders={SessionDirs(isub).name}';
-     sessionFolders(ismember(sessionFolders,{'.','..', 'ROM'}))=[]; % dynamic subject folders
+     sessionFolders(ismember(sessionFolders,{'.','..', 'ROM', 'EMG_columnplots'}))=[]; % dynamic subject folders
      
      % Need to use session number because we cannot use numerics as a valid
      % field name in staticElabPath structure below.
@@ -57,7 +57,6 @@ for nS = length(subjectNames)
                if exist(staticElabPath.(subjectName).(sessionNumber{nSess}), 'dir') == 7
                     % If so print to screen and make dir of path
                     fprintf('\nStatic elaboration exists for %s in %s\n', subjectNames{nS}, sessionNumber{nSess});
-                    staticFiledir=dir([staticElabPath.(subjectName).(sessionNumber{nSess}) filesep ]);
                     staticFileName='Static1_Processed';
                     staticFileFullPath=[staticElabPath.(subjectName).(sessionNumber{nSess}) filesep staticFileName filesep 'StaticCal'];
                     
@@ -87,7 +86,6 @@ for nS = length(subjectNames)
                     % run staticElaboration main function
                     cd([motoDir, filesep, 'src', filesep, 'StaticElaboration']);
                     run StaticInterface.m;
-                    staticFiledir=dir([staticElabPath.(subjectName).(sessionNumber{nSess}) filesep ]);
                     staticFileName='Static1_Processed';
                     staticFileFullPath=[staticElabPath.(subjectName).(sessionNumber{nSess}) filesep staticFileName filesep 'StaticCal'];
                     
@@ -138,10 +136,13 @@ for nS = length(subjectNames)
                               parameters);
                     end
                end
-               close all
           end
+          close all
      end
 end
-
+% Save variable with directories to static elab folders for each subject
+% and session
+cd(BasePath);
+save('staticElabPathNames.mat', 'staticElabPath')
 end
 

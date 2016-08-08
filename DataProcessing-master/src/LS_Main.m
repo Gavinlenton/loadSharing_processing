@@ -1,4 +1,4 @@
-%% -------------------------------------------------------------%%
+% -------------------------------------------------------------%
 
 % Main processing script for load sharing data
 % - Generate the appropriate files to run an OpenSim simulation sequence for the Load Sharing Data
@@ -11,8 +11,14 @@
 % Written by Gavin Lenton June 2016
 % gavin.lenton@griffithuni.edu.au
 
-%% --------------------------------------------------------------- %%
+% --------------------------------------------------------------%
 
+%% 
+tmp = matlab.desktop.editor.getActive;
+cd(fileparts(tmp.Filename));
+addpath('.\');
+
+%%
 clear; clc; close all;
 
 % Specify folder directories based on system used - may need to modify default directories as I
@@ -131,7 +137,7 @@ for i = 1:length(subjectFolders)
 			disp('No EMG captured in this armour condition, continuing with analysis...');
 		end
 		
-		% Clear for next trial
+		% Clear memory for next trial
 		clearvars acqLS data
 		
 	end
