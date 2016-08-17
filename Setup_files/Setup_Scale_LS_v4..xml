@@ -25,32 +25,6 @@
 			<!--Specifies the measurements by which body segments are to be scaled.-->
 			<MeasurementSet>
 				<objects>
-					<Measurement name="head">
-						<!--Flag to turn on and off scaling for this measurement.-->
-						<apply>true</apply>
-						<!--Set of marker pairs used to determine the scale factors.-->
-						<MarkerPairSet>
-							<objects>
-								<MarkerPair>
-									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LFHD RBHD</markers>
-								</MarkerPair>
-								<MarkerPair>
-									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RFHD LBHD</markers>
-								</MarkerPair>
-							</objects>
-						</MarkerPairSet>
-						<!--Set of bodies to be scaled by this measurement.-->
-						<BodyScaleSet>
-							<objects>
-								<BodyScale name="head">
-									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
-									<axes> X Z</axes>
-								</BodyScale>
-							</objects>
-						</BodyScaleSet>
-					</Measurement>
 					<Measurement name="torso_height">
 						<!--Flag to turn on and off scaling for this measurement.-->
 						<apply>true</apply>
@@ -1126,7 +1100,7 @@
 			<!--Name of file containing the joint angles used to set the initial configuration of the model for the purpose of placing the markers. These coordinate values can also be included in the optimization problem used to place the markers. Before the model markers are placed, a single frame of an inverse kinematics (IK) problem is solved. The IK problem can be solved simply by matching marker positions, but if the model markers are not in the correct locations, the IK solution will not be very good and neither will marker placement. Alternatively, coordinate values (specified in this file) can be specified and used to influence the IK solution. This is valuable particularly if you have high confidence in the coordinate values. For example, you know for the static trial the subject was standing will all joint angles close to zero. If the coordinate set (see the CoordinateSet property) contains non-zero weights for coordinates, the IK solution will try to match not only the marker positions, but also the coordinates in this file. Least-squared error is used to solve the IK problem. -->
 			<coordinate_file>Unassigned</coordinate_file>
 			<!--Time range over which the marker positions are averaged.-->
-			<time_range> -1 -1</time_range>
+			<time_range> 0.35 0.45</time_range>
 			<!--Name of the motion file (.mot) written after marker relocation (optional).-->
 			<output_motion_file>Unassigned</output_motion_file>
 			<!--Output OpenSim model file (.osim) after scaling and maker placement.-->

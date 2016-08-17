@@ -1,0 +1,15 @@
+Loaded model LS_FullBodyModel from file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Loaded model LS_FullBodyModel from file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_linearScaled.osim
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+
+Step 3: Placing markers on model
+Loaded marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (87 markers, 998 frames)
+Averaged frames from time 0.35 to 0.45 in Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc (frames 36 to 47)
+Deleted 1 unused markers from model LS_FullBodyModel
+Frame at (t=0):	total squared error = 0.057055, marker error: RMS=0.0287556, max=0.0662265 (LPUA1)
+Moved markers in model LS_FullBodyModel to match locations in marker file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Static1_Processed.trc
+Wrote model file Subject 14_optmkrpos.osim from model LS_FullBodyModel
+Wrote marker file Subject 14_markeradjustment.xml from model LS_FullBodyModel
+Loaded model LS_FullBodyModel from file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject14_Generic.osim
+Loaded model LS_FullBodyModel from file Z:\s2921887\Google Drive\LS_main_data_collection\ElaboratedData\Subject 14\2015-09-07\staticElaborations\Static1_Processed\StaticCal\Subject 14_Scaled_Pose_OptMusc.osim

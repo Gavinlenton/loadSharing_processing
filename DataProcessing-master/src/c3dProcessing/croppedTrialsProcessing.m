@@ -13,12 +13,12 @@ a = isub2 < 2000000;
 c3dFilesCropped = {croppedSessionDirs(a).name}';
 c3dFilesCropped = selectWalkingTrials(c3dFilesCropped, 0);
 
-% Run c3d2mat again on cropped trials.
+% Run c3d2mat again on cropped trials
 % Navigate to directory where function is
-% cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
+cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
 
 % Run modified c3d2mat
-%    C3D2MAT_cropped(fName, c3dFilesCropped, pname);
+C3D2MAT_cropped(fName, c3dFilesCropped, pname);
 
 % 	 % Figure properties
 % cmap = colormap(parula(350));
@@ -51,7 +51,7 @@ for croppedTrialNum = 1:length(c3dFilesCropped)
 % 		title('Vertical GRF')
 % 		legend(legendLabels, 'Location', 'eastoutside')
 % 		legend boxoff
-% 		
+		
 		% Save output for future use
 		outputDir = [pname, filesep, 'matData'];
 		

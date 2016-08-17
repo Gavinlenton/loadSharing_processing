@@ -140,9 +140,11 @@ for nS = length(subjectNames)
           close all
      end
 end
+
 % Save variable with directories to static elab folders for each subject
 % and session
 cd(BasePath);
 save('staticElabPathNames.mat', 'staticElabPath')
+
 end
 
