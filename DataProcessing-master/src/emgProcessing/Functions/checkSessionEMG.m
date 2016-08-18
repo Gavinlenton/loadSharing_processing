@@ -11,7 +11,6 @@ function [emgCaptured] = checkSessionEMG(subject, c3dinSession, rootDir)
 load([rootDir, 'emgExist4Subject.mat']);
 
 % Find the subject number
-subject = cell2mat(subject);
 Key   = 'Subject';
 Index = strfind(subject, Key);
 Value = sscanf(subject(Index(1) + length(Key):end), '%g', 1);

@@ -275,9 +275,9 @@ for i = 1:length(data.fp_data.GRF_data)
 				if i == 1 && j == 1
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
 						
-						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
 						
 						% OLD FILTERING HERE
 						%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
@@ -294,9 +294,9 @@ for i = 1:length(data.fp_data.GRF_data)
 					% know it will be for the second (i.e., left) body.
 				elseif i == 1 && j == 2
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-						data.GRF.FP(j).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(j).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(j).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(j).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
+						data.GRF.FP(j).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
+						data.GRF.FP(j).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
 						
 						% OLD FILTERING HERE
 						%                          data.GRF.FP(j).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
@@ -315,9 +315,9 @@ for i = 1:length(data.fp_data.GRF_data)
 					% assignment we know that it's the left body toe-off
 				elseif i == 2 && j == 1
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
 						
 						% OLD FILTER HERE
 						%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
@@ -337,25 +337,42 @@ for i = 1:length(data.fp_data.GRF_data)
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
 						
 						if length(on_i) == 3
-							% Add the GRF from first and second plated during
+							% Add the GRF from first and second plates during
 							% transition period.
 							data.GRF.FP(1).F(a,:) = lpfilter([(data.fp_data.GRF_data(i).F(a(1):FP(1).On(2)-1,:)+...
 								data.fp_data.GRF_data(1).F(a(1):FP(1).On(2)-1,:));...
-								data.fp_data.GRF_data(i).F(FP(1).On(2):a(end),:)],filter_freq,dt, 'damped');
+								data.fp_data.GRF_data(i).F(FP(1).On(2):a(end),:)],10,dt, 'damped');
 							
-							data.GRF.FP(1).M(a,:) = lpfilter([(data.fp_data.GRF_data(i).M(a(1):FP(1).On(2)-1,:)+...
-								data.fp_data.GRF_data(1).M(a(1):FP(1).On(2)-1,:));...
-								data.fp_data.GRF_data(i).M(FP(1).On(2):a(end),:)],filter_freq,dt, 'damped');
+							data.fp_data.GRF_data(i).M(:,:) = lpfilter(data.fp_data.GRF_data(i).M(:,:),24,dt, 'butter');
+							data.fp_data.GRF_data(1).M(:,:) = lpfilter(data.fp_data.GRF_data(1).M(:,:),24,dt, 'butter');
+							
+							data.GRF.FP(1).M(a,1:2) = lpfilter(data.fp_data.GRF_data(i).M(a,1:2),10,dt, 'damped');
+							
+							data.GRF.FP(1).M(a,3) = lpfilter([(data.fp_data.GRF_data(i).M(a(1):FP(1).On(2)-1,3)-...
+								data.fp_data.GRF_data(1).M(a(1):FP(1).On(2)-1,3));...
+								data.fp_data.GRF_data(i).M(FP(1).On(2):a(end),3)],10,dt, 'damped');
 							
 							% COP stitching remains the same
-							data.fp_data.GRF_data(i).P(:,:) = lpfilter(data.fp_data.GRF_data(i).P(:,:),filter_freq,dt, 'damped');
-							data.fp_data.GRF_data(1).P(:,:) = lpfilter(data.fp_data.GRF_data(1).P(:,:),filter_freq,dt, 'damped');
-							data.fp_data.GRF_data(i).P(1:a(end)-20,:) = lpfilter(data.fp_data.GRF_data(i).P(1:a(end)-20,:),6,dt, 'butter');
-							data.fp_data.GRF_data(1).P(1:a(end)-20,:) = lpfilter(data.fp_data.GRF_data(1).P(1:a(end)-20,:),6,dt, 'butter');
+							data.fp_data.GRF_data(i).P(:,:) = lpfilter(data.fp_data.GRF_data(i).P(:,:),10,dt, 'damped');
+							data.fp_data.GRF_data(1).P(:,:) = lpfilter(data.fp_data.GRF_data(1).P(:,:),10,dt, 'damped');
+							data.fp_data.GRF_data(i).P(1:a(end),:) = lpfilter(data.fp_data.GRF_data(i).P(1:a(end),:),filter_freq,dt, 'butter');
+							data.fp_data.GRF_data(1).P(1:a(end),:) = lpfilter(data.fp_data.GRF_data(1).P(1:a(end),:),filter_freq,dt, 'butter');
 							
 							% Locate first peak in COP as this is when I want
 							% to stitch it.
 							[pks, locCOPPeak] = findpeaks(data.fp_data.GRF_data(2).P(:,2), 'MinPeakDistance', 300);
+							COP1 = data.fp_data.GRF_data(1).P(locCOPPeak(1),2);
+							COP2 = data.fp_data.GRF_data(2).P(locCOPPeak(1),2);
+							diffCOP = (COP1-COP2)/2;
+							
+							data.GRF.FP(1).P(a(1)-40:locCOPPeak(1),2) = data.fp_data.GRF_data(1).P(a(1)-40:locCOPPeak(1),2) - diffCOP;
+							
+% 							data.GRF.FP(1).P(a(1)-15:locCOPPeak(1)-15,2) = data.fp_data.GRF_data(i).P(a(1)-15:locCOPPeak(1)-15,2) + ...
+% 								(data.fp_data.GRF_data(1).P(a(1)-15:locCOPPeak(1)-15,2)-...
+% 								(data.fp_data.GRF_data(i).P(a(1)-15:locCOPPeak(1)-15,2)));
+							
+							% Assign from first peak in COP to end of
+							% stance
 							data.GRF.FP(1).P(locCOPPeak(1):a(end),:) = data.fp_data.GRF_data(i).P(locCOPPeak(1):a(end),:);
 							
 						else
@@ -375,9 +392,9 @@ for i = 1:length(data.fp_data.GRF_data)
 					% assignment we know that it's the left body stance
 				elseif i == 2 && j == 3
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
-						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),filter_freq,dt, 'damped');
-						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),filter_freq,dt, 'damped');
+						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
+						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
+						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
 						
 						
 						%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));

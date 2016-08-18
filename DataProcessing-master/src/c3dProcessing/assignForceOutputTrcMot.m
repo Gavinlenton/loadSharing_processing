@@ -5,7 +5,7 @@ function [dataFinal, force_data2] = assignForceOutputTrcMot(data)
 %   must be a file generated from the function btk_loadc3d
 
           %Choose force plate filter frequency
-          data.FilterFreq = 30;
+          data.FilterFreq = 26;
           
           %Assign forces to a foot
 %           dataForcesAssigned = assign_forces(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[30, 0.25],data.FilterFreq);

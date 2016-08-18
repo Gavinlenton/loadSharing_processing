@@ -66,7 +66,7 @@ if nargin > 0
 	end
 else [fname, pname] = uigetfile('*.c3d', 'Select C3D file');
 	% load the c3dfile
-	data = btk_loadc3d([pname, fname], 10);
+	data = btk_loadc3d([pname, fname], 5);
 	anim = 'on';
 end
 
@@ -270,46 +270,49 @@ if isfield(data,'fp_data')
 	% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
 	for col1 = 1:3
 		% Front plate forces
-		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),filt_freq,dt, 'damped', 10);
+		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),filt_freq,dt, 'damped');
 		% Front plate moments
-		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),filt_freq,dt, 'damped', 10);
+		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),2,dt, 'butter');
 		% Rear plate forces
-		force_data_filtered(a4,col1+10) = lpfilter(force_data_out(a4,col1+10),filt_freq,dt, 'damped', 10);
+		force_data_filtered(a4,col1+10) = lpfilter(force_data_out(a4,col1+10),filt_freq,dt, 'damped');
 		% Rear plate moments
-		force_data_filtered(a4,col1+16) = lpfilter(force_data_out(a4,col1+16),filt_freq,dt, 'damped', 10);
+		force_data_filtered(a4,col1+16) = lpfilter(force_data_out(a4,col1+16),2,dt, 'butter');
 		
 		% COP front
 		if a(end) ~= length(fp_time1)
-		force_data_filtered(a(1)+1:a(end)+4, col1+4) = lpfilter(force_data_out(a(1)+1:a(end)+4, col1+4), 6,dt, 'butter', 2);
+		force_data_filtered(a(1):a(end)+5, col1+4) = lpfilter(force_data_out(a(1):a(end)+5, col1+4), 6,dt, 'butter');
 		else
-			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), 6,dt, 'butter', 2);
+			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), 6,dt, 'butter');
 		end
 		% COP rear
-		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 6,dt, 'butter', 2);
+		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 6,dt, 'butter');
 	end
 	
 	% Butterworth filter to smooth out FP cropping
 	b_filt_freq = 8;
 	[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
 	
-	force_data_filtered(a3(1):a3(end)+5, 2:4) = lpfilter(force_data_filtered(a3(1):a3(end)+5, 2:4),b_filt_freq,dt, 'butter');	
-	force_data_filtered(a3(1):a3(end)+5, 8:10) = lpfilter(force_data_filtered(a3(1):a3(end)+5, 8:10),b_filt_freq,dt, 'butter');
+	force_data_filtered(a3(1):a3(end), 2:4) = lpfilter(force_data_filtered(a3(1):a3(end), 2:4),b_filt_freq,dt, 'butter');	
+	force_data_filtered(a3(1):a3(end), 8:10) = lpfilter(force_data_filtered(a3(1):a3(end), 8:10),b_filt_freq,dt, 'butter');
 	force_data_filtered(a4, 11:13) = lpfilter(force_data_filtered(a4, 11:13),b_filt_freq,dt, 'butter');
 	force_data_filtered(a4, 17:19) = lpfilter(force_data_filtered(a4, 17:19),b_filt_freq,dt, 'butter');
 	
-% 	force_data_filtered(a3(1):a3(end)+5, 2:4) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a3(1):a3(end)+5, 2:4));
-% 	force_data_filtered(a3(1):a3(end)+5, 8:10) = matfiltfilt(dt,b_filt_freq,2, force_data_filtered(a3(1):a3(end)+5, 8:10));
-% 	force_data_filtered(a4, 11:13) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 11:13));
-% 	force_data_filtered(a4, 17:19) = matfiltfilt(dt,b_filt_freq, 2, force_data_filtered(a4, 17:19));
-	
 	% Clean up COP
-	if a(end) ~= length(fp_time1)
-		force_data_filtered(a(1)+1:a(end)+5, 5:7) = lpfilter(force_data_filtered(a(1)+1:a(end)+5, 5:7),4,dt, 'butter');
-	else
-		force_data_filtered(a(1)+1:a(end), 5:7) = lpfilter(force_data_filtered(a(1)+1:a(end), 5:7),2,dt, 'butter');
-	end
-	force_data_filtered(a(1):a(1)+1, 7) = 0;
+		% Heavy filter on the A/P COP data because the transition between
+		% plates is challenging.
+		force_data_filtered(a(1):a(end), 6:7) = lpfilter(force_data_filtered(a(1):a(end), 6:7),4,dt, 'butter');
+		force_data_filtered(a(1):a(end), 5) = lpfilter(force_data_filtered(a(1):a(end), 5),2,dt, 'butter');
+	
 	force_data_filtered(a2, 14:16) = lpfilter(force_data_filtered(a2, 14:16),4,dt, 'butter');
+	
+	% do some cleaning of the COP before and after contact
+	r = find(abs(diff(force_data_filtered(:, 7)))>0);
+	if ~isempty(b)
+		for j = 1:3
+			force_data_filtered(1:r(1), j+4) = force_data_filtered(r(1)+1, j+4);
+			force_data_filtered(r(end):end, j+4) = force_data_filtered(r(end)-1, j+4) ;
+		end
+	end
 	
 	% assign a value of zero to any NaNs
 	force_data_filtered(logical(isnan(force_data_filtered))) = 0;
@@ -353,7 +356,7 @@ if isfield(data,'fp_data')
 		% check data
 		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 50)
+	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 100) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) 
 		% If there is issue with force assignment then print with modified
 		% name
 		disp('Trial has dodgy data, printing with modified filename');
