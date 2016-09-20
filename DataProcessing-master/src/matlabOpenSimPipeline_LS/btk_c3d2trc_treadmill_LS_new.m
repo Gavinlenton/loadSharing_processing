@@ -143,7 +143,7 @@ end
 % Assign marker info to markersData
 markersData = data_out';
 
-% Apply filter 
+% Apply filter
 data_out_filtered = zeros(size(markersData));
 
 % Sampling freq
@@ -153,8 +153,8 @@ Fs = 1/data.marker_data.Info.frequency;
 Fc = 8;
 
 % Apply 2nd order Butterworth filt with two passes.
-for col = 3:length(data_out)
-	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter', 2);
+for col = 3:size(data_out,1)
+	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter');
 	markersData(:,col) = data_out_filtered(:,col);
 end
 
@@ -252,68 +252,62 @@ if isfield(data,'fp_data')
 		
 	end
 	
-	% Apply 10 Hz filter to smooth stiching out - don't want to filter the
-	% COP here.
+	%% FILTERING
 	
-	% Clean up data at beginning and end
+	% Find indices for filtering
 	a = find(force_data_out(:,5) > 0);
 	a2 = find(force_data_out(300:end,14) > 0) + 299;
 	a3 = find(force_data_out(:,3) > 0);
-	a4 = find(force_data_out(300:end,12) > 0) + 299;
 	
 	% Define filter parameters
-	filt_freq = 20;
+	filt_freq = 26;
+	damped_filt_freq = 10;
 	dt = 1/data.fp_data.Info(1).frequency;
 	
 	force_data_filtered = zeros(size(force_data_out));
 	
 	% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
 	for col1 = 1:3
-		% Front plate forces
-		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),filt_freq,dt, 'damped');
-		% Front plate moments
-		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),2,dt, 'butter');
-		% Rear plate forces
-		force_data_filtered(a4,col1+10) = lpfilter(force_data_out(a4,col1+10),filt_freq,dt, 'damped');
-		% Rear plate moments
-		force_data_filtered(a4,col1+16) = lpfilter(force_data_out(a4,col1+16),2,dt, 'butter');
+		% Right foot forces
+		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),filt_freq,dt, 'butter');
+		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),damped_filt_freq,dt, 'damped');
+		% Right foot moments
+		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),filt_freq,dt, 'butter');
+		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),damped_filt_freq,dt, 'damped');
+		% Left Foot forces
+		force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
+		force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
+		% Left foot moments
+		force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),filt_freq,dt, 'butter');
+		force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),damped_filt_freq,dt, 'damped');
 		
 		% COP front
 		if a(end) ~= length(fp_time1)
-		force_data_filtered(a(1):a(end)+5, col1+4) = lpfilter(force_data_out(a(1):a(end)+5, col1+4), 6,dt, 'butter');
+			force_data_filtered(a(1):a(end)+5, col1+4) = lpfilter(force_data_out(a(1):a(end)+5, col1+4), damped_filt_freq,dt, 'damped');
 		else
-			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), 6,dt, 'butter');
+			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), damped_filt_freq,dt, 'damped');
 		end
 		% COP rear
-		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 6,dt, 'butter');
+		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
 	end
-	
-	% Butterworth filter to smooth out FP cropping
-	b_filt_freq = 8;
-	[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
-	
-	force_data_filtered(a3(1):a3(end), 2:4) = lpfilter(force_data_filtered(a3(1):a3(end), 2:4),b_filt_freq,dt, 'butter');	
-	force_data_filtered(a3(1):a3(end), 8:10) = lpfilter(force_data_filtered(a3(1):a3(end), 8:10),b_filt_freq,dt, 'butter');
-	force_data_filtered(a4, 11:13) = lpfilter(force_data_filtered(a4, 11:13),b_filt_freq,dt, 'butter');
-	force_data_filtered(a4, 17:19) = lpfilter(force_data_filtered(a4, 17:19),b_filt_freq,dt, 'butter');
-	
-	% Clean up COP
-		% Heavy filter on the A/P COP data because the transition between
-		% plates is challenging.
-		force_data_filtered(a(1):a(end), 6:7) = lpfilter(force_data_filtered(a(1):a(end), 6:7),4,dt, 'butter');
-		force_data_filtered(a(1):a(end), 5) = lpfilter(force_data_filtered(a(1):a(end), 5),2,dt, 'butter');
-	
-	force_data_filtered(a2, 14:16) = lpfilter(force_data_filtered(a2, 14:16),4,dt, 'butter');
 	
 	% do some cleaning of the COP before and after contact
 	r = find(abs(diff(force_data_filtered(:, 7)))>0);
+	framesCleanedStart = 1;
+	framesCleanedEnd = 5;
 	if ~isempty(b)
 		for j = 1:3
-			force_data_filtered(1:r(1), j+4) = force_data_filtered(r(1)+1, j+4);
-			force_data_filtered(r(end):end, j+4) = force_data_filtered(r(end)-1, j+4) ;
+			force_data_filtered(1:r(1), j+7) = 0;
+			force_data_filtered(1:r(1), j+4) = force_data_filtered(r(1)+framesCleanedStart, j+4);
+			force_data_filtered(r(end)-framesCleanedEnd:end, j+4) = force_data_filtered(r(end)-framesCleanedEnd, j+4) ;
 		end
 	end
 	
+	% M/L and A/P free moments equal to zero as they contribute negligibly
+	% to ID
+	force_data_filtered(:, [8,10]) = 0;
+	force_data_filtered(:, [17,19]) = 0;
+
 	% assign a value of zero to any NaNs
 	force_data_filtered(logical(isnan(force_data_filtered))) = 0;
 	
@@ -351,12 +345,15 @@ if isfield(data,'fp_data')
 	
 	%% Print MOT
 	
+	% Find when peaks occur to determine if Force is dodgy
+	[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
+	
 	if any(isempty(fieldnames(data.GRF.FP(i))))
 		% Specify new file name if there is missing data name so I know to
 		% check data
 		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 100) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) 
+	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 200) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) || loc1 > 220
 		% If there is issue with force assignment then print with modified
 		% name
 		disp('Trial has dodgy data, printing with modified filename');

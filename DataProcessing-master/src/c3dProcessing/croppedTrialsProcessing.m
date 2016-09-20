@@ -7,7 +7,7 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
 croppedSessionDirs = dir([pname, filesep, '*.c3d']);
 isub2=[croppedSessionDirs(:).bytes]';
 % Only include files above 2000000 bytes as these are walking trials
-a = isub2 < 2000000;
+a = isub2 < 500000;
 
 % Delete files I don't want to analyse
 c3dFilesCropped = {croppedSessionDirs(a).name}';
@@ -15,10 +15,10 @@ c3dFilesCropped = selectWalkingTrials(c3dFilesCropped, 0);
 
 % Run c3d2mat again on cropped trials
 % Navigate to directory where function is
-cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
+% cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
 
 % Run modified c3d2mat
-C3D2MAT_cropped(fName, c3dFilesCropped, pname);
+% C3D2MAT_cropped(fName, c3dFilesCropped, pname);
 
 % 	 % Figure properties
 % cmap = colormap(parula(350));

@@ -81,10 +81,12 @@ for i = 1:length(data.fp_data.GRF_data)
 	% filter the force and determine when the foot is in contact with the
 	% ground - this is not the same filtering as is done on the final data
 	% and is required to be able to determine the contact periods
-	Fv = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(:,3));
+	
+	Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3), 30,dt, 'damped');
 	
 	% if this is a cyclic movement, then it is best to make the baseline
 	% zero as this improves capacity for detecting events
+	% If there are minus values then make them equal to 1
 	minusValues = Fv < 0;
 	Fv(minusValues) = 0;
 	
@@ -107,7 +109,8 @@ for i = 1:length(data.fp_data.GRF_data)
 			dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.010);
 		end
 		
-		on_i = [nt(1); nt(dnt+1)];
+		% Create on and off events
+ 		on_i = [nt(1); nt(dnt+1)];
 		off_i = [nt(dnt); nt(end)];
 		
 		if (off_i(1)-on_i(1)) < 7
@@ -120,7 +123,8 @@ for i = 1:length(data.fp_data.GRF_data)
 			on_i(end) = [];
 		end
 		
-		ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.10);
+		% Finds if events are really close
+		ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.015);
 		if ~isempty(ns)
 			if ns(end) == length(off_i)
 				ns(end) = [];
@@ -130,7 +134,7 @@ for i = 1:length(data.fp_data.GRF_data)
 		end
 		
 		
-		%  Detect if force assignments were incorrect
+		%% Detect if force assignments were incorrect
 		% (Should always be at least two on and two off events in FP1)
 		if i == 1 && length(on_i) ~= 2
 			disp('Threshold not high enough to detect multiple events, increasing to 50N')
@@ -173,7 +177,7 @@ for i = 1:length(data.fp_data.GRF_data)
 				off_i = [nt(dnt); nt(end)];
 			end
 			
-			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.10);
+			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.010);
 			if ~isempty(ns)
 				if ns(end) == length(off_i)
 					ns(end) = [];
@@ -234,7 +238,7 @@ for i = 1:length(data.fp_data.GRF_data)
 				end
 			end
 			
-			% 			Check parameters for inconsistencies.
+			% Check parameters for inconsistencies.
 			if (off_i(1)-on_i(1)) < 7
 				off_i(1) = [];
 				on_i(1) = [];
@@ -245,7 +249,7 @@ for i = 1:length(data.fp_data.GRF_data)
 				on_i(end) = [];
 			end
 			
-			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.1);
+			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.015);
 			if ~isempty(ns)
 				if ns(end) == length(off_i)
 					ns(end) = [];
@@ -253,7 +257,8 @@ for i = 1:length(data.fp_data.GRF_data)
 				off_i(ns) = [];
 				on_i(ns+1) = [];
 			end
-			%
+			
+			% Create variable to keep track of event frames
 			FP(i).On = on_i;
 			FP(i).Off = off_i;
 			
@@ -275,14 +280,35 @@ for i = 1:length(data.fp_data.GRF_data)
 				if i == 1 && j == 1
 					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
 						
-						data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
-						data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
-						data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
+						% Clean up AP force
+						force_AP = data.fp_data.GRF_data(i).F(:,2) > 0; 
+						data.fp_data.GRF_data(i).F(force_AP,2) = 0;
+						data.fp_data.GRF_data(i).F(1:find(force_AP,1,'first'),2) = 0;
 						
-						% OLD FILTERING HERE
-						%                          data.GRF.FP(i).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));
-						%                          data.GRF.FP(i).M(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).M(a,:));
-						%                          data.GRF.FP(i).P(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).P(a,:));
+						data.GRF.FP(i).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
+						data.GRF.FP(i).M(a(1):dnt(end),:) = data.fp_data.GRF_data(i).M(a(1):dnt(end),:);
+						
+						% Fix beginning and end of COP data
+						% ML
+						centre_plate_2_ML = mode(data.fp_data.GRF_data(2).P(:,1));
+						% Fix beginning
+						data.fp_data.GRF_data(i).P(1:a(1)+1,1) = centre_plate_2_ML;
+						% Fix end
+						data.fp_data.GRF_data(i).P(a(1):a(1)+10,1) = mean(data.fp_data.GRF_data(i).P(a,1));
+						ML_bad = data.fp_data.GRF_data(i).P(1:a(end),1) < (centre_plate_2_ML - 10); 
+						data.fp_data.GRF_data(i).P(ML_bad,1) = mean(data.fp_data.GRF_data(i).P(a,1));
+						
+						% AP
+						centre_plate_1_AP = mode(data.fp_data.GRF_data(1).P(:,2));
+						% Fix beginning
+						data.fp_data.GRF_data(i).P(1:a(1)+3,2) = centre_plate_1_AP;
+						AP_bad = find(data.fp_data.GRF_data(i).P(200:a(end),2) > centre_plate_1_AP);
+						% Fix end
+						data.fp_data.GRF_data(i).P(AP_bad + 199,2) = centre_plate_1_AP;
+						data.GRF.FP(i).P(a(1):dnt(end),:) = data.fp_data.GRF_data(i).P(a(1):dnt(end),:);
+						
+						% Clean up moments at the beginning
+						data.GRF.FP(i).M(a(1):a(1)+5,:) = 0;
 						
 					else % otherwise just assign the raw data
 						data.GRF.FP(i).(assign_bodies{i}).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
@@ -334,47 +360,94 @@ for i = 1:length(data.fp_data.GRF_data)
 					% assignment we know that it's the right body late
 					% stance
 				elseif i == 2 && j == 2
-					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 25Hz)
+					if filter_freq > 0 % filter the data if a filter frequency is defined (defaults at low pass 26Hz)
 						
 						if length(on_i) == 3
-							% Add the GRF from first and second plates during
+							
+							% Add the Forces from first and second plates during
 							% transition period.
-							data.GRF.FP(1).F(a,:) = lpfilter([(data.fp_data.GRF_data(i).F(a(1):FP(1).On(2)-1,:)+...
-								data.fp_data.GRF_data(1).F(a(1):FP(1).On(2)-1,:));...
-								data.fp_data.GRF_data(i).F(FP(1).On(2):a(end),:)],10,dt, 'damped');
 							
-							data.fp_data.GRF_data(i).M(:,:) = lpfilter(data.fp_data.GRF_data(i).M(:,:),24,dt, 'butter');
-							data.fp_data.GRF_data(1).M(:,:) = lpfilter(data.fp_data.GRF_data(1).M(:,:),24,dt, 'butter');
+							% ML GRF is noisy so have to fix
+							force_ML = data.fp_data.GRF_data(i).F(:,1);
+							force_ML(1:a(1)-1,1) = 0; force_ML(a(end)+1:end, 1) = 0;
 							
-							data.GRF.FP(1).M(a,1:2) = lpfilter(data.fp_data.GRF_data(i).M(a,1:2),10,dt, 'damped');
+							data.GRF.FP(1).F(a,2:3) = [(data.fp_data.GRF_data(i).F(a(1):FP(1).Off(1),2:3)+...
+								data.fp_data.GRF_data(1).F(a(1):FP(1).Off(1),2:3));...
+								data.fp_data.GRF_data(i).F(FP(1).Off(1)+1:a(end),2:3)];
 							
-							data.GRF.FP(1).M(a,3) = lpfilter([(data.fp_data.GRF_data(i).M(a(1):FP(1).On(2)-1,3)-...
-								data.fp_data.GRF_data(1).M(a(1):FP(1).On(2)-1,3));...
-								data.fp_data.GRF_data(i).M(FP(1).On(2):a(end),3)],10,dt, 'damped');
+							data.GRF.FP(1).F(a,1) = [(force_ML(a(1):FP(1).Off(1)-1,:)+...
+								data.fp_data.GRF_data(1).F(a(1):FP(1).Off(1)-1,1));...
+								force_ML(FP(1).Off(1):a(end),1)];
 							
-							% COP stitching remains the same
-							data.fp_data.GRF_data(i).P(:,:) = lpfilter(data.fp_data.GRF_data(i).P(:,:),10,dt, 'damped');
-							data.fp_data.GRF_data(1).P(:,:) = lpfilter(data.fp_data.GRF_data(1).P(:,:),10,dt, 'damped');
-							data.fp_data.GRF_data(i).P(1:a(end),:) = lpfilter(data.fp_data.GRF_data(i).P(1:a(end),:),filter_freq,dt, 'butter');
-							data.fp_data.GRF_data(1).P(1:a(end),:) = lpfilter(data.fp_data.GRF_data(1).P(1:a(end),:),filter_freq,dt, 'butter');
+							data.GRF.FP(1).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
 							
-							% Locate first peak in COP as this is when I want
-							% to stitch it.
-							[pks, locCOPPeak] = findpeaks(data.fp_data.GRF_data(2).P(:,2), 'MinPeakDistance', 300);
-							COP1 = data.fp_data.GRF_data(1).P(locCOPPeak(1),2);
-							COP2 = data.fp_data.GRF_data(2).P(locCOPPeak(1),2);
-							diffCOP = (COP1-COP2)/2;
+							% Clean up moments at end
+							below = data.GRF.FP(1).M(:,3) < 0;
+							data.GRF.FP(1).M(below,:) = 0;
+							data.GRF.FP(1).M(a(end)-5:a(end),:) = 0;
 							
-							data.GRF.FP(1).P(a(1)-40:locCOPPeak(1),2) = data.fp_data.GRF_data(1).P(a(1)-40:locCOPPeak(1),2) - diffCOP;
+							% Centre of each plate in AP direction
+							centre_plate_2_AP = mode(data.fp_data.GRF_data(2).P(:,2));
+							centre_plate_2_ML = mode(data.fp_data.GRF_data(2).P(:,1));
 							
-% 							data.GRF.FP(1).P(a(1)-15:locCOPPeak(1)-15,2) = data.fp_data.GRF_data(i).P(a(1)-15:locCOPPeak(1)-15,2) + ...
-% 								(data.fp_data.GRF_data(1).P(a(1)-15:locCOPPeak(1)-15,2)-...
-% 								(data.fp_data.GRF_data(i).P(a(1)-15:locCOPPeak(1)-15,2)));
+							% Fix beginning and end of COP data
+							% ML
+							% Fix beginning
+							data.fp_data.GRF_data(i).P(a(1)-1,1) = centre_plate_2_ML;
+							data.fp_data.GRF_data(i).P(a(1):a(1)+15,1) = mean(data.fp_data.GRF_data(i).P(a,1));
+							data.fp_data.GRF_data(i).P(1:a(1)-2,1) = centre_plate_2_ML;
 							
+							% Fix end
+							ML_bad_2 = find(data.fp_data.GRF_data(i).P(a(1):a(end)+1,1) < (centre_plate_2_ML - 10)) + (a(1)-1);
+							data.fp_data.GRF_data(i).P(ML_bad_2,1) = mean(data.fp_data.GRF_data(i).P(a,1));
+							data.fp_data.GRF_data(i).P(a(end)-10:a(end),1) = mean(data.fp_data.GRF_data(i).P(a,1));
+							data.fp_data.GRF_data(i).P(a(end)+1,1) = centre_plate_2_ML;
+						
+							% AP
+							% Fix end
+							data.fp_data.GRF_data(i).P(a(end)-1:a(end),2) = centre_plate_2_AP;
+						
+							% Find period when foot comes onto second plate
+							locCOP2On = find(data.fp_data.GRF_data(2).P(:,2) > 600);
+														
+							interval = locCOP2On(1)-30:FP(1).Off(1);
+							
+							% Find rate at which slope is decreasing
+							theta = data.fp_data.GRF_data(1).P(150:250,2);
+							t = (1:1:101)';
+							slope = mean(log(theta)./t);
+							tau = -1/slope;
+							
+							% Create gap filling
+							start_gap = data.fp_data.GRF_data(1).P(interval(1),2);
+							finish_gap = data.fp_data.GRF_data(2).P(interval(end),2);
+							spaces = (start_gap - finish_gap) / abs(tau);
+							COP_gap_AP = linspace(start_gap, finish_gap, spaces);
+							COP_gap_ML = ((data.fp_data.GRF_data(2).P(interval,1) + data.fp_data.GRF_data(1).P(interval,1))/2)';
+														
 							% Assign from first peak in COP to end of
 							% stance
-							data.GRF.FP(1).P(locCOPPeak(1):a(end),:) = data.fp_data.GRF_data(i).P(locCOPPeak(1):a(end),:);
 							
+							% Determine the difference between created gap
+							% and defined interval
+							diffFromGap = length(interval) - length(COP_gap_AP);
+							
+							% If they are different then pad the interval
+							% with the difference
+							if diffFromGap > 0
+								interval = floor(locCOP2On(1)-(30-(diffFromGap/2))):floor(FP(1).Off(1)-(diffFromGap/2));
+								COP_gap_ML = ((data.fp_data.GRF_data(2).P(interval,1) + data.fp_data.GRF_data(1).P(interval,1))/2)';
+							elseif diffFromGap < 0
+								interval = floor(locCOP2On(1)-(30+(abs(diffFromGap)/2))):floor(FP(1).Off(1)+(abs(diffFromGap)/2));
+								COP_gap_ML = ((data.fp_data.GRF_data(2).P(interval,1) + data.fp_data.GRF_data(1).P(interval,1))/2)';
+							else	
+							end
+							
+							% Assign to the first force plate
+							data.GRF.FP(1).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
+							data.GRF.FP(1).P(interval,2) = COP_gap_AP';
+							data.GRF.FP(1).P(interval,1) = COP_gap_ML';							
+
 						else
 							% Old method of stitching
 							data.GRF.FP(1).F(a,:) = matfiltfilt(dt,filter_freq,2,data.fp_data.GRF_data(i).F(a,:));

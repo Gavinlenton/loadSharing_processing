@@ -50,7 +50,7 @@ for ii = 1:length(subjectFolders)
 	% Subject name
 	subjectName = subjectFolders{ii};
 	
-	% Loop through sessions
+	%% Loop through sessions
 	for i = 1:length(sessionFolders)
 		
 		% Initialise and define directories
@@ -85,7 +85,7 @@ for ii = 1:length(subjectFolders)
 			
 		else
 			% It exists so continue happily
-			fprintf('acquisition.xml already exist in folder: %s, \n Continuing with analysis... \n', pname);
+			fprintf('acquisition.xml already exist in folder: %s,\nContinuing with analysis...\n', pname);
 		end
 		
 		%% --- MERGE EMG IF COLLECTED INTO A TXT FILE --- %%
@@ -147,7 +147,7 @@ for ii = 1:length(subjectFolders)
 				
 				% If no EMG captured in the session
 			else
-				sprintf('No EMG captured for %s, continuing with analysis...', c3dFile_name(1:end-4));
+				fprintf('No EMG captured for %s, continuing with analysis...', c3dFile_name(1:end-4));
 			end
 			
 			% Clear memory for next trial
@@ -164,7 +164,7 @@ for ii = 1:length(subjectFolders)
 		ROMTrialsProcessing(pname, sessionConditions, fName);
 		
 		% Clear for next session
-		clearvars -except fName motoDir physFolder subjectFolders subjectName sessionFolders
+		clearvars -except fName motoDir physFolder subjectFolders subjectName sessionFolders BaseName
 	end
 	
 end

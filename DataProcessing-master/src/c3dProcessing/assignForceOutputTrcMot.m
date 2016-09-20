@@ -10,7 +10,7 @@ function [dataFinal, force_data2] = assignForceOutputTrcMot(data)
           %Assign forces to a foot
 %           dataForcesAssigned = assign_forces(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[30, 0.25],data.FilterFreq);
           
-          dataForcesAssigned2 = assign_forces_LS(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[30, 0.25],data.FilterFreq);
+          dataForcesAssigned2 = assign_forces_LS(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[20, 0.25],data.FilterFreq);
           
           %Create the .trc and .mot files
 %           [dataFinal, force_data2] = btk_c3d2trc_treadmill_LS(dataForcesAssigned,'off');
