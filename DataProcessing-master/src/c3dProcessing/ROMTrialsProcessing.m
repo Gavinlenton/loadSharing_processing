@@ -33,7 +33,10 @@ function  ROMTrialsProcessing(pname, sessionConditions, fName)
           % Save each session in separate tabs
           for tt = 1:length(sessionConditions)
                session = sessionConditions{tt};
-               anglesJointMeans.(session) = anglesJointMean.(session);
+			   % Only if the condition had ROM trials
+			   if isfield(anglesJointMeans, session)
+				   anglesJointMeans.(session) = anglesJointMean.(session);
+			   end
           end
 
           save([matFileDir, filesep, fileName], 'anglesJointMeans');

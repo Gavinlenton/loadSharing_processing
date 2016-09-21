@@ -1,5 +1,5 @@
 function [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
-     sessionData, maxc3dFileOther, maxName] = initialiseForAnalysis(pname)
+     sessionData, maxName] = initialiseForAnalysis(pname)
 %Defines paths and files for processing of EMG and dynamic walking trials
 %in LS data
 %   Input the pathname to determine max EMG trial name, path names, and
@@ -34,7 +34,6 @@ if ~exist([pname, filesep, maxc3dFile_name], 'file')
      end
 else
      maxName = maxTrials{1};
-     maxc3dFileOther = maxTrials{2};
 end
 
 end

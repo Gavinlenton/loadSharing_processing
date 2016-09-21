@@ -259,6 +259,8 @@ if isfield(data,'fp_data')
 	a2 = find(force_data_out(300:end,14) > 0) + 299;
 	a3 = find(force_data_out(:,3) > 0);
 	
+	if length(a3) < 800 && ~any(a3 > 800)
+	
 	% Define filter parameters
 	filt_freq = 26;
 	damped_filt_freq = 10;
@@ -353,7 +355,7 @@ if isfield(data,'fp_data')
 		% check data
 		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 200) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) || loc1 > 220
+	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 200) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) || loc1(1) > 220
 		% If there is issue with force assignment then print with modified
 		% name
 		disp('Trial has dodgy data, printing with modified filename');
@@ -370,6 +372,10 @@ if isfield(data,'fp_data')
 		writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
 	end
 	
+	else
+		disp('Force plate data incorrect for rear plate so not printing mot file')
+		force_dataMoto = 1;
+	end
 	cd ..
 	
 else disp('No force plate information available.')
