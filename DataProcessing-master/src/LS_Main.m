@@ -1,9 +1,9 @@
 % -------------------------------------------------------------%
 
 % Main processing script for load sharing data
-% - Generate the appropriate files to run an OpenSim simulation sequence for the Load Sharing Data
-% - Process EMG data and output excitations in MOT format
-% - Process ROM trials and output joint angles
+% 1. Generate the appropriate files to run an OpenSim simulation sequence for the Load Sharing Data
+% 2. Process EMG data and output excitations in MOT format
+% 3. Process ROM trials and output joint angles
 
 % Please acknowledge Glen Lichtwark from the University of Queensland and
 % Alice Mantoan from Universita di Padua for the use of their OpenSim pipeline tools
@@ -16,7 +16,7 @@
 %%
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath('.\');
+addpath(['.' filesep]);
 
 %%
 clear; clc; close all;
@@ -34,6 +34,7 @@ if ispc
 else
 	% Mac or Linux
 	[BaseName, physFolder, motoDir, subjectFolders] = defineFolders(2);
+	
 end
 
 %% --- MAIN DATA ANALYSIS --- %%
@@ -70,12 +71,14 @@ for ii = 1:length(subjectFolders)
 			
 			% Nav to file directory and run modified interface function
 			cd([motoDir, filesep, 'src', filesep, 'AcquisitionInterface', filesep]);
+			addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
 			AcquisitionInterface_LS(subjectName, pname, sessionFolders{i,1});
 			
 			% If the acquisition doesn't exist then just copy it from other
 			% file and updated parameter
 		elseif ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i ~= 1
 			fileSource = [fName, filesep, sessionFolders{1}, filesep, 'acquisition.xml'];
+			addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
 			copyfile(fileSource, c3dFile_folder)
 			cd(pname);
 			acquisitionInfo=xml_read(fullfile(pname, 'acquisition.xml'));
@@ -104,7 +107,11 @@ for ii = 1:length(subjectFolders)
 		% Navigate to directory where function is
 		cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
 		% Run c3d2mat
+		
+		if ~exist(fullfile(regexprep(pname, 'InputData', 'ElaboratedData'), 'sessionData'), 'dir');
 		C3D2MAT(fName, c3dFiles, pname);
+		end
+		
 		% Replace emg analog labels
 		replaceAnalogLabels(pname);
 		
@@ -112,7 +119,7 @@ for ii = 1:length(subjectFolders)
 		
 		% Define all required path names
 		[newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
-			sessionData, maxc3dFileOther, maxName] = initialiseForAnalysis(pname);
+			sessionData, maxName] = initialiseForAnalysis(pname);
 		
 		% Check if EMG was captured in the session with first condition
 		dynamicTrialsName = dynamicCropFolders{1,1};
@@ -147,7 +154,7 @@ for ii = 1:length(subjectFolders)
 				
 				% If no EMG captured in the session
 			else
-				fprintf('No EMG captured for %s, continuing with analysis...', c3dFile_name(1:end-4));
+				fprintf('No EMG captured for %s, continuing with analysis...\n', c3dFile_name(1:end-4));
 			end
 			
 			% Clear memory for next trial
@@ -164,7 +171,7 @@ for ii = 1:length(subjectFolders)
 		ROMTrialsProcessing(pname, sessionConditions, fName);
 		
 		% Clear for next session
-		clearvars -except fName motoDir physFolder subjectFolders subjectName sessionFolders BaseName
+		clearvars -except fName motoDir physFolder subjectFolders subjectName sessionFolders BaseName i
 	end
 	
 end
