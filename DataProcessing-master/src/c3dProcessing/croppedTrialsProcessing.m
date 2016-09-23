@@ -37,6 +37,7 @@ for croppedTrialNum = 1:length(c3dFilesCropped)
 	
 	[dataFinal, force_data2] = assignForceOutputTrcMot(data1);
 	
+	
 	if ~isempty(force_data2)
 		
 		% Uncomment to check to see if forces assigned correctly

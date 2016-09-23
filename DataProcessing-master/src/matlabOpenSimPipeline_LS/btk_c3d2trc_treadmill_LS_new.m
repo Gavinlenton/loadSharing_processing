@@ -203,17 +203,21 @@ if isfield(data,'fp_data')
 	% Needs to loop through both force plates
 	for i = 1:2
 		
-		% rescale the GRF COP to meters if necessary
-		data.fp_data.GRF_data(i).P =  data.fp_data.GRF_data(i).P/p_sc;
-		% rescale the moments to meters as well, if necessary
-		data.fp_data.GRF_data(i).M =  data.fp_data.GRF_data(i).M/p_sc;
+		% 		% rescale the GRF COP to meters if necessary
+		% 		data.GRF.FP(i).P =  data.GRF.FP(i).P/p_sc;
+		% 		% rescale the moments to meters as well, if necessary
+		% 		data.fp_data.GRF_data(i).M =  data.fp_data.GRF_data(i).M/p_sc;
 		
 		% do some cleaning of the COP before and after contact
-		b = find(abs(diff(data.fp_data.GRF_data(i).P(:,2)))>0);
-		if ~isempty(b)
+		r = find(abs(diff(data.GRF.FP(i).P(:, 2)))>0);
+		if ~isempty(r)
 			for j = 1:3
-				data.fp_data.GRF_data(i).P(1:b(1),j) = data.fp_data.GRF_data(i).P(b(1)+1,j);
-				data.fp_data.GRF_data(i).P(b(end):end,j) = data.fp_data.GRF_data(i).P(b(end)-1,j);
+				data.GRF.FP(i).P(1:r(1),j) = data.GRF.FP(i).P(r(1)+1,j);
+				data.GRF.FP(i).P(r(end):end,j) = data.GRF.FP(i).P(r(end)-1,j);
+				 minusValues = data.GRF.FP(i).P(:,j) < data.GRF.FP(i).P(r(end)-1,j);
+				if any(minusValues)
+					data.GRF.FP(i).P(minusValues,j) = data.GRF.FP(i).P(r(end)-1,j);			
+				end
 			end
 		end
 		
@@ -255,123 +259,121 @@ if isfield(data,'fp_data')
 	%% FILTERING
 	
 	% Find indices for filtering
-	a = find(force_data_out(:,5) > 0);
 	a2 = find(force_data_out(300:end,14) > 0) + 299;
 	a3 = find(force_data_out(:,3) > 0);
 	
 	if length(a3) < 800 && ~any(a3 > 800)
-	
-	% Define filter parameters
-	filt_freq = 26;
-	damped_filt_freq = 10;
-	dt = 1/data.fp_data.Info(1).frequency;
-	
-	force_data_filtered = zeros(size(force_data_out));
-	
-	% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
-	for col1 = 1:3
-		% Right foot forces
-		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),filt_freq,dt, 'butter');
-		force_data_filtered(a3(1):a3(end)+5,col1+1) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+1),damped_filt_freq,dt, 'damped');
-		% Right foot moments
-		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),filt_freq,dt, 'butter');
-		force_data_filtered(a3(1):a3(end)+5,col1+7) = lpfilter(force_data_out(a3(1):a3(end)+5,col1+7),damped_filt_freq,dt, 'damped');
-		% Left Foot forces
-		force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
-		force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
-		% Left foot moments
-		force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),filt_freq,dt, 'butter');
-		force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),damped_filt_freq,dt, 'damped');
 		
-		% COP front
-		if a(end) ~= length(fp_time1)
-			force_data_filtered(a(1):a(end)+5, col1+4) = lpfilter(force_data_out(a(1):a(end)+5, col1+4), damped_filt_freq,dt, 'damped');
-		else
-			force_data_filtered(a(1)+1:a(end), col1+4) = lpfilter(force_data_out(a(1)+1:a(end), col1+4), damped_filt_freq,dt, 'damped');
-		end
-		% COP rear
-		force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
-	end
-	
-	% do some cleaning of the COP before and after contact
-	r = find(abs(diff(force_data_filtered(:, 7)))>0);
-	framesCleanedStart = 1;
-	framesCleanedEnd = 5;
-	if ~isempty(b)
-		for j = 1:3
-			force_data_filtered(1:r(1), j+7) = 0;
-			force_data_filtered(1:r(1), j+4) = force_data_filtered(r(1)+framesCleanedStart, j+4);
-			force_data_filtered(r(end)-framesCleanedEnd:end, j+4) = force_data_filtered(r(end)-framesCleanedEnd, j+4) ;
-		end
-	end
-	
-	% M/L and A/P free moments equal to zero as they contribute negligibly
-	% to ID
-	force_data_filtered(:, [8,10]) = 0;
-	force_data_filtered(:, [17,19]) = 0;
-
-	% assign a value of zero to any NaNs
-	force_data_filtered(logical(isnan(force_data_filtered))) = 0;
-	
-	% Re-arrange so data matches MOtoNMS convention
-	force_dataMoto = force_data_filtered(:, 2:19);
-	
-	force_dataMoto(:,7:12) = force_data_filtered(:,11:16);
-	force_dataMoto(:,13:15) = force_data_filtered(:,8:10);
-	force_dataMoto(:,16:18) = force_data_filtered(:,17:19);
-	
-	%% Find where force on left leg is zeroing and fix
-	dodgyFP = find(force_dataMoto(600:end, 8) == 0) + 599;
-	
-	% Only fix if there's a zero value
-	if ~isempty(dodgyFP)
-		if length(dodgyFP) > 1
-			% If there's more than 1 frame zeroed then apply interp
-			for columnM = 1:3
-				force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+6) = (force_dataMoto(dodgyFP(1)-1, columnM+6)...
-					+ force_dataMoto(dodgyFP(end)+1, columnM+6))/2;
-				force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+15) = (force_dataMoto(dodgyFP(1)-1, columnM+15)...
-					+ force_dataMoto(dodgyFP(end)+1, columnM+15))/2;
+		% Define filter parameters
+		filt_freq = 26;
+		damped_filt_freq = 10;
+		dt = 1/data.fp_data.Info(1).frequency;
+		
+		force_data_filtered = zeros(size(force_data_out));
+		
+		% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
+		for col1 = 1:3
+			% Right foot forces
+			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),filt_freq,dt, 'butter');
+			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
+			% Right foot moments
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),filt_freq,dt, 'butter');
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
+			% Left Foot forces
+			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
+			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
+			% Left foot moments
+			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),filt_freq,dt, 'butter');
+			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),damped_filt_freq,dt, 'damped');
+			
+			% COP right
+			if a3(end) ~= length(fp_time1)
+				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), damped_filt_freq,dt, 'damped');
+			else
+				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), damped_filt_freq,dt, 'damped');
 			end
-			% Loop through columns and fix by taking mean of previous and
-			% following frame
-		else
-			for columnF = 1:3
-				force_dataMoto(dodgyFP, columnF+6) = (force_dataMoto(dodgyFP-1, columnF+6)...
-					+ force_dataMoto(dodgyFP+1, columnF+6))/2;
-				force_dataMoto(dodgyFP, columnF+15) = (force_dataMoto(dodgyFP-1, columnF+15)...
-					+ force_dataMoto(dodgyFP+1, columnF+15))/2;
+			% COP left
+			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
+		end
+		
+		% Clean up again just to be sure
+		b = find(abs(diff(force_data_filtered(:,5)))>0);
+		if ~isempty(b)
+			for j = 1:3
+				force_data_filtered(1:b(1),j+4) = force_data_filtered(b(1)+1,j+4);
+				force_data_filtered(b(end):end,j+4) = force_data_filtered(b(end)-1,j+4);
 			end
 		end
-	end
-	
-	%% Print MOT
-	
-	% Find when peaks occur to determine if Force is dodgy
-	[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
-	
-	if any(isempty(fieldnames(data.GRF.FP(i))))
-		% Specify new file name if there is missing data name so I know to
-		% check data
-		disp('Trial is missing data, GRFs not printed')
 		
-	elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 200) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) || loc1(1) > 220
-		% If there is issue with force assignment then print with modified
-		% name
-		disp('Trial has dodgy data, printing with modified filename');
-		fullFileNameGRF = [finalpathname, filesep, fileNameGRF(1:end-4), '_NFU.mot'];
-		% Write the MOT file using MOtoNMS function
-		writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
+		% M/L and A/P free moments equal to zero as they contribute negligibly
+		% to ID
+		force_data_filtered(:, [8,10]) = 0;
+		force_data_filtered(:, [17,19]) = 0;
+		badMoment = force_data_filtered(:, 9) < 0;
+		force_data_filtered(badMoment, 9) = 0;
 		
-	else
+		% assign a value of zero to any NaNs
+		force_data_filtered(logical(isnan(force_data_filtered))) = 0;
 		
-		% Otherwise name and print normally
-		fullFileNameGRF = [finalpathname, filesep, fileNameGRF];
+		% Re-arrange so data matches MOtoNMS convention
+		force_dataMoto = force_data_filtered(:, 2:19);
 		
-		% Write the MOT file using MOtoNMS function
-		writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
-	end
-	
+		force_dataMoto(:,7:12) = force_data_filtered(:,11:16);
+		force_dataMoto(:,13:15) = force_data_filtered(:,8:10);
+		force_dataMoto(:,16:18) = force_data_filtered(:,17:19);
+		
+		%% Find where force on left leg is zeroing and fix
+		dodgyFP = find(force_dataMoto(600:end, 8) == 0) + 599;
+		
+		% Only fix if there's a zero value
+		if ~isempty(dodgyFP)
+			if length(dodgyFP) > 1
+				% If there's more than 1 frame zeroed then apply interp
+				for columnM = 1:3
+					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+6) = (force_dataMoto(dodgyFP(1)-1, columnM+6)...
+						+ force_dataMoto(dodgyFP(end)+1, columnM+6))/2;
+					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+15) = (force_dataMoto(dodgyFP(1)-1, columnM+15)...
+						+ force_dataMoto(dodgyFP(end)+1, columnM+15))/2;
+				end
+				% Loop through columns and fix by taking mean of previous and
+				% following frame
+			else
+				for columnF = 1:3
+					force_dataMoto(dodgyFP, columnF+6) = (force_dataMoto(dodgyFP-1, columnF+6)...
+						+ force_dataMoto(dodgyFP+1, columnF+6))/2;
+					force_dataMoto(dodgyFP, columnF+15) = (force_dataMoto(dodgyFP-1, columnF+15)...
+						+ force_dataMoto(dodgyFP+1, columnF+15))/2;
+				end
+			end
+		end
+		
+		%% Print MOT
+		
+		% Find when peaks occur to determine if Force is dodgy
+		[pks, loc1] = findpeaks(force_data_filtered(:,3), 'MinPeakDistance', 300);
+		
+		if any(isempty(fieldnames(data.GRF.FP(i))))
+			% Specify new file name if there is missing data name so I know to
+			% check data
+			disp('Trial is missing data, GRFs not printed')
+			
+		elseif any(force_dataMoto(loc1(1):loc1(end), 2) < 200) || any(force_dataMoto(a3(1)+1:300, 4) < 0.4) || loc1(1) > 220
+			% If there is issue with force assignment then print with modified
+			% name
+			disp('Trial has dodgy data, printing with modified filename');
+			fullFileNameGRF = [finalpathname, filesep, fileNameGRF(1:end-4), '_NFU.mot'];
+			% Write the MOT file using MOtoNMS function
+			writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
+			
+		else
+			
+			% Otherwise name and print normally
+			fullFileNameGRF = [finalpathname, filesep, fileNameGRF];
+			
+			% Write the MOT file using MOtoNMS function
+			writeMot_LS(force_dataMoto ,force_data_out(:,1), fullFileNameGRF);
+		end
+		
 	else
 		disp('Force plate data incorrect for rear plate so not printing mot file')
 		force_dataMoto = 1;

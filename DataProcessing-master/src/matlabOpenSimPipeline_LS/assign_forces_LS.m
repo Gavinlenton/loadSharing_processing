@@ -60,10 +60,6 @@ if iscell(assign_markers)
 else error('The body and marker assignment lists must be cell arrays');
 end
 
-% examine the force signals for each forceplate and determine whether any
-% of the markers are close to the COP to indicate that this force should be
-% assigned to the bodies that the marker attaches to
-
 % define the ratio of force sampling frequency to marker sampling frequency
 % F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; %assume same sampling frequency on all plates!!!
 dt = 1/data.fp_data.Info(1).frequency;
@@ -76,23 +72,36 @@ for b = 1:2
 	data.GRF.FP(b).P = zeros(size(data.fp_data.GRF_data(b).P));
 end
 
+% Loop through force plates
 for i = 1:length(data.fp_data.GRF_data)
+	
+	% if this is a cyclic movement, then it is best to make the baseline
+	% zero as this improves capacity for detecting events
+	
+	% Find the zero value of the first force plate
+	% Know that the end of the trial does not contain a stance because we
+	% process from right HS to right HS
+	if i == 1
+		zeroValue = mean(data.fp_data.GRF_data(i).F(900:end-10,3));
+		
+		% subtract this value from the data
+		data.fp_data.GRF_data(i).F(:,3) = data.fp_data.GRF_data(i).F(:,3) - zeroValue;
+	end
 	
 	% filter the force and determine when the foot is in contact with the
 	% ground - this is not the same filtering as is done on the final data
 	% and is required to be able to determine the contact periods
-	
 	Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3), 30,dt, 'damped');
-	
-	% if this is a cyclic movement, then it is best to make the baseline
-	% zero as this improves capacity for detecting events
-	% If there are minus values then make them equal to 1
-	minusValues = Fv < 0;
-	Fv(minusValues) = 0;
-	
+		
 	if (max(Fv)-min(Fv))>400
 		Fv = Fv-median(Fv(Fv<(min(Fv)+25)));
 	end
+	
+	% Remove any minus values
+	minusValues = Fv < 0;
+	Fv(minusValues) = 0;
+	data.fp_data.GRF_data(i).F(minusValues,3) = 0;
+	
 	nt = find(Fv>thresh(1));
 	
 	if ~isempty(nt)
@@ -382,8 +391,6 @@ for i = 1:length(data.fp_data.GRF_data)
 						data.GRF.FP(1).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
 						
 						% Clean up moments at end
-						below = data.GRF.FP(1).M(:,3) < 0;
-						data.GRF.FP(1).M(below,:) = 0;
 						data.GRF.FP(1).M(a(end)-5:a(end),:) = 0;
 						
 						% Centre of each plate in AP direction
