@@ -200,13 +200,13 @@
 					</IKMarkerTask>
 					<IKMarkerTask name="LBHD">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
-						<apply>true</apply>
+						<apply>false</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>20</weight>
 					</IKMarkerTask>
 					<IKMarkerTask name="RBHD">
 						<!--Whether or not this task will be used during inverse kinematics solve.-->
-						<apply>true</apply>
+						<apply>false</apply>
 						<!--Weight given to a marker or coordinate for solving inverse kinematics problems.-->
 						<weight>20</weight>
 					</IKMarkerTask>

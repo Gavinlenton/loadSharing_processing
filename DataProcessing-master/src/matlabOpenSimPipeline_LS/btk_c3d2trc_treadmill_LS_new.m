@@ -256,6 +256,47 @@ if isfield(data,'fp_data')
 		
 	end
 	
+	
+	% Fix the AP GRF because it's still lagging behind foot marker
+	
+	% Find period when foot comes onto second plate
+	locCOP2On = data.FP(2).On(2);
+	
+	interval = locCOP2On(1)-30:data.FP(1).Off(1);
+	
+	% Find rate at which slope is decreasing
+	theta = data.fp_data.GRF_data(1).P(150:250,2);
+	t = (1:1:101)';
+	slope = mean(log(theta)./t);
+	tau = -1/slope;
+	
+	% Create gap filling
+	if interval(1) >= locCOP2On-30
+		
+		start_gap = data.fp_data.GRF_data(1).P(interval(1),2);
+		finish_gap = data.fp_data.GRF_data(2).P(interval(end),2);
+		spaces = (start_gap - finish_gap) / abs(tau);
+		COP_gap_AP = linspace(start_gap, finish_gap, spaces);
+		
+		% Assign from first peak in COP to end of
+		% stance
+		
+		% Determine the difference between created gap
+		% and defined interval
+		diffFromGap = length(interval) - length(COP_gap_AP);
+		
+		% If they are different then pad the interval
+		% with the difference
+		if diffFromGap > 0
+			interval = floor(locCOP2On(1)-(30-(diffFromGap/2))):floor(data.FP(1).Off(1)-(diffFromGap/2));
+		elseif diffFromGap < 0
+			interval = floor(locCOP2On(1)-(30+(abs(diffFromGap)/2))):floor(data.FP(1).Off(1)+(abs(diffFromGap)/2));
+		else
+		end
+		
+		% Assign to the first force plate
+		force_data_out(interval,5) = (COP_gap_AP')./1000;
+	end
 	%% FILTERING
 	
 	% Find indices for filtering

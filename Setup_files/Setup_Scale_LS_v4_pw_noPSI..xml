@@ -33,11 +33,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> RASI CLAV</markers>
+									<markers>RASI CLAV</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LASI CLAV</markers>
+									<markers>LASI CLAV</markers>
 								</MarkerPair>
 							</objects>
 							<groups />
@@ -403,7 +403,7 @@
 								</BodyScale>
 								<BodyScale name="tibia_r">
 									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
-									<axes> X Y Z</axes>
+									<axes> X Y</axes>
 								</BodyScale>
 							</objects>
 							<groups />
@@ -426,6 +426,10 @@
 						<BodyScaleSet>
 							<objects>
 								<BodyScale name="origin_tibia_r">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
+								<BodyScale name="tibia_r">
 									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
 									<axes> Z</axes>
 								</BodyScale>
@@ -539,7 +543,7 @@
 								</BodyScale>
 								<BodyScale name="tibia_l">
 									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
-									<axes> X Y Z</axes>
+									<axes> X Y</axes>
 								</BodyScale>
 							</objects>
 							<groups />
@@ -565,6 +569,10 @@
 									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
 									<axes> Z</axes>
 								</BodyScale>
+								<BodyScale name="tibia_l">
+									<!--Axes (X Y Z) along which to scale a body. For example, 'X Y Z' scales along all three axes, and 'Y' scales just along the Y axis.-->
+									<axes> Z</axes>
+								</BodyScale>
 							</objects>
 							<groups />
 						</BodyScaleSet>
@@ -577,11 +585,11 @@
 							<objects>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LCAL LMT5</markers>
+									<markers> LCAL LMT1</markers>
 								</MarkerPair>
 								<MarkerPair>
 									<!--Names of two markers, the distance between which is used to compute a body scale factor.-->
-									<markers> LCAL LMT1</markers>
+									<markers> LCAL LMT5</markers>
 								</MarkerPair>
 							</objects>
 							<groups />

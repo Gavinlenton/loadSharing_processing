@@ -6,7 +6,7 @@ function  croppedTrialsProcessing(pname, fName, motoDir)
 % Re-set folder as that chosen above to include new files
 croppedSessionDirs = dir([pname, filesep, '*.c3d']);
 isub2=[croppedSessionDirs(:).bytes]';
-% Only include files above 2000000 bytes as these are walking trials
+% Only include files above 500000 bytes as these are walking trials
 a = isub2 < 500000;
 
 % Delete files I don't want to analyse
@@ -35,7 +35,7 @@ for croppedTrialNum = 1:length(c3dFilesCropped)
 	% Assign force to feet, stitch forces together, and output .trc
 	% and .mot files for further analysis.
 	
-	[dataFinal, force_data2] = assignForceOutputTrcMot(data1);
+	[dataFinal, force_data2] = assignForceOutputTrcMot(data1, fileName);
 	
 	
 	if ~isempty(force_data2)

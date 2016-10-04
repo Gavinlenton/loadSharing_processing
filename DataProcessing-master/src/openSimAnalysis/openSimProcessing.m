@@ -91,41 +91,51 @@ for nS = 1:length(subjectNames)
                     % If statement to check files you're running are for ID as well (this is
                     % because Matlab keeps crashing...)
                     
-                    idOption = questdlg('Are you running ID on same trials as IK?',...
-                         'ID trials', 'Yes', 'No', 'No IK trials before, or matlab crashed', 'Yes');
-                    
-                    if strcmp(idOption, 'Yes') == 1
-                         
-                         % Run IK as per normal
-                         [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
-                         
-%                          % Plot IK results
-%                          IKmotFilename='ik.mot'; %our default name
-%                          [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
-                         
-                         % Run ID on same trials as IK
-                         [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName, IKoutputDir, IKprocessedTrials);
-                         
-                    elseif strcmp(idOption, 'No') == 1
-                         
-                         % Run IK as per normal
-                         [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
-                         
-                         % Plot IK results
-                         IKmotFilename='ik.mot'; %our default name
-                         [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
-                         
-                         % Run ID on different trials as IK
-                         [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, IKoutputDir);
-                         
-                    else
-                         
-                         % Matlab crashed or you just want to run only ID
-                         [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName);
-                         
-                    end
-                    
-                    %% MUSCLE ANALYSIS
+					idOption = questdlg('Are you running ID on same trials as IK?',...
+						'ID trials', 'Yes', 'No', 'No IK trials before, or matlab crashed', 'Yes');
+					 
+					 if strcmp(idOption, 'Yes') == 1
+						 
+						 % Run IK as per normal
+						 [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
+						 
+						 %                          % Plot IK results
+						 %                          IKmotFilename='ik.mot'; %our default name
+						 %                          [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
+						 
+						 % Run ID on same trials as IK
+						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName, IKoutputDir, IKprocessedTrials);
+						 
+					 elseif strcmp(idOption, 'No') == 1
+						 
+						 % Run IK as per normal
+						 [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
+						 
+						 % Plot IK results
+						 IKmotFilename='ik.mot'; %our default name
+						 [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
+						 
+						 % Run ID on different trials as IK
+						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, IKoutputDir);
+						 
+					 else
+						 
+						 % Matlab crashed or you just want to run only ID
+						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName);
+						 
+					 end
+					
+					%% ANALYZE TOOL
+					
+% 					filename='C:\OpenSim 3.1\Models\PendulumExample\analyzePointKinematicsPendulum.xml'
+% analyzeTool = AnalyzeTool(filename) % construct an analyzeTool object from file
+% pointKinematicsObject=analyzeTool ().getAnalysisSet().get('PointKinematics') % get a handle to PK object
+% ....
+% Note: You will need to edit all variables to be specific for your data and models. You may want to do this in the xml file before hand.
+% 
+% Once you have that all setup correctly you execute by using 'analyzeTool .run()' command
+				
+					%% MUSCLE ANALYSIS
                     %
                     %                %when run IK before & want to process the same trials
                     %                [MAoutputDir,MAtrialsOutputDir, MAprocessedTrials]=MuscleAnalysis(inputDir, model_file, IKoutputDir, IKprocessedTrials);

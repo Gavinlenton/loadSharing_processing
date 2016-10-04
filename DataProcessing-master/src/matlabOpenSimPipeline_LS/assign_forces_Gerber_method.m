@@ -13,15 +13,13 @@ function dataOutput = assign_forces_Gerber_method(data,thresh)
 %               that is used to assess a positive assignment (in meters -
 %               defaults to 0.2m)
 %
-% OUTPUT -  data - structure containing the relevant data 
+% OUTPUT -  data - structure containing the relevant data
 %
 % Written by Glen Lichtwark (University of Queensland)
 % Updated September 2014
 
 % Updated June 2016 by Gavin Lenton (Griffith University) for compability with load
 % sharing project data.
-% Code now assigns force even when two markers are within the designated
-% threshold.
 
 % define the ratio of force sampling frequency to marker sampling frequency
 % F = data.fp_data.Info(1).frequency/data.marker_data.Info.frequency; %assume same sampling frequency on all plates!!!
@@ -55,7 +53,7 @@ for i = 1:length(data.fp_data.GRF_data)
 	% ground - this is not the same filtering as is done on the final data
 	% and is required to be able to determine the contact periods
 	Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3), 30,dt, 'damped');
-		
+	
 	if (max(Fv)-min(Fv))>400
 		Fv = Fv-median(Fv(Fv<(min(Fv)+25)));
 	end
@@ -85,14 +83,19 @@ for i = 1:length(data.fp_data.GRF_data)
 		on_i = [nt(1); nt(dnt+1)];
 		off_i = [nt(dnt); nt(end)];
 		
-		if (off_i(1)-on_i(1)) < 7
-			off_i(1) = [];
-			on_i(1) = [];
-		end
-		
-		if (off_i(end)-on_i(end)) < 7
-			off_i(end) = [];
-			on_i(end) = [];
+		% Check parameters for inconsistencies.
+		for event = 1:length(on_i)
+			if event == 1
+				if (off_i(event)-on_i(event)) < 7
+					off_i(event) = [];
+					on_i(event) = [];
+					break
+				end
+			elseif (off_i(event)-on_i(event)) < 50
+				off_i(event) = [];
+				on_i(event) = [];
+				break
+			end
 		end
 		
 		% Finds if events are really close
@@ -109,116 +112,29 @@ for i = 1:length(data.fp_data.GRF_data)
 		%% Detect if force assignments were incorrect
 		% (Should always be at least two on and two off events in FP1)
 		if i == 1 && length(on_i) ~= 2
-			disp('Threshold not high enough to detect multiple events, increasing to 50N')
-			% Try increasing threshold
-			thresh = 50;
-			nt = find(Fv>thresh(1));
+			disp('Threshold not high enough to detect multiple events, increasing to 30N')
 			
-			dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
-			on_i = [nt(1); nt(dnt+1)];
-			off_i = [nt(dnt); nt(end)];
+			[on_i, off_i] = detectNewForcePlateEvents(Fv, data, i);
 			
-			% Check parameters for inconsistencies.
-			if (off_i(1)-on_i(1)) < 7
-				off_i(1) = [];
-				on_i(1) = [];
-			end
-			
-			if (off_i(end)-on_i(end)) < 7
-				off_i(end) = [];
-				on_i(end) = [];
-			end
-			
-			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.08);
-			if ~isempty(ns)
-				if ns(end) == length(off_i)
-					ns(end) = [];
-				end
-				off_i(ns) = [];
-				on_i(ns+1) = [];
-			end
-			
-			if i == 1 && length(on_i) ~= 2
-				disp('Threshold not high enough to detect multiple events, increasing to 100N')
-				% Try increasing threshold
-				thresh = 100;
-				nt = find(Fv>thresh(1));
-				
-				dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.010);
-				on_i = [nt(1); nt(dnt+1)];
-				off_i = [nt(dnt); nt(end)];
-			end
-			
-			ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.010);
-			if ~isempty(ns)
-				if ns(end) == length(off_i)
-					ns(end) = [];
-				end
-				off_i(ns) = [];
-				on_i(ns+1) = [];
-			end
-		end
-		if i == 2 && length(on_i) ~= 3
+		elseif i == 2 && length(on_i) ~= 3
 			disp('Not enough events on FP2, modifying parameters')
-			% Try increasing threshold
-			try thresh = 50;
-				nt = find(Fv>thresh(1));
-				dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.015);
-				on_i = [nt(1); nt(dnt+1)];
-				off_i = [nt(dnt); nt(end)];
-				disp('Changed FP thresh');
-			catch
-			end
-			if length(on_i) ~= 3
-				
-				% Then try reducing time between events
-				thresh = 30;
-				nt = find(Fv>thresh(1));
-				disp('Changed time between events');
-				
-				try dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
-					on_i = [nt(1); nt(dnt+1)];
-					off_i = [nt(dnt); nt(end)];
-				catch
-				end
-			end
-			if length(on_i) ~= 3
-				% Do both
-				thresh = 50;
-				nt = find(Fv>thresh(1));
-				try
-					dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.005);
-					on_i = [nt(1); nt(dnt+1)];
-					off_i = [nt(dnt); nt(end)];
-					disp('Changed FP thresh and event timing');
-				catch
-				end
-			end
 			
-			% Try again and reduce time between events to 1 frame
-			if length(on_i) ~= 3
-				% Do both
-				thresh = 80;
-				nt = find(Fv>thresh(1));
-				try
-					dnt = find(diff(nt)>data.fp_data.Info(1).frequency*0.001);
-					on_i = [nt(1); nt(dnt+1)];
-					off_i = [nt(dnt); nt(end)];
-					disp('Changed FP thresh and event timing AGAIN');
-				catch
-				end
-			end
+			[on_i, off_i] = detectNewForcePlateEvents(Fv, data, i);
 		end
 		
 		% Check parameters for inconsistencies.
-		if (off_i(1)-on_i(1)) < 7
-			off_i(1) = [];
-			on_i(1) = [];
-		end
-		
-		if (off_i(end)-on_i(end)) < 7
-			off_i(end) = [];
-			on_i(end) = [];
+		for event = 1:length(on_i)
+			if event == 1
+				if (off_i(event)-on_i(event)) < 7
+					off_i(event) = [];
+					on_i(event) = [];
+				end
+				break
+			elseif (off_i(event)-on_i(event)) < 80
+				off_i(event) = [];
+				on_i(event) = [];
+				break
+			end
 		end
 		
 		ns = find((off_i - on_i) < data.fp_data.Info(1).frequency*0.015);
@@ -233,79 +149,94 @@ for i = 1:length(data.fp_data.GRF_data)
 		% Create variable to keep track of event frames
 		FP(i).On = on_i;
 		FP(i).Off = off_i;
-		
-		% loop through each event (from one value of on_i to its corresponding off_i)
-		% and determine which of the bodies is contacting to make this force
-		for j = 1:length(on_i)
 			
-			% define the current period of interest
-			a = on_i(j):off_i(j);
-			
-			% FP 1 = R/L
-			% FP 2 = L/R/L
-			
-			% IF force plate = first (e.g., 1) and it's the first force assignment the
-			% force should always go to right body because trials always start with
-			% right heel-strike
-			if i == 1 && j == 1
-					
-				% Just assign moments
-				data.GRF.FP(i).M(a(1):dnt(end),:) = data.fp_data.GRF_data(i).M(a(1):dnt(end),:);
+			% loop through each event (from one value of on_i to its corresponding off_i)
+			% and determine which of the bodies is contacting to make this force
+			for j = 1:length(on_i)
 				
-				% Clean up moments at the beginning
-				data.GRF.FP(i).M(a(1):a(1)+5,:) = 0;
-					
-				% If force plate  = 1 and it's the second force assignment we always
-				% know it will be for the second (i.e., left) body.
-			elseif i == 1 && j == 2
+				% define the current period of interest
+				a = on_i(j):off_i(j);
 				
+				% FP 1 = Right foot heel-strike/Left foot heel-strike
+				% FP 2 = Left foot toe-off/Right foot toe-off/Left foot
+				% toe-off
+				
+				% IF force plate = first (e.g., 1) and it's the first force assignment the
+				% force should always go to right body because trials always start with
+				% right heel-strike
+				if i == 1 && j == 1
+					
+					if length(on_i) == 2
+						if ~isempty(dnt)
+						% Just assign moments
+						data.GRF.FP(i).M(a(1):dnt(end),:) = data.fp_data.GRF_data(i).M(a(1):dnt(end),:);
+						% Clean up moments at the beginning
+						data.GRF.FP(i).M(a(1):a(1)+5,:) = 0;
+						end
+						
+					else
+						disp('Force plate one did not assign force values correctly');
+						break
+					end
+					
+					% If force plate  = 1 and it's the second force assignment we always
+					% know it will be for the second (i.e., left) body.
+				elseif i == 1 && j == 2
+					
 					data.GRF.FP(j).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
 					data.GRF.FP(j).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
 					data.GRF.FP(j).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
-				
-				%SECOND FORCE PLATE CONDITIONS
-				
-				% If force plate = 2 and it's the first force
-				% assignment we know that it's the left body toe-off
-			elseif i == 2 && j == 1
-
+					
+					% If force plate = 2 and it's the first force
+					% assignment we know that it's the left body toe-off
+				elseif i == 2 && j == 1
+					
 					data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
 					data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
 					data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
 					
-				% If force plate = 2 and it's the second force
-				% assignment we know that it's the right body late
-				% stance
-			elseif i == 2 && j == 2
+					% If force plate = 2 and it's the second force
+					% assignment we know that it's the right body late
+					% stance
+				elseif i == 2 && j == 2
 					
 					if length(on_i) == 3
-						
 						% Just assign moments
 						data.GRF.FP(1).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
+						
+					else
+						disp('Force plate two did not assign force values correctly');
+						break
 					end
-				
-				% If force plate = 2 and it's the third force
-				% assignment we know that it's the left body stance
-			elseif i == 2 && j == 3
-				
+					
+					% If force plate = 2 and it's the third force
+					% assignment we know that it's the left body stance
+				elseif i == 2 && j == 3
+					
 					data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
 					data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
 					data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
-				
-			else
-				% Display that the force was not assigned
-				disp(['Force event ' num2str(j) ' on force plate ' num2str(i) ...
-					' cannot be assigned. Try adjusting the thresholds to improve detection.'])
+					
+				else
+					% Display that the force was not assigned
+					disp(['Force event ' num2str(j) ' on force plate ' num2str(i) ...
+						' cannot be assigned. Try adjusting the thresholds to improve detection.'])
+				end
 			end
+			
+		else
+			disp(['There is no GRF data for force plate ', num2str(i), ', please check the trial data']);
+			
 		end
-		
-
-	else
-		disp(['There is no GRF data for force plate ', num2str(i), ', please check the trial data']);
-		
-	end
 end
-
-	dataOutput = combineForcePlates(data, FP);
 	
+	data.FP = FP;
+	% Combine data from the force plates here provided the events were
+	% assigned correctly
+	if length(FP(1).On) == 2 && length(FP(2).On) == 3
+		dataOutput = combineForcePlates(data, FP);
+	else
+		disp('Forces were not assigned correctly for this trial, not assigning forces to data')
+		dataOutput = data;
+	end
 end
