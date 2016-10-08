@@ -150,7 +150,7 @@ data_out_filtered = zeros(size(markersData));
 Fs = 1/data.marker_data.Info.frequency;
 
 % Filter freq
-Fc = 8;
+Fc = 6;
 
 % Apply 2nd order Butterworth filt with two passes.
 for col = 3:size(data_out,1)
@@ -166,8 +166,6 @@ fileNameGRF = regexprep(fileNameTRC, '.trc', '_grf.mot');
 % Define path name to new folder
 newpathname = [strrep(pname, 'InputData', 'ElaboratedData'),...
 	'dynamicElaborations', filesep, fileNameTRC(1:indexName)];
-
-
 
 % Final path name to store .trc and .mot files
 finalpathname = [newpathname, filesep, fileNameTRC(1:end-4)];
@@ -209,17 +207,17 @@ if isfield(data,'fp_data')
 		% 		data.fp_data.GRF_data(i).M =  data.fp_data.GRF_data(i).M/p_sc;
 		
 		% do some cleaning of the COP before and after contact
-		r = find(abs(diff(data.GRF.FP(i).P(:, 2)))>0);
-		if ~isempty(r)
-			for j = 1:3
-				data.GRF.FP(i).P(1:r(1),j) = data.GRF.FP(i).P(r(1)+1,j);
-				data.GRF.FP(i).P(r(end):end,j) = data.GRF.FP(i).P(r(end)-1,j);
-				 minusValues = data.GRF.FP(i).P(:,j) < data.GRF.FP(i).P(r(end)-1,j);
-				if any(minusValues)
-					data.GRF.FP(i).P(minusValues,j) = data.GRF.FP(i).P(r(end)-1,j);			
-				end
-			end
-		end
+% 		r = find(abs(diff(data.GRF.FP(i).P(:, 2)))>0);
+% 		if ~isempty(r)
+% 			for j = 1:3
+% 				data.GRF.FP(i).P(1:r(1),j) = data.GRF.FP(i).P(r(1)+1,j);
+% 				data.GRF.FP(i).P(r(end):end,j) = data.GRF.FP(i).P(r(end)-1,j);
+% 				 minusValues = data.GRF.FP(i).P(:,j) < data.GRF.FP(i).P(r(end)-1,j);
+% 				if any(minusValues)
+% 					data.GRF.FP(i).P(minusValues,j) = data.GRF.FP(i).P(r(end)-1,j);			
+% 				end
+% 			end
+% 		end
 		
 		% Define the period which we are analysing
 		
@@ -256,25 +254,27 @@ if isfield(data,'fp_data')
 		
 	end
 	
-	
+	dt = 1/data.fp_data.Info(1).frequency;
 	% Fix the AP GRF because it's still lagging behind foot marker
 	
 	% Find period when foot comes onto second plate
 	locCOP2On = data.FP(2).On(2);
 	
-	interval = locCOP2On(1)-30:data.FP(1).Off(1);
+	timeBeforeTransition = locCOP2On(1)-70;
+	interval = timeBeforeTransition:data.FP(1).Off(1) + 40;
 	
 	% Find rate at which slope is decreasing
-	theta = data.fp_data.GRF_data(1).P(150:250,2);
-	t = (1:1:101)';
+	theta = lpfilter(force_data_out(150:250,5) .* 1000, 10, dt, 'butter');
+	t = (1:1:length(theta))';
 	slope = mean(log(theta)./t);
-	tau = -1/slope;
+	% Added 0.5 to slope because it wasn't enough
+	tau = -1/slope + 0.5;
 	
 	% Create gap filling
-	if interval(1) >= locCOP2On-30
+	if interval(1) >= timeBeforeTransition
 		
-		start_gap = data.fp_data.GRF_data(1).P(interval(1),2);
-		finish_gap = data.fp_data.GRF_data(2).P(interval(end),2);
+		start_gap = force_data_out(interval(1),5) .* 1000;
+		finish_gap = force_data_out(interval(end),5) .* 1000;
 		spaces = (start_gap - finish_gap) / abs(tau);
 		COP_gap_AP = linspace(start_gap, finish_gap, spaces);
 		
@@ -288,9 +288,9 @@ if isfield(data,'fp_data')
 		% If they are different then pad the interval
 		% with the difference
 		if diffFromGap > 0
-			interval = floor(locCOP2On(1)-(30-(diffFromGap/2))):floor(data.FP(1).Off(1)-(diffFromGap/2));
+			interval = floor(locCOP2On(1)-70):floor(data.FP(1).Off(1)+ 40 -(diffFromGap));
 		elseif diffFromGap < 0
-			interval = floor(locCOP2On(1)-(30+(abs(diffFromGap)/2))):floor(data.FP(1).Off(1)+(abs(diffFromGap)/2));
+			interval = floor(locCOP2On(1)-70):floor(data.FP(1).Off(1)+ 40 +(abs(diffFromGap)));
 		else
 		end
 		
@@ -307,8 +307,8 @@ if isfield(data,'fp_data')
 		
 		% Define filter parameters
 		filt_freq = 26;
-		damped_filt_freq = 10;
-		dt = 1/data.fp_data.Info(1).frequency;
+		damped_filt_freq = 4;
+		
 		
 		force_data_filtered = zeros(size(force_data_out));
 		
@@ -316,25 +316,26 @@ if isfield(data,'fp_data')
 		for col1 = 1:3
 			% Right foot forces
 			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),filt_freq,dt, 'butter');
-			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
+			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_filtered(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
 			% Right foot moments
 			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),filt_freq,dt, 'butter');
-			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
-			% Left Foot forces
-			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
-			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
-			% Left foot moments
-			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),filt_freq,dt, 'butter');
-			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),damped_filt_freq,dt, 'damped');
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_filtered(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_filtered(a3(1):a3(end),col1+7),6,dt, 'butter');
+% 			% Left Foot forces
+% 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
+% 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
+% 			% Left foot moments
+% 			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),filt_freq,dt, 'butter');
+% 			force_data_filtered(:,col1+16) = lpfilter(force_data_out(:,col1+16),damped_filt_freq,dt, 'damped');
 			
 			% COP right
 			if a3(end) ~= length(fp_time1)
-				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), damped_filt_freq,dt, 'damped');
+				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), 10,dt, 'damped');
 			else
-				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), damped_filt_freq,dt, 'damped');
+				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), 10,dt, 'damped');
 			end
 			% COP left
-			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
+			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 10,dt, 'damped');
 		end
 		
 		% Clean up again just to be sure
@@ -344,12 +345,14 @@ if isfield(data,'fp_data')
 				force_data_filtered(1:b(1),j+4) = force_data_filtered(b(1)+1,j+4);
 				force_data_filtered(b(end):end,j+4) = force_data_filtered(b(end)-1,j+4);
 			end
+			% Clean up end of moments
+			force_data_filtered(b(end)-15:end,9) = 0;
 		end
 		
 		% M/L and A/P free moments equal to zero as they contribute negligibly
 		% to ID
 		force_data_filtered(:, [8,10]) = 0;
-		force_data_filtered(:, [17,19]) = 0;
+		force_data_filtered(:, 11:end) = 0;
 		badMoment = force_data_filtered(:, 9) < 0;
 		force_data_filtered(badMoment, 9) = 0;
 		
@@ -363,31 +366,31 @@ if isfield(data,'fp_data')
 		force_dataMoto(:,13:15) = force_data_filtered(:,8:10);
 		force_dataMoto(:,16:18) = force_data_filtered(:,17:19);
 		
-		%% Find where force on left leg is zeroing and fix
-		dodgyFP = find(force_dataMoto(600:end, 8) == 0) + 599;
-		
-		% Only fix if there's a zero value
-		if ~isempty(dodgyFP)
-			if length(dodgyFP) > 1
-				% If there's more than 1 frame zeroed then apply interp
-				for columnM = 1:3
-					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+6) = (force_dataMoto(dodgyFP(1)-1, columnM+6)...
-						+ force_dataMoto(dodgyFP(end)+1, columnM+6))/2;
-					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+15) = (force_dataMoto(dodgyFP(1)-1, columnM+15)...
-						+ force_dataMoto(dodgyFP(end)+1, columnM+15))/2;
-				end
-				% Loop through columns and fix by taking mean of previous and
-				% following frame
-			else
-				for columnF = 1:3
-					force_dataMoto(dodgyFP, columnF+6) = (force_dataMoto(dodgyFP-1, columnF+6)...
-						+ force_dataMoto(dodgyFP+1, columnF+6))/2;
-					force_dataMoto(dodgyFP, columnF+15) = (force_dataMoto(dodgyFP-1, columnF+15)...
-						+ force_dataMoto(dodgyFP+1, columnF+15))/2;
-				end
-			end
-		end
-		
+% 		%% Find where force on left leg is zeroing and fix
+% 		dodgyFP = find(force_dataMoto(600:end, 8) == 0) + 599;
+% 		
+% 		% Only fix if there's a zero value
+% 		if ~isempty(dodgyFP)
+% 			if length(dodgyFP) > 1
+% 				% If there's more than 1 frame zeroed then apply interp
+% 				for columnM = 1:3
+% 					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+6) = (force_dataMoto(dodgyFP(1)-1, columnM+6)...
+% 						+ force_dataMoto(dodgyFP(end)+1, columnM+6))/2;
+% 					force_dataMoto(dodgyFP(1):dodgyFP(end), columnM+15) = (force_dataMoto(dodgyFP(1)-1, columnM+15)...
+% 						+ force_dataMoto(dodgyFP(end)+1, columnM+15))/2;
+% 				end
+% 				% Loop through columns and fix by taking mean of previous and
+% 				% following frame
+% 			else
+% 				for columnF = 1:3
+% 					force_dataMoto(dodgyFP, columnF+6) = (force_dataMoto(dodgyFP-1, columnF+6)...
+% 						+ force_dataMoto(dodgyFP+1, columnF+6))/2;
+% 					force_dataMoto(dodgyFP, columnF+15) = (force_dataMoto(dodgyFP-1, columnF+15)...
+% 						+ force_dataMoto(dodgyFP+1, columnF+15))/2;
+% 				end
+% 			end
+% 		end
+% 		
 		%% Print MOT
 		
 		% Find when peaks occur to determine if Force is dodgy

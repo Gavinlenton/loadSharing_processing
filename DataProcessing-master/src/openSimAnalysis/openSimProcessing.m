@@ -4,6 +4,7 @@
 % Copyright (C) 2015 Alice Mantoan, Monica Reggiani
 % <https://simtk.org/home/bops>
 % Please acknowledge the authors of BOPS when using this script.
+clc; clear;
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
@@ -63,7 +64,7 @@ for nS = 1:length(subjectNames)
                     'dynamicElaborations', filesep, trialsFolders{tD}];
                
                % Define model name for IK/ID and automatically find it
-               modelName = [subjectNames{nS}, '_Scaled_Pose_OptMusc.osim'];
+               modelName = [subjectNames{nS}, '_FBM_Scaled_Pose_OptMusc.osim'];
                
                % If it's NA trial then model name is in 'Processed' folder
                if regexp(trialsFolders{tD}, 'NA')
@@ -83,59 +84,106 @@ for nS = 1:length(subjectNames)
                
                if exist(model_file, 'file')
                     
+                    % Make sure the hip and subtalar DOFs are unlocked
+                    joints = {'hip', 'subtalar'};
+                    lockDOFS([sessionName, filesep, 'staticElaborations', filesep,...
+                    ['Static1_' trialName], filesep, 'StaticCal', filesep], modelName, joints, 0);
+                    
                     % Navigate to folder where BOPS is;
                     cd([folderBOPS, filesep, 'src']);
                     
                     %% INVERSE KINEMATICS and INVERSE DYNAMICS
                     
-                    % If statement to check files you're running are for ID as well (this is
-                    % because Matlab keeps crashing...)
+                    procIdIndex = regexp(trialsFolders{tD}, '_P');
+                    IK_id = trialsFolders{tD}(1:procIdIndex-1);
                     
-					idOption = questdlg('Are you running ID on same trials as IK?',...
-						'ID trials', 'Yes', 'No', 'No IK trials before, or matlab crashed', 'Yes');
-					 
-					 if strcmp(idOption, 'Yes') == 1
-						 
-						 % Run IK as per normal
-						 [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
-						 
-						 %                          % Plot IK results
-						 %                          IKmotFilename='ik.mot'; %our default name
-						 %                          [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
-						 
-						 % Run ID on same trials as IK
-						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName, IKoutputDir, IKprocessedTrials);
-						 
-					 elseif strcmp(idOption, 'No') == 1
-						 
-						 % Run IK as per normal
-						 [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
-						 
-						 % Plot IK results
-						 IKmotFilename='ik.mot'; %our default name
-						 [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
-						 
-						 % Run ID on different trials as IK
-						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, IKoutputDir);
-						 
-					 else
-						 
-						 % Matlab crashed or you just want to run only ID
-						 [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file, sessionName);
-						 
-					 end
-					
-					%% ANALYZE TOOL
-					
-% 					filename='C:\OpenSim 3.1\Models\PendulumExample\analyzePointKinematicsPendulum.xml'
-% analyzeTool = AnalyzeTool(filename) % construct an analyzeTool object from file
-% pointKinematicsObject=analyzeTool ().getAnalysisSet().get('PointKinematics') % get a handle to PK object
-% ....
-% Note: You will need to edit all variables to be specific for your data and models. You may want to do this in the xml file before hand.
-% 
-% Once you have that all setup correctly you execute by using 'analyzeTool .run()' command
-				
-					%% MUSCLE ANALYSIS
+                    % Check to see if IK has already been run with new
+                    % model
+                    if ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'FBM_ik.mot'], 'file')
+                         
+                         % Run IK as per normal
+                         [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
+                         
+                         % Plot IK results
+                         IKmotFilename='FBM_ik.mot'; %our default name
+                         [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
+                         
+                         uiwait
+                         
+                         % Then run on other model
+                         if ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'openKnee_ik.mot'], 'file')
+                              % Update to the knee unlocked model file
+                              model_file_kneeUnlocked = regexprep(model_file, 'FBM_Scaled_Pose_OptMusc', 'openKnee_optmkrpos');
+                              
+                              % Determine other knee DOF angles using
+                              % simmspline values
+                              prescribeKneeAngles(model_file, sessionName, IKoutputDir);
+                              
+                              % Check to see if ID has been run
+                              if ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'inverse_dynamics.sto'], 'file')
+                                   
+                                   % Run ID
+                                   [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file_kneeUnlocked, IKoutputDir);
+                                   
+                                   % Plot ID results
+                                   IDmotFilename='inverse_dynamics.sto'; %our default name
+                                   
+                                   [coordinates,Xaxislabel]=plotResults('ID', IDoutputDir, IDtrialsOutputDir, model_file, IDprocessedTrials, IDmotFilename, coordinates, Xaxislabel);
+                                        
+                                   % Pause UI and delete the bad trials
+                                   uiwait
+                              end
+                         end
+                         
+                         % Check to see if it has been run with older model
+                    elseif ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'openKnee_ik.mot'], 'file')
+                         
+                         % Update to the knee unlocked model file
+                         model_file_kneeUnlocked = regexprep(model_file, 'FBM_Scaled_Pose_OptMusc', 'openKnee_optmkrpos');
+                         
+                         % Determine other knee DOF angles using
+                         % simmspline values
+                           prescribeKneeAngles(model_file, sessionName);
+                           
+                         % Check to see if ID has been run
+                         if ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'inverse_dynamics.sto'], 'file')
+                              
+                              % Run ID
+                              [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file_kneeUnlocked, IKoutputDir);
+
+                              % Plot ID results
+                               IDmotFilename='inverse_dynamics.sto'; %our default name
+
+                               [coordinates,Xaxislabel]=plotResults('ID', IDoutputDir, IDtrialsOutputDir, model_file, IDprocessedTrials, IDmotFilename);
+                              % Pause UI and delete the bad trials
+                              uiwait
+                         end
+                         
+                         prescribeKneeAngles(model_file, sessionName);
+                         % Check to see if ID has been run
+                    elseif ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'inverse_dynamics.sto'], 'file')
+                         
+                         % Update to the knee unlocked model file
+                         model_file_kneeUnlocked = regexprep(model_file, 'FBM_Scaled_Pose_OptMusc', 'openKnee_optmkrpos');
+                         
+                         % Run ID on different trials as IK
+                         [IDoutputDir, IDtrialsOutputDir, IDprocessedTrials]=InverseDynamics(inputDir, model_file_kneeUnlocked, IKoutputDir);
+                         
+                         % Plot ID results
+                         IDmotFilename='inverse_dynamics.sto'; %our default name
+
+                         [coordinates,Xaxislabel]=plotResults('ID', IDoutputDir, IDtrialsOutputDir, model_file, IDprocessedTrials, IDmotFilename);
+    
+                         % Pause UI and delete the bad trials
+                         uiwait
+                         
+                    else
+                         disp('Already processed IK and ID for this condition')
+                         
+                    end
+                    
+                    
+                    %% MUSCLE ANALYSIS
                     %
                     %                %when run IK before & want to process the same trials
                     %                [MAoutputDir,MAtrialsOutputDir, MAprocessedTrials]=MuscleAnalysis(inputDir, model_file, IKoutputDir, IKprocessedTrials);
@@ -181,7 +229,7 @@ for nS = 1:length(subjectNames)
      end
 end
 
-%% PLOTTING ID AND EMG RESULTS
+%% Data analysis for ID, IK, and raw EMG results
 
 % Select folders to get to session folder
 BasePath=uigetdir('..\..\..', 'Select Elaborated Data Folder');
@@ -189,7 +237,7 @@ fName = uigetdir(BasePath, 'Select the Subject for analysis');
 SessionDirs = dir(fName);
 isub=[SessionDirs(:).isdir];
 sessionFolders={SessionDirs(isub).name}';
-sessionFolders(ismember(sessionFolders,{'.','..', 'ROM'}))=[]; % dynamic subject folders
+sessionFolders(ismember(sessionFolders,{'.','..', 'ROM', 'AnalysedData', 'Figures'}))=[]; % dynamic subject folders
 
 for folder = 1:length(sessionFolders)
      sessionName = [fName, filesep, sessionFolders{folder}];
@@ -200,10 +248,12 @@ for folder = 1:length(sessionFolders)
           'Select scaled OpenSim model for analysis');
      model_file=[genericModelPath genericModelID];
      
+     % Plot the kinematics result
+     plotKinematics(sessionName, model_file);
+     
      % Plot the joint moments
      plotMoments(sessionName, model_file);
      
      % Plot the EMG data and save as .mat files
      % 	loadPlotEMG(sessionName, fName);
-     
 end
