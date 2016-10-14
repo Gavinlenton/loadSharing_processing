@@ -150,11 +150,13 @@ data_out_filtered = zeros(size(markersData));
 Fs = 1/data.marker_data.Info.frequency;
 
 % Filter freq
-Fc = 6;
+Fc = 28;
 
 % Apply 2nd order Butterworth filt with two passes.
 for col = 3:size(data_out,1)
-	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter');
+	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'damped');
+% 	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter');
+	
 	markersData(:,col) = data_out_filtered(:,col);
 end
 
@@ -260,43 +262,63 @@ if isfield(data,'fp_data')
 	% Find period when foot comes onto second plate
 	locCOP2On = data.FP(2).On(2);
 	
-	timeBeforeTransition = locCOP2On(1)-70;
-	interval = timeBeforeTransition:data.FP(1).Off(1) + 40;
+	timeBeforeTransition = locCOP2On(1)-60;
+	interval = timeBeforeTransition:data.FP(1).Off(1) + 20;
 	
 	% Find rate at which slope is decreasing
-	theta = lpfilter(force_data_out(150:250,5) .* 1000, 10, dt, 'butter');
+	theta = force_data_out(100:200,5) .* 1000;
 	t = (1:1:length(theta))';
 	slope = mean(log(theta)./t);
-	% Added 0.5 to slope because it wasn't enough
-	tau = -1/slope + 0.5;
+	% Added 0.7 to slope because it wasn't enough
+	tau = -1/slope + 0.7;
 	
 	% Create gap filling
-	if interval(1) >= timeBeforeTransition
-		
-		start_gap = force_data_out(interval(1),5) .* 1000;
-		finish_gap = force_data_out(interval(end),5) .* 1000;
-		spaces = (start_gap - finish_gap) / abs(tau);
-		COP_gap_AP = linspace(start_gap, finish_gap, spaces);
-		
-		% Assign from first peak in COP to end of
-		% stance
-		
-		% Determine the difference between created gap
-		% and defined interval
-		diffFromGap = length(interval) - length(COP_gap_AP);
-		
-		% If they are different then pad the interval
-		% with the difference
-		if diffFromGap > 0
-			interval = floor(locCOP2On(1)-70):floor(data.FP(1).Off(1)+ 40 -(diffFromGap));
-		elseif diffFromGap < 0
-			interval = floor(locCOP2On(1)-70):floor(data.FP(1).Off(1)+ 40 +(abs(diffFromGap)));
-		else
+	if ~isempty(interval)
+		if interval(1) >= timeBeforeTransition
+			
+			% Start and finish values are +- 10 because it was too short
+			% otherwise
+			start_gap = force_data_out(interval(1)-10,5) * 1000;
+			finish_gap = force_data_out(interval(end)+10,5) * 1000;
+			spaces = (ceil(start_gap) - floor(finish_gap)) / abs(ceil(tau));
+			COP_gap_AP = linspace(start_gap, finish_gap, spaces);
+			
+			% Assign from first peak in COP to end of
+			% stance
+			
+			% Determine the difference between created gap
+			% and defined interval
+			diffFromGap = length(interval) - length(COP_gap_AP);
+			
+			% If they are different then pad the interval
+			% with the difference
+			if diffFromGap > 0
+				interval = floor(locCOP2On(1)-60):floor(data.FP(1).Off(1)+ 20 -(diffFromGap));
+			elseif diffFromGap < 0
+				interval = floor(locCOP2On(1)-60):floor(data.FP(1).Off(1)+ 20 +(abs(diffFromGap)));
+			else
+			end
+			
+			% Assign to the first force plate
+			force_data_out(interval,5) = (COP_gap_AP')./1000;
 		end
-		
-		% Assign to the first force plate
-		force_data_out(interval,5) = (COP_gap_AP')./1000;
 	end
+	% Fix AP force at heel-strike because there are large errors due
+	% to noise
+	A = lpfilter(force_data_out(:,2), 10, dt, 'damped');
+	A(1:data.FP(1).On(1),1) = 0;
+	dd = find(A(:,1)<0);
+	force_data_out(1:dd(1),2) = 0;
+	
+	% Fix if there are issues with COP
+	f = find(abs(diff(force_data_out(:,5)))>0);
+	if ~isempty(f)
+		badAP = force_data_out(:, 5) == 0.3800;
+		force_data_out(badAP, 5) = mean(force_data_out(f(end)-20:f(end), 5))-0.1;
+		badML = force_data_out(:, 7) < 0.2000 & force_data_out(:, 7) > 0;
+		force_data_out(badML, 7) = mean(force_data_out(f(end)-20:f(end), 7));
+	end
+	
 	%% FILTERING
 	
 	% Find indices for filtering
@@ -306,21 +328,22 @@ if isfield(data,'fp_data')
 	if length(a3) < 800 && ~any(a3 > 800)
 		
 		% Define filter parameters
-		filt_freq = 26;
-		damped_filt_freq = 4;
-		
+% 		filt_freq = 8;
+ 		damped_filt_freq = 10;
 		
 		force_data_filtered = zeros(size(force_data_out));
 		
 		% Apply 20th order (5 passes of a second order) critically-damped zero-lag filter
 		for col1 = 1:3
-			% Right foot forces
-			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),filt_freq,dt, 'butter');
-			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_filtered(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
-			% Right foot moments
-			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),filt_freq,dt, 'butter');
-			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_filtered(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
-			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_filtered(a3(1):a3(end),col1+7),6,dt, 'butter');
+% 			Right foot forces
+% 			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),filt_freq,dt, 'butter');
+% 			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_filtered(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
+
+			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
+			
+% 			% Right foot moments
+% 			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),filt_freq,dt, 'butter');
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
 % 			% Left Foot forces
 % 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
 % 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
@@ -330,12 +353,12 @@ if isfield(data,'fp_data')
 			
 			% COP right
 			if a3(end) ~= length(fp_time1)
-				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), 10,dt, 'damped');
+				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), damped_filt_freq,dt, 'damped');
 			else
-				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), 10,dt, 'damped');
+				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), damped_filt_freq,dt, 'damped');
 			end
 			% COP left
-			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), 10,dt, 'damped');
+			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
 		end
 		
 		% Clean up again just to be sure
@@ -345,16 +368,16 @@ if isfield(data,'fp_data')
 				force_data_filtered(1:b(1),j+4) = force_data_filtered(b(1)+1,j+4);
 				force_data_filtered(b(end):end,j+4) = force_data_filtered(b(end)-1,j+4);
 			end
-			% Clean up end of moments
-			force_data_filtered(b(end)-15:end,9) = 0;
 		end
 		
-		% M/L and A/P free moments equal to zero as they contribute negligibly
-		% to ID
-		force_data_filtered(:, [8,10]) = 0;
-		force_data_filtered(:, 11:end) = 0;
-		badMoment = force_data_filtered(:, 9) < 0;
-		force_data_filtered(badMoment, 9) = 0;
+		%% CHECK NORMAL FORCE PLATE VALUES IN LITERATURE FOR FREE MOMENT AND Mz
+	
+	% M/L and A/P free moments equal to zero as they contribute negligibly
+	% to ID
+	force_data_filtered(:, [8,10]) = 0;
+	force_data_filtered(:, 11:end) = 0;
+	badMoment = force_data_filtered(:, 9) < 0;
+	force_data_filtered(badMoment, 9) = force_data_filtered(badMoment, 9) .* -1;
 		
 		% assign a value of zero to any NaNs
 		force_data_filtered(logical(isnan(force_data_filtered))) = 0;

@@ -2,7 +2,7 @@ function [jointAngles] = determineJointAngles(c3dFiles, pname)
 %% JOINT ANGLES DETERMINATION
 %  Imports markers from a vicon nexus c3d file for load shraing ROM trials.
 %  Use these markers to define the angle between specific segments
-%  angles of interest -  hip trunk shoulder
+%  angles of interest -  hip, trunk, shoulder
 
 %          - - - - - - - %% - - - - - - - -
 %
@@ -79,27 +79,30 @@ for c3dAcq = 1:length(c3dFiles)
     % Empty structure for outputs
     
     outputs = {'Max', 'Min', 'Range'};
-    
-    if ~isempty(fieldnames(anglesList))
-        
-        for k = 1:length(angles)
-            
-            % Define angles for analysis
-            anglesData = abs(anglesList.(angles{k}));
-            
-            % Calculate max, min, and ROM
-            maximum = max(anglesData);
-            minimum = min(anglesData);
-            ROM = range(anglesData);
-            
-            % Save data to structure
-            jointAngles.(string(1:end-4)).(angles{k}).(outputs{1}) = maximum;
-            jointAngles.(string(1:end-4)).(angles{k}).(outputs{2}) = minimum;
-            jointAngles.(string(1:end-4)).(angles{k}).(outputs{3}) = ROM;
-            
-        end
-        
-    else
-        
-    end
+	
+	if ~isempty(fieldnames(anglesList))
+		
+		for k = 1:length(angles)
+			
+			% Only if field exists
+			if isfield(anglesList, angles{k})
+				
+				% Define angles for analysis
+				anglesData = abs(anglesList.(angles{k}));
+				
+				% Calculate max, min, and ROM
+				maximum = max(anglesData);
+				minimum = min(anglesData);
+				ROM = range(anglesData);
+				
+				% Save data to structure
+				jointAngles.(string(1:end-4)).(angles{k}).(outputs{1}) = maximum;
+				jointAngles.(string(1:end-4)).(angles{k}).(outputs{2}) = minimum;
+				jointAngles.(string(1:end-4)).(angles{k}).(outputs{3}) = ROM;
+			end
+		end
+		
+	else
+		
+	end
 end

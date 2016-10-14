@@ -86,9 +86,11 @@ osimModel= current_model;
 % Get the model coordinate name from the new model for knee ab/add and
 % int/ext rot
 modelCoordSet = osimModel.getCoordinateSet();
+
+%% AUTOMATE THIS
 % Get the knee_angle_r and knee_angle_l coordinate set from the model
-currentcoord = modelCoordSet.get(9);
-currentcoord2 = modelCoordSet.get(23);
+currentcoord = modelCoordSet.get('knee_angle_r');
+currentcoord2 = modelCoordSet.get('knee_angle_l');
 
 % Loop through the trials
 for j = 1:length(inputTrials)

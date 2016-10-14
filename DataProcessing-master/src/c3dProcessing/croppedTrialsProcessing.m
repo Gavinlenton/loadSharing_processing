@@ -31,7 +31,6 @@ for croppedTrialNum = 1:length(c3dFilesCropped)
 	
 	%Load the cropped acquisition
 	data1 = btk_loadc3d([pname, filesep, fileName], 20);
-	
 	% Assign force to feet, stitch forces together, and output .trc
 	% and .mot files for further analysis.
 	

@@ -43,7 +43,11 @@ for i = 1:length(data.fp_data.GRF_data)
 	% Know that the end of the trial does not contain a stance because we
 	% process from right HS to right HS
 	if i == 1
-		zeroValue = mean(data.fp_data.GRF_data(i).F(900:end-10,3));
+		zeroValue = mean(data.fp_data.GRF_data(i).F(end-60:end-10,3));
+		% If it's stupid and becomes a NaN then just make it zero
+		if isnan(zeroValue)
+			zeroValue = 0;
+		end
 		
 		% subtract this value from the data
 		data.fp_data.GRF_data(i).F(:,3) = data.fp_data.GRF_data(i).F(:,3) - zeroValue;
@@ -52,7 +56,7 @@ for i = 1:length(data.fp_data.GRF_data)
 	% filter the force and determine when the foot is in contact with the
 	% ground - this is not the same filtering as is done on the final data
 	% and is required to be able to determine the contact periods
-	Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3), 30,dt, 'damped');
+	Fv = lpfilter(data.fp_data.GRF_data(i).F(:,3), 8,dt, 'butter');
 	
 	if (max(Fv)-min(Fv))>400
 		Fv = Fv-median(Fv(Fv<(min(Fv)+25)));
@@ -213,9 +217,9 @@ for i = 1:length(data.fp_data.GRF_data)
 					% assignment we know that it's the left body stance
 				elseif i == 2 && j == 3
 					
-					data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
-					data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
-					data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
+					data.GRF.FP(i).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
+					data.GRF.FP(i).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
+					data.GRF.FP(i).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
 					
 				else
 					% Display that the force was not assigned
