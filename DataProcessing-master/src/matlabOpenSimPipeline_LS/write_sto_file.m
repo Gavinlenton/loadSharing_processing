@@ -43,7 +43,7 @@ fprintf(fid_1,'%s\n',filestring);
 fprintf(fid_1,'version=1\n');
 fprintf(fid_1,'nRows=%d\n', size(D,1)); 
 fprintf(fid_1,'nColumns=%d\n', size(D,2)); 
-fprintf(fid_1,'inDegrees=no\n'); 
+fprintf(fid_1,'inDegrees=yes\n'); 
 fprintf(fid_1,'endheader\n'); 
 fprintf(fid_1, hd);
 % then write the output marker data

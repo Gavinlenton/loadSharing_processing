@@ -104,34 +104,38 @@ save([metricsPath, AnalysisName], 'y');
 % save([figurePath, 'plottedData'], 'y')
 % 
 % % Settings for plot
-plotLabels=regexprep(Yquantities, '_', ' ');
-legendLabels=regexprep(trialsList, '_', ' ');
-cmap = colormap(parula(180));
-plotTitle = filename;
-
-for k=1:size(y,1)
-	
-	plotColor = cmap(round(1+5.5*(k-1)),:);
-	
-	for j=1:size(y,2)
-		
-		h(j)=figure(j);
-		
-		plot(timeVector{k}, y{k,j},'Color',plotColor)
-		hold on
-		
-		xlabel(x)
-		ylabel([plotLabels(j)])
-		warning off
-		legend(legendLabels)
-		title(filename)
-		
-		saveas(h(j),[figurePath  Yquantities{j} '.fig'])
-	end
-end
+% plotLabels=regexprep(Yquantities, '_', ' ');
+% legendLabels=regexprep(trialsList, '_', ' ');
+% cmap = colormap(parula(180));
+% plotTitle = filename;
+% 
+% for k=1:size(y,1)
+% 	
+% 	plotColor = cmap(round(1+5.5*(k-1)),:);
+% 	
+% 	for j=1:size(y,2)
+% 		
+% 		h(j)=figure(j);
+% 		
+% 		plot(timeVector{k}, y{k,j},'Color',plotColor)
+% 		hold on
+% 		
+% 		xlabel(x)
+% 		ylabel([plotLabels(j)])
+% 		warning off
+% 		legend(legendLabels)
+% 		title(filename)
+% 		
+% 		saveas(h(j),[figurePath  Yquantities{j} '.fig'])
+% 	end
+% end
 
 % After deleting bad data calculate the means and save to a structure
 headers = Yquantities;
+
+% Time in frames for angular velocity calc and filtering (change this is you didn't
+% collect data at 100Hz)
+dt = 1/100;
 
 % Put the metrics in a structure
 for dof = 1:length(headers)
@@ -139,6 +143,9 @@ for dof = 1:length(headers)
     allData.(headers{dof}) = [];
 	% Loop through good trials
      for trial = 1:length(trialsList)
+          
+          % FILTER PROCESSED DATA
+          y{trial,dof} = lpfilt(y{trial,dof}, 8, dt, 'butter');
           
           % Combine data into array - resample if necessary
           % If it doesn't equal 101 then resample
@@ -148,10 +155,6 @@ for dof = 1:length(headers)
                allData.(headers{dof})(:, trial) = y{trial, dof};
           end
      end
-     
-     % Time in frames for angular velocity calc (change this is you didn't
-     % collect data at 100Hz)
-     dt = 1/100;
      
      % Summary statistics
      meanOfTrials = mean(allData.(headers{dof}), 2);
@@ -208,11 +211,11 @@ for dof = 1:length(headers)
                %                positiveInSpans = find(ismember(spanLocs, goodSpans));  %indices of these spans
                
                % Check this code to make sure it works.
-               positivePower = ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK')(positiveInSpans);
-               negativePower = ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK')(~positiveInSpans);
+               positiveWork = ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK')(positiveInSpans);
+               negativeWork = ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK')(~positiveInSpans);
                
-               ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK_POS') = positivePower;
-               ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK_NEG') = negativePower;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK_POS') = positiveWork;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_WORK_NEG') = negativeWork;
                
           else 
                disp('IK data file missing, check to see if you need to process it first');
@@ -230,7 +233,7 @@ end
 
 % Save files
 if strcmp(filename,'inverse_dynamics.sto')
-     save([metricsPath, condition_name, ' IDMetrics.mat'], 'ID_metrics');
+     save([metricsPath, condition_name, '_IDMetrics.mat'], 'ID_metrics');
 elseif strcmp(filename,'ik.mot')
      save([metricsPath, condition_name, '_IKMetrics.mat'], 'IK_metrics'); 
 end

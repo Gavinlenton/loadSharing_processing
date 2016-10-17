@@ -77,18 +77,59 @@ end
 	
 	for ii = 1:length(conditionNamez)
 		HF(:, ii) = anglesStatistics.(conditionNamez{ii})(:,1);
-		ShoulderFF(:, ii) = anglesStatistics.(conditionNamez{ii})(:,2);
+		shoulderFF(:, ii) = anglesStatistics.(conditionNamez{ii})(:,2);
 		UUA(:, ii) = anglesStatistics.(conditionNamez{ii})(:,3);
 		TF(:, ii) = anglesStatistics.(conditionNamez{ii})(:,4);
 	end
 	
 	Participants = [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20];
 	
+	
+	%% UPDATE THIS INFORMATION LATER
+	
 	% Create tables of the data
-	tableHF = table(Participants, HF(:,1), HF(:,2), HF(:,3), HF(:,4), HF(:,5), HF(:,6)...
-		, HF(:,7), HF(:,8), HF(:,9), HF(:,10), HF(:,11), HF(:,12), HF(:,13), 'VariableNames', {'Participants', conditionNamez{1}...
-		conditionNamez{2},conditionNamez{3},conditionNamez{4},conditionNamez{5},conditionNamez{6},conditionNamez{7},...
-		conditionNamez{8},conditionNamez{9},conditionNamez{10}, conditionNamez{11}, conditionNamez{12}, conditionNamez{13}});
+	table_HF = table(Participants, HF(:,2), HF(:,4), HF(:,5), HF(:,7), HF(:,9), HF(:,11)...
+		, HF(:,13), HF(:,6), HF(:,1), HF(:,8), HF(:,10), HF(:,12), HF(:,3), 'VariableNames', {'Participants', conditionNamez{2}...
+		conditionNamez{4},conditionNamez{5},conditionNamez{7},conditionNamez{9},conditionNamez{11},conditionNamez{13},...
+		conditionNamez{6},conditionNamez{1},conditionNamez{8}, conditionNamez{10}, conditionNamez{12}, conditionNamez{3}});
+	
+		% Create tables of the data
+	table_shoulderFF = table(Participants, shoulderFF(:,2), shoulderFF(:,4), shoulderFF(:,5), shoulderFF(:,7), shoulderFF(:,9), shoulderFF(:,11)...
+		, shoulderFF(:,13), shoulderFF(:,6), shoulderFF(:,1), shoulderFF(:,8), shoulderFF(:,10), shoulderFF(:,12), shoulderFF(:,3), 'VariableNames', {'Participants', conditionNamez{2}...
+		conditionNamez{4},conditionNamez{5},conditionNamez{7},conditionNamez{9},conditionNamez{11},conditionNamez{13},...
+		conditionNamez{6},conditionNamez{1},conditionNamez{8}, conditionNamez{10}, conditionNamez{12}, conditionNamez{3}});
+	
+		% Create tables of the data
+	table_UUA = table(Participants, UUA(:,2), UUA(:,4), UUA(:,5), UUA(:,7), UUA(:,9), UUA(:,11)...
+		, UUA(:,13), UUA(:,6), UUA(:,1), UUA(:,8), UUA(:,10), UUA(:,12), UUA(:,3), 'VariableNames', {'Participants', conditionNamez{2}...
+		conditionNamez{4},conditionNamez{5},conditionNamez{7},conditionNamez{9},conditionNamez{11},conditionNamez{13},...
+		conditionNamez{6},conditionNamez{1},conditionNamez{8}, conditionNamez{10}, conditionNamez{12}, conditionNamez{3}});
+	
+		% Create tables of the data
+	table_TF = table(Participants, TF(:,2), TF(:,4), TF(:,5), TF(:,7), TF(:,9), TF(:,11)...
+		, TF(:,13), TF(:,6), TF(:,1), TF(:,8), TF(:,10), TF(:,12), TF(:,3), 'VariableNames', {'Participants', conditionNamez{2}...
+		conditionNamez{4},conditionNamez{5},conditionNamez{7},conditionNamez{9},conditionNamez{11},conditionNamez{13},...
+		conditionNamez{6},conditionNamez{1},conditionNamez{8}, conditionNamez{10}, conditionNamez{12}, conditionNamez{3}});
+	
+	conditionNamesNew = cell(13, 1);
+	conditionNamesNew = conditionNamez(newOrder, 1);
+	
+	MeansHF = varfun(@nanmean,table_HF, 'OutputFormat', 'uniform');
+	SD_HF = varfun(@nanstd, table_HF, 'OutputFormat', 'uniform');
+	HFStats = [MeansHF; SD_HF];
+	HFStats(:,1) = [];
+	
+	% Plot 15 kg - use previous code to plot 15 and 30 kg on same figure 
+	bar(HFStats(1,2:7));
+	xlabelz = gca;
+	xlabelz.XTickLabel(:) = conditionNamesNew(2:7);
+	
+	% write data to csv
+	writetable(table_HF , 'hip_flexion_ROM.csv', 'Delimiter', ',');
+	writetable(table_shoulderFF , 'shoulder_FF_ROM.csv', 'Delimiter', ',');
+	writetable(table_UUA , 'UUA_ROM.csv', 'Delimiter', ',');
+	writetable(table_TF , 'trunk_flexion_ROM.csv', 'Delimiter', ',');
+	
 	
 	% Means and SD
 	
@@ -96,22 +137,6 @@ end
 	save('ShoulderFF_table.mat', 'tableShoulderFF');
 	save('UUA_table.mat', 'tableUUA');
 	save('TF_table.mat', 'tableTF');
-	
-	
-	tableShoulderFF = table(Participants, ShoulderFF(:,1), ShoulderFF(:,2), ShoulderFF(:,3), ShoulderFF(:,4), ShoulderFF(:,5), ShoulderFF(:,6)...
-		, ShoulderFF(:,7), ShoulderFF(:,8), ShoulderFF(:,9), ShoulderFF(:,10), ShoulderFF(:,11), ShoulderFF(:,12), ShoulderFF(:,13), 'VariableNames', {'Participants', conditionNamez{1}...
-		conditionNamez{2},conditionNamez{3},conditionNamez{4},conditionNamez{5},conditionNamez{6},conditionNamez{7},...
-		conditionNamez{8},conditionNamez{9},conditionNamez{10}, conditionNamez{11}, conditionNamez{12}, conditionNamez{13}});
-	
-	tableUUA = table(Participants, UUA(:,1), UUA(:,2), UUA(:,3), UUA(:,4), UUA(:,5), UUA(:,6)...
-		, UUA(:,7), UUA(:,8), UUA(:,9), UUA(:,10), UUA(:,11), UUA(:,12), UUA(:,13), 'VariableNames', {'Participants', conditionNamez{1}...
-		conditionNamez{2},conditionNamez{3},conditionNamez{4},conditionNamez{5},conditionNamez{6},conditionNamez{7},...
-		conditionNamez{8},conditionNamez{9},conditionNamez{10}, conditionNamez{11}, conditionNamez{12}, conditionNamez{13}});
-	
-	tableTF = table(Participants, TF(:,1), TF(:,2), TF(:,3), TF(:,4), TF(:,5), TF(:,6)...
-		, TF(:,7), TF(:,8), TF(:,9), TF(:,10), TF(:,11), TF(:,12), TF(:,13), 'VariableNames', {'Participants', conditionNamez{1}...
-		conditionNamez{2},conditionNamez{3},conditionNamez{4},conditionNamez{5},conditionNamez{6},conditionNamez{7},...
-		conditionNamez{8},conditionNamez{9},conditionNamez{10}, conditionNamez{11}, conditionNamez{12}, conditionNamez{13}});
 	
 	
 end
