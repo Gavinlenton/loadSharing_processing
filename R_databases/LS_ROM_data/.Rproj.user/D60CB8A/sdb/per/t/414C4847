@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "# Basic data analysis for ROM data\n\n# set working directory\nsetwd(\"~/Google Drive/LS_main_data_collection/ElaboratedData/ROM/\")\nhip_flexion_ROM <- read.csv(\"hip_flexion_ROM.csv\", header = TRUE, sep = \",\", na.strings = \"NaN\")\nshoulder_FF_ROM <- read.csv(\"shoulder_FF_ROM.csv\", header = TRUE, sep = \",\", na.strings = \"NaN\")\nUUA_ROM <- read.csv(\"UUA_ROM.csv\", header = TRUE, sep = \",\", na.strings = \"NaN\")\ntrunk_flexion_ROM <- read.csv(\"trunk_flexion_ROM.csv\", header = TRUE, sep = \",\", na.strings = \"NaN\")\n\n# Check all variables for outliers\nsummary(hip_flexion_ROM)\nsummary(trunk_flexion_ROM)\nsummary(shoulder_FF_ROM)\n# UUA looks good\nsummary(UUA_ROM)\n\n# Convert super low values to NA\nhip_flexion_ROM[,2:14][hip_flexion_ROM[,2:14] < 55] <- NA\nshoulder_FF_ROM[,2:14][shoulder_FF_ROM[,2:14] < 90] <- NA\nUUA_ROM[,2:14][UUA_ROM[,2:14] < 90] <- NA\ntrunk_flexion_ROM[,2:14][trunk_flexion_ROM[,2:14] < 70] <- NA\n\n# Create subset of the data for 15 kg\nhip_flexion_ROM.sub15kg <- subset(hip_flexion_ROM, select=c(\"TBAS15\",\"CRYE15\",\"TYR15\",\"USMC15\",\"CORE15\",\"SORD15\"))\nshoulder_FF_ROM.sub15kg <- subset(shoulder_FF_ROM, select=c(\"TBAS15\",\"CRYE15\",\"TYR15\",\"USMC15\",\"CORE15\",\"SORD15\"))\nUUA_ROM.sub15kg <- subset(UUA_ROM, select=c(\"TBAS15\",\"CRYE15\",\"TYR15\",\"USMC15\",\"CORE15\",\"SORD15\"))\ntrunk_flexion_ROM.sub15kg <- subset(trunk_flexion_ROM, select=c(\"TBAS15\",\"CRYE15\",\"TYR15\",\"USMC15\",\"CORE15\",\"SORD15\"))\n\n# Create subset of the data for 30 kg\nhip_flexion_ROM.sub30kg <- subset(hip_flexion_ROM, select=c(\"TBAS30\",\"CRYE30\",\"TYR30\",\"USMC30\",\"CORE30\",\"SORD30\"))\nshoulder_FF_ROM.sub30kg <- subset(shoulder_FF_ROM, select=c(\"TBAS30\",\"CRYE30\",\"TYR30\",\"USMC30\",\"CORE30\",\"SORD30\"))\nUUA_ROM.sub30kg <- subset(UUA_ROM, select=c(\"TBAS30\",\"CRYE30\",\"TYR30\",\"USMC30\",\"CORE30\",\"SORD30\"))\ntrunk_flexion_ROM.sub30kg <- subset(trunk_flexion_ROM, select=c(\"TBAS30\",\"CRYE30\",\"TYR30\",\"USMC30\",\"CORE30\",\"SORD30\"))\n\n# Summary of 15 kg data\nsummary_HF_15kg <- dfapply(hip_flexion_ROM.sub15kg, favstats)\nsummary_shoulderFF_15kg <- dfapply(shoulder_FF_ROM.sub15kg, favstats)\nsummary_UUA_15kg <- dfapply(UUA_ROM.sub15kg, favstats)\nsummary_TF_15kg <- dfapply(trunk_flexion_ROM.sub15kg, favstats)\n\n# Summary of 30 kg data\nsummary_HF_30kg <- dfapply(hip_flexion_ROM.sub30kg, favstats)\nsummary_shoulderFF_30kg <- dfapply(shoulder_FF_ROM.sub30kg, favstats)\nsummary_UUA_30kg <- dfapply(UUA_ROM.sub30kg, favstats)\nsummary_TF_30kg <- dfapply(trunk_flexion_ROM.sub30kg, favstats)\n\n\n",
+    "created" : 1476706616997.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "11730493",
+    "id" : "414C4847",
+    "lastKnownWriteTime" : 1476765804,
+    "last_content_update" : 1476765804863,
+    "path" : "~/Google Drive/LS_main_data_collection/R_databases/LS_ROM_data/Rom_summary_stats.R",
+    "project_path" : "Rom_summary_stats.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

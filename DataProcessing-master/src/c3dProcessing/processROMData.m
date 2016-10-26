@@ -84,9 +84,6 @@ end
 	
 	Participants = [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20];
 	
-	
-	%% UPDATE THIS INFORMATION LATER
-	
 	% Create tables of the data
 	table_HF = table(Participants, HF(:,2), HF(:,4), HF(:,5), HF(:,7), HF(:,9), HF(:,11)...
 		, HF(:,13), HF(:,6), HF(:,1), HF(:,8), HF(:,10), HF(:,12), HF(:,3), 'VariableNames', {'Participants', conditionNamez{2}...
@@ -116,7 +113,7 @@ end
 	
 	MeansHF = varfun(@nanmean,table_HF, 'OutputFormat', 'uniform');
 	SD_HF = varfun(@nanstd, table_HF, 'OutputFormat', 'uniform');
-	HFStats = [MeansHF; SD_HF];
+	HFStats = [MeansHF; SD_HF]; 
 	HFStats(:,1) = [];
 	
 	% Plot 15 kg - use previous code to plot 15 and 30 kg on same figure 
@@ -129,7 +126,6 @@ end
 	writetable(table_shoulderFF , 'shoulder_FF_ROM.csv', 'Delimiter', ',');
 	writetable(table_UUA , 'UUA_ROM.csv', 'Delimiter', ',');
 	writetable(table_TF , 'trunk_flexion_ROM.csv', 'Delimiter', ',');
-	
 	
 	% Means and SD
 	

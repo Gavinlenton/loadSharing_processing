@@ -26,7 +26,6 @@ for xx=1:length(subsdir)
 end
 
 %% Loop through subjects
-
 for nS = 1:length(subjectNames)
      
      % Subject folder here
@@ -64,7 +63,7 @@ for nS = 1:length(subjectNames)
                     'dynamicElaborations', filesep, trialsFolders{tD}];
                
                % Define model name for IK/ID and automatically find it
-               modelName = [subjectNames{nS}, '_FBM_Scaled_Pose_OptMusc.osim'];
+               modelName = [regexprep(subjectNames{nS}, ' ', ''), '_FBM_optmkrpos.osim'];
                
                % If it's NA trial then model name is in 'Processed' folder
                if regexp(trialsFolders{tD}, 'NA')
@@ -81,13 +80,13 @@ for nS = 1:length(subjectNames)
                     ['Static1_' trialName], filesep, 'StaticCal', filesep, modelName];
                
                % Check if model file exist
-               
                if exist(model_file, 'file')
                     
-                    % Make sure the hip and subtalar DOFs are unlocked
+                    % Make sure the hip DOFs are unlocked and the subtalar DOF is locked
                     joints = {'hip', 'subtalar'};
+                    islocked = [0 1];
                     lockDOFS([sessionName, filesep, 'staticElaborations', filesep,...
-                    ['Static1_' trialName], filesep, 'StaticCal', filesep], modelName, joints, 0);
+                         ['Static1_' trialName], filesep, 'StaticCal', filesep], modelName, joints, islocked);
                     
                     % Navigate to folder where BOPS is;
                     cd([folderBOPS, filesep, 'src']);
@@ -97,23 +96,25 @@ for nS = 1:length(subjectNames)
                     procIdIndex = regexp(trialsFolders{tD}, '_P');
                     IK_id = trialsFolders{tD}(1:procIdIndex-1);
                     
-                    % Check to see if IK has already been run with new
-                    % model
+                    % Check to see if IK has already been run
                     if ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'FBM_ik.mot'], 'file')
                          
-                         % Run IK as per normal
+                         % Run IK 
                          [IKoutputDir, IKtrialsOutputDir, IKprocessedTrials]=InverseKinematics(inputDir, model_file);
                          
                          % Plot IK results
                          IKmotFilename='FBM_ik.mot'; %our default name
                          [coordinates,Xaxislabel]=plotResults('IK', IKoutputDir, IKtrialsOutputDir, model_file, IKprocessedTrials, IKmotFilename);
                          
+                         % Delete crappy trials if they exist
                          uiwait
                          
-                         % Then run on other model
+                         % Then prescribe motion to other DOFS at the knee
+                         % in new model
                          if ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'openKnee_ik.mot'], 'file')
+                              
                               % Update to the knee unlocked model file
-                              model_file_kneeUnlocked = regexprep(model_file, 'FBM_Scaled_Pose_OptMusc', 'openKnee_optmkrpos');
+                              model_file_kneeUnlocked = regexprep(model_file, 'FBM_optmkrpos', 'openKnee_optmkrpos');
                               
                               % Determine other knee DOF angles using
                               % simmspline values
@@ -128,7 +129,7 @@ for nS = 1:length(subjectNames)
                                    % Plot ID results
                                    IDmotFilename='inverse_dynamics.sto'; %our default name
                                    
-                                   [coordinates,Xaxislabel]=plotResults('ID', IDoutputDir, IDtrialsOutputDir, model_file, IDprocessedTrials, IDmotFilename, coordinates, Xaxislabel);
+                                   [coordinates,Xaxislabel]=plotResults('ID', IDoutputDir, IDtrialsOutputDir, model_file_kneeUnlocked, IDprocessedTrials, IDmotFilename);
                                         
                                    % Pause UI and delete the bad trials
                                    uiwait
@@ -139,11 +140,11 @@ for nS = 1:length(subjectNames)
                     elseif ~exist([sessionName, filesep, 'inverseKinematics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'openKnee_ik.mot'], 'file')
                          
                          % Update to the knee unlocked model file
-                         model_file_kneeUnlocked = regexprep(model_file, 'FBM_Scaled_Pose_OptMusc', 'openKnee_optmkrpos');
+                         model_file_kneeUnlocked = regexprep(model_file, 'FBM_optmkrpos', 'openKnee_optmkrpos');
                          
                          % Determine other knee DOF angles using
                          % simmspline values
-                           prescribeKneeAngles(model_file, sessionName);
+                         prescribeKneeAngles(model_file, sessionName);
                            
                          % Check to see if ID has been run
                          if ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'inverse_dynamics.sto'], 'file')
@@ -159,7 +160,6 @@ for nS = 1:length(subjectNames)
                               uiwait
                          end
                          
-                         prescribeKneeAngles(model_file, sessionName);
                          % Check to see if ID has been run
                     elseif ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id, filesep, [IK_id, '_Processed1'], filesep, 'inverse_dynamics.sto'], 'file')
                          
@@ -246,13 +246,13 @@ for folder = 1:length(sessionFolders)
      [genericModelID,genericModelPath]=uigetfile([sessionName, filesep,...
           'staticElaborations', filesep, '*.osim'],...
           'Select scaled OpenSim model for analysis');
-     model_file=[genericModelPath genericModelID];
+     model_file_kneeUnlocked=[genericModelPath genericModelID];
      
      % Plot the kinematics result
-     plotKinematics(sessionName, model_file);
+     plotKinematics(sessionName, model_file_kneeUnlocked);
      
      % Plot the joint moments
-     plotMoments(sessionName, model_file);
+     plotMoments(sessionName, model_file_kneeUnlocked);
      
      % Plot the EMG data and save as .mat files
      % 	loadPlotEMG(sessionName, fName);

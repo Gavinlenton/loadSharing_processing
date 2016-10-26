@@ -439,15 +439,15 @@ for cycle = 1:length(timePoints)-1
           end
           
           % groups of muscles
-          rf = dynamicTrialScaledEmg(phase, 5);
-          vl = dynamicTrialScaledEmg(phase, 7);
-          vm = dynamicTrialScaledEmg(phase, 8);
+          rf = dynamicTrialScaledEmg(phase, 9);
+          vl = dynamicTrialScaledEmg(phase, 8);
+          vm = dynamicTrialScaledEmg(phase, 7);
           quad = rf + vm + vl;
-          bf = dynamicTrialScaledEmg(phase, 1);
-          sm = dynamicTrialScaledEmg(phase, 6);
+          bf = dynamicTrialScaledEmg(phase, 6);
+          sm = dynamicTrialScaledEmg(phase, 11);
           hams = bf + sm;
           mg = dynamicTrialScaledEmg(phase, 3);
-          lg = dynamicTrialScaledEmg(phase, 2);
+          lg = dynamicTrialScaledEmg(phase, 4);
           hamsPlus = hams + mg + lg;
           medial = vm + sm;
           lateral = vl + bf;
