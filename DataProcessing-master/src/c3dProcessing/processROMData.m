@@ -111,16 +111,6 @@ end
 	conditionNamesNew = cell(13, 1);
 	conditionNamesNew = conditionNamez(newOrder, 1);
 	
-	MeansHF = varfun(@nanmean,table_HF, 'OutputFormat', 'uniform');
-	SD_HF = varfun(@nanstd, table_HF, 'OutputFormat', 'uniform');
-	HFStats = [MeansHF; SD_HF]; 
-	HFStats(:,1) = [];
-	
-	% Plot 15 kg - use previous code to plot 15 and 30 kg on same figure 
-	bar(HFStats(1,2:7));
-	xlabelz = gca;
-	xlabelz.XTickLabel(:) = conditionNamesNew(2:7);
-	
 	% write data to csv
 	writetable(table_HF , 'hip_flexion_ROM.csv', 'Delimiter', ',');
 	writetable(table_shoulderFF , 'shoulder_FF_ROM.csv', 'Delimiter', ',');

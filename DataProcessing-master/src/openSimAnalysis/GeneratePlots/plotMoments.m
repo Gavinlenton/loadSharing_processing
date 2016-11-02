@@ -1,34 +1,32 @@
-function plotMoments(sessionName, model_file)
+function plotMoments(sessionName, model_file, IDoutputDir)
 %Plot multiple moments from the .sto files generated from OpenSim's ID
 %analysis
 %   Input model file directory and session name directory to generate individual
 %   joint moment figures of the DOFs of interest (e.g., hip flexion).
 %   Multiple trials can be plotted on the same figure for each DOF
 
-% Folder where the IK Results files are stored
-IDresultsDir = uigetdir(sessionName, 'Select folder with INVERSE DYNAMICS results to use');
+if nargin < 3
+     % Folder where the ID Results files are stored
+     IDoutputDir = uigetdir(sessionName, 'Select folder with INVERSE DYNAMICS results to use');
+end
 
 % Generate list of trials
-trials=dir(IDresultsDir);
+trials=dir(IDoutputDir);
 j=1;
-
 for k = 3:length(trials)
      trialsList{j}=trials(k).name;
      j = j + 1;
 end
 trialsList(ismember(trialsList,{'Figures','IDMetrics.mat'}))=[];
 
-% Be selective if you want to
-[trialsIndex,~] = listdlg('PromptString','Select trials to plot:',...
+ % Be selective if you want to
+[trialsIndex,~] = listdlg('PromptString','Select ID trials to plot:',...
      'SelectionMode','multiple',...
      'ListString',trialsList);
 
 inputTrials=trialsList(trialsIndex);
 
-% Generate full path to files
-for n = 1:length(inputTrials)
-     trialsListDir{n} = [IDresultsDir filesep inputTrials{n}];
-end
+% inputTrials=trialsList;
 
 % Define subject weight for normalisation
 % Folder containing acquisition xml
@@ -41,13 +39,22 @@ condition_name = inputTrials{1}(1:condition_nameIndex-1);
 
 % Plot multiple trials
 IDfilename='inverse_dynamics.sto';
-dofs=getDofsFromModel(model_file);
-[selectedDofsIndex,v] = listdlg('PromptString','Select dofs for plots:',...
-     'SelectionMode','multiple',...
-     'ListString',dofs);
 
+% Automatic selection of DOFs 
+dofsToPlot = {'hip_flexion_r'; 'hip_adduction_r'; 'hip_rotation_r'; 'knee_angle_r';...
+     'knee_adduction_r'; 'knee_rotation_r'; 'ankle_angle_r'; 'lumbar_extension';...
+     'lumbar_bending'; 'lumbar_rotation'};
+
+% UNCOMMENT THIS TO MANUALLY SELECT WHICH DOFS TO PLOT
+% [selectedDofsIndex,v] = listdlg('PromptString','Select dofs for plots:',...
+%      'SelectionMode','multiple',...
+%      'ListString',dofs);
+% dofs=getDofsFromModel(model_file);
 % Assign dofs to plot
-dofsToPlot=dofs(selectedDofsIndex)';
+% dofsToPlot=dofs(selectedDofsIndex)';
+
+% Pre-allocate
+momentsToPlot = cell(length(dofsToPlot),1);
 
 % Convert dofs to names of moments output in .sto file
 for i=1:length(dofsToPlot)
@@ -63,6 +70,6 @@ elabDataFolder = sessionName(1:end-10);
 % Plot multiple results on a figure per DOF
 % The moments plotted from OpenSim are the inverse of what is typically
 % seen, you can choose to invert the results if desired.
-plotResultsMultipleTrials_LS(IDresultsDir, elabDataFolder, inputTrials,  IDfilename, xaxislabel, momentsToPlot, subject_weight, subject_name, condition_name)
+plotResultsMultipleTrials_LS(IDoutputDir, elabDataFolder, inputTrials,  IDfilename, xaxislabel, momentsToPlot, subject_weight, subject_name, condition_name)
 
 

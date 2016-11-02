@@ -64,39 +64,64 @@ if exist(figurePath,'dir') ~= 7
      mkdir(figurePath);
 end
 
+dirRemoved = 0;
+
 %Load data
 for k=1:length(trialsList)
      
-     file=importdata([resultsPath filesep trialsList{k} filesep filename]);
+     folder_trial = [resultsPath trialsList{k} filesep];
      
-     if nargin>4
+     if exist([folder_trial, filename], 'file')
           
-          coord_idx=findIndexes(file.colheaders,Yquantities);
+          % Import data
+          file=importdata([folder_trial, filename]);
+          
+          if nargin>4
+               
+               coord_idx=findIndexes(file.colheaders,Yquantities);
+          else
+               Yquantities=file.colheaders(2:end); %take all columns except time
+               coord_idx=[2:size(file.colheaders,2)];
+          end
+          
+          %% CHECK THE FILENAMES FOR BOTH IK AND ID
+          
+          results = file.data;
+          
+          % Normalising moments to body weight
+          if strcmp(filename,'inverse_dynamics.sto')
+               results(:, 2:end) = results(:, 2:end)./subject_weight;
+          end
+          
+          for j =1: length(coord_idx)
+               
+               coordCol=coord_idx(j);
+               
+               y{k,j} = results(:,coordCol);
+               
+          end
+          
+          timeVector{k}=getXaxis(x, results);
      else
-          Yquantities=file.colheaders(2:end); %take all columns except time
-          coord_idx=[2:size(file.colheaders,2)];
+          rmdir([resultsPath, filesep, trialsList{k}], 's');
+          dirRemoved = dirRemoved + 1;
      end
-     
-     %% CHECK THE FILENAMES FOR BOTH IK AND ID
-     
-     results = file.data;
-     
-     % Normalising moments to body weight
-     if strcmp(filename,'inverse_dynamics.sto')
-          results(:, 2:end) = results(:, 2:end)./subject_weight;
-     end
-     
-     for j =1: length(coord_idx)
-          
-          coordCol=coord_idx(j);
-          
-          y{k,j} = results(:,coordCol);
-          
-     end
-     
-     timeVector{k}=getXaxis(x, results);
-     
 end
+
+% Remove the deleted trials from the cell matrix
+[sizeR, sizeC] = size(y);
+sizeR_deletedRows = sizeR - dirRemoved;
+
+% Remove any nonzero
+yNew = y(~cellfun('isempty',y));
+yLength = length(yNew);
+difference = yLength/length(Yquantities) - sizeR_deletedRows;
+
+if difference ~= 0
+     sizeR_deletedRows = sizeR_deletedRows + difference;
+end
+
+y = reshape(yNew, [sizeR_deletedRows, sizeC]);
 
 %Save data in mat format
 save([metricsPath, AnalysisName], 'y');
@@ -147,7 +172,7 @@ for dof = 1:length(headers)
      allData.(headers{dof}) = [];
      stepTime = [];
      % Loop through good trials
-     for trial = 1:length(trialsList)
+     for trial = 1:length(trialsList) - dirRemoved
           
           % FILTER PROCESSED DATA
           % Determine average stride time
@@ -158,12 +183,11 @@ for dof = 1:length(headers)
           % Combine data into array - resample if necessary
           % If it doesn't equal 101 then resample
           if length(y{trial, dof}) ~= 101
-               allData.(headers{dof})(:, trial) = lpfilter(resample(y{trial, dof}, 101, length(y{trial, dof})), 8, dt, 'butter');
+               allData.(headers{dof})(:, trial) = lpfilter(resample(y{trial, dof}, 101, length(y{trial, dof}), 0), 8, dt, 'butter');
           else
-               allData.(headers{dof})(:, trial) = lpfilter(y{trial,dof}, 8, dt, 'butter');
+               allData.(headers{dof})(:, trial) = y{trial,dof};
           end
      end
-     
      
      % Summary statistics
      meanOfTrials = mean(allData.(headers{dof}), 2);
@@ -172,25 +196,34 @@ for dof = 1:length(headers)
      maxResult = max(meanOfTrials);
      minResult = min(meanOfTrials);
      rangeResult = abs(maxResult-minResult);
-     
+     upperError = meanOfTrials + standardDev;
+     lowerError = meanOfTrials - standardDev;
      
      % Name for ID metrics
      if strcmp(filename,'inverse_dynamics.sto')
-          ID_metrics.(subject_name).(condition_name).(headers{dof}).('max_min_range') = [maxResult, minResult, rangeResult];
-          ID_metrics.(subject_name).(condition_name).(headers{dof}).('sd') = standardDev;
-          ID_metrics.(subject_name).(condition_name).(headers{dof}).('var') = variance;
-          ID_metrics.(subject_name).(condition_name).(headers{dof}).('mean') = meanOfTrials;
-          
-          % Only get step time once
-          if dof == 1
-               step_time = round(mean(stepTime), 0) * dt;
-               ID_metrics.(subject_name).(condition_name).('step_time') = step_time;
-          end
           
           % Load IK metrics
           cd(elab_folder);
           if exist('IKMetrics_all.mat', 'file')
                load('IKMetrics_all.mat');
+               
+               % Load ID mat file if it exists
+               if exist('IDMetrics_all.mat', 'file') && dof == 1
+                    load('IDMetrics_all.mat')
+               end
+               
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('max_min_range') = [maxResult, minResult, rangeResult];
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('sd') = standardDev;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('var') = variance;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('mean') = meanOfTrials;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('upper_error') = upperError;
+               ID_metrics.(subject_name).(condition_name).(headers{dof}).('lower_error') = lowerError;
+               
+               % Only get step time once
+               if dof == 1
+                    step_time = round(mean(stepTime), 0) * dt;
+                    ID_metrics.(subject_name).(condition_name).('step_time') = step_time;
+               end
                
                % Calculate joint power and add it to structure
                ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER') = (meanOfTrials...
@@ -238,7 +271,11 @@ for dof = 1:length(headers)
                     power_pos_hip = work_pos_hip_bothLimbs / ID_metrics.(subject_name).(condition_name).('step_time');
                     
                     % Negative work
-                    H2 = ismember(spanLocsBelow, goodSpansBelow(1));
+                    if numel(goodSpansBelow) == 1
+                         H2 = ismember(spanLocsBelow, goodSpansBelow(1));
+                    else
+                         H2 = ismember(spanLocsBelow, goodSpansBelow(2));
+                    end
                     work_neg_hip = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(H2,1));
                     work_neg_hip_norm = work_neg_hip * dt;
                     
@@ -265,17 +302,25 @@ for dof = 1:length(headers)
                     
                     % Check to see how many spans were detected and assign
                     % appropriately.
-                    if length(goodSpansBelow) == 4
+                    if length(goodSpansBelow) > 4
+                         K3 = ismember(spanLocsBelow, goodSpansBelow(3));
+                         work_K3 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K3,1));
+                         K4 = ismember(spanLocsBelow, goodSpansBelow(end-1));
+                         K5 = ismember(spanLocsBelow, goodSpansBelow(end));
+                         work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1)) +...
+                              trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K5,1));
+                         
+                    elseif length(goodSpansBelow) == 4
                          K3 = ismember(spanLocsBelow, goodSpansBelow(3));
                          work_K3 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K3,1));
                          K4 = ismember(spanLocsBelow, goodSpansBelow(4));
                          work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1));
-                    
+                         
                     elseif length(goodSpansBelow) == 3
                          K3 = ismember(spanLocsBelow, goodSpansBelow(2));
                          work_K3 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K3,1));
                          K4 = ismember(spanLocsBelow, goodSpansBelow(3));
-                         work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1));            
+                         work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1));
                     end
                     
                     % Sum positive work to get total positive work
@@ -286,7 +331,7 @@ for dof = 1:length(headers)
                     work_neg_knee_bothLimbs = work_neg_knee_norm *2;
                     power_neg_knee = work_neg_knee_bothLimbs / ID_metrics.(subject_name).(condition_name).('step_time');
                     
-                    % Positive work 
+                    % Positive work
                     A = find(goodSpans == 2, 1);
                     % If positive span was not detected (i.e., was less
                     % than 5 frames)
@@ -296,18 +341,18 @@ for dof = 1:length(headers)
                          ID_metrics.(subject_name).(condition_name).(headers{dof}).('positive_power_index') = positiveInSpans;
                     end
                     
-                     K2 = ismember(spanLocs, goodSpans(2));
-                     b = find(K2 > 0);
-                     
-                     % If the assignment is in the range I'm looking for
-                     % (e.g., 15-40% of stride) then perform calcs
-                     if b(1) < 40
-                          work_pos_knee = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K2,1));
-                          work_pos_knee_norm = work_pos_knee * dt;
-                     else
-                          work_pos_knee_norm = 0;
-                     end
-                     
+                    K2 = ismember(spanLocs, goodSpans(2));
+                    b = find(K2 > 0);
+                    
+                    % If the assignment is in the range I'm looking for
+                    % (e.g., 15-40% of stride) then perform calcs
+                    if b(1) < 60
+                         work_pos_knee = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K2,1));
+                         work_pos_knee_norm = work_pos_knee * dt;
+                    else
+                         work_pos_knee_norm = 0;
+                    end
+                    
                     % Multiply by 2 to get both limbs (assumed symmetry)
                     work_pos_knee_bothLimbs = work_pos_knee_norm  *2;
                     power_pos_knee = work_pos_knee_bothLimbs / ID_metrics.(subject_name).(condition_name).('step_time');
@@ -347,17 +392,27 @@ for dof = 1:length(headers)
                     power_pos_ankle = work_pos_ankle_bothLimbs / ID_metrics.(subject_name).(condition_name).('step_time');
                     
                     % Negative work
+                    goodSpansBelow = find(spanLengthBelow>=10);   %get only spans of 10+ frames
+                    negativeInSpans = ismember(spanLocsBelow, goodSpansBelow);  %indices of these spans
+                    ID_metrics.(subject_name).(condition_name).(headers{dof}).('negative_power_index') = negativeInSpans;
                     A1_half = ismember(spanLocsBelow, goodSpansBelow(1));
-                    A1_half2 = ismember(spanLocsBelow, goodSpansBelow(2));
                     
-                    % Again checking for correct timestamps
-                    c = find(A1_half2 > 0);
-                    if c(1) > 40
-                         work_neg_ankle = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half,1));
+                    if numel(goodSpansBelow) > 1
+                         A1_half2 = ismember(spanLocsBelow, goodSpansBelow(2));
+                         
+                         % Again checking for correct timestamps
+                         c = find(A1_half2 > 0);
+                         if c(1) > 40
+                              work_neg_ankle = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half,1));
+                         else
+                              work_neg_ankle = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half,1)) +...
+                                   trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half2,1));
+                         end
+                         
                     else
-                    work_neg_ankle = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half,1)) +...
-                         trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half2,1));
+                         work_neg_ankle = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(A1_half,1));
                     end
+                    
                     work_neg_ankle_norm = work_neg_ankle * dt;
                     
                     % Multiply by 2 to get both limbs (assumed symmetry)
@@ -381,9 +436,10 @@ for dof = 1:length(headers)
           
      elseif strcmp(filename,'openKnee_ik.mot')
           
-          % Load IK metrics if it exists
+          % Load IK metrics if it exists but don't load if it's the second
+          % loop
           cd(elab_folder);
-          if exist('IKMetrics_all.mat', 'var')
+          if exist('IKMetrics_all.mat', 'file') && dof == 1
                load('IKMetrics_all.mat');
           end
           
@@ -393,6 +449,8 @@ for dof = 1:length(headers)
           IK_metrics.(subject_name).(condition_name).(headers{dof}).('var') = variance;
           IK_metrics.(subject_name).(condition_name).(headers{dof}).('mean') = meanOfTrials;
           IK_metrics.(subject_name).(condition_name).(headers{dof}).('ANGULAR_VEL') = gradient(meanOfTrials,dt)*(pi/180);
+          IK_metrics.(subject_name).(condition_name).(headers{dof}).('upper_error') = upperError;
+          IK_metrics.(subject_name).(condition_name).(headers{dof}).('lower_error') = lowerError;
      end
 end
 

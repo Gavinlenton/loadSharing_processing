@@ -1,4 +1,4 @@
-function [trialsList] = trialsListGeneration_LS(inputDir)
+function [trialsList] = trialsListGeneration_LS(inputDir, trialsDir)
 % Function to get the trials list from the input folder 
 
 % This file is part of Batch OpenSim Processing Scripts (BOPS).
@@ -22,7 +22,7 @@ function [trialsList] = trialsListGeneration_LS(inputDir)
 
 %%
 
-trials=dir(inputDir);
+trials=dir(trialsDir);
 j=1;
 
 for k=3:length(trials)
