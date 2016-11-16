@@ -16,7 +16,7 @@
 %%
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath(['.' filesep]);
+addpath(genpath(['.' filesep]));
 
 %%
 clear; clc; close all;
@@ -40,7 +40,7 @@ end
 %% --- MAIN DATA ANALYSIS --- %%
 
 % Loop through subjects
-for ii = 8:length(subjectFolders)
+for ii = 1:length(subjectFolders)
 	
 	fName = [BaseName filesep subjectFolders{ii}];
 	% Create directory cell array of session dates for chosen subject
@@ -50,6 +50,8 @@ for ii = 8:length(subjectFolders)
 	sessionFolders(ismember(sessionFolders,{'.','..'}))=[]; % dynamic subject folders
 	% Subject name
 	subjectName = subjectFolders{ii};
+	
+	fprintf('Processing data for %s, get jiggy with it...\n', subjectName);
 	
 	%% Loop through sessions
 	for i = 1:length(sessionFolders)
@@ -124,8 +126,8 @@ for ii = 8:length(subjectFolders)
 			%% --- LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION --- %%
 			
 			% Define all required path names
-			[newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
-				sessionData, maxName] = initialiseForAnalysis(pname);
+			[newPathName, dynamicFolders, dynamicCropFolders,...
+				sessionData] = initialiseForAnalysis(pname);
 			
 			% Check if EMG was captured in the session with first condition
 			dynamicTrialsName = dynamicCropFolders{1,1};
@@ -176,22 +178,22 @@ for ii = 8:length(subjectFolders)
 % 		
 		%% --- ROM TRIALS PROCESSING --- %%
 		
-		% Load ROM data file if the direcotry exists
-		if exist([regexprep(BaseName, 'InputData', 'ElaboratedData'), filesep, 'ROM'], 'dir')
-			cd([regexprep(BaseName, 'InputData', 'ElaboratedData'), filesep, 'ROM']);
-			load('romData.mat');
-		end
-		
-		% Check if the ROM data exists
-		if strcmp(fieldnames(anglesJointMeans), regexprep(subjectName, ' ', '_'))
-			
-			% Check if the ROM for the session has been run before
-			if ~strcmp(sessionConditions{1}, fieldnames(anglesJointMeans.(regexprep(subjectName, ' ', '_'))));
-				ROMTrialsProcessing(pname, sessionConditions, BaseName, subjectName);
-			end
-		else
-			ROMTrialsProcessing(pname, sessionConditions, BaseName, subjectName);
-		end
+% 		% Load ROM data file if the direcotry exists
+% 		if exist([regexprep(BaseName, 'InputData', 'ElaboratedData'), filesep, 'ROM'], 'dir')
+% 			cd([regexprep(BaseName, 'InputData', 'ElaboratedData'), filesep, 'ROM']);
+% 			load('romData.mat');
+% 		end
+% 		
+% 		% Check if the ROM data exists
+% 		if strcmp(fieldnames(anglesJointMeans), regexprep(subjectName, ' ', '_'))
+% 			
+% 			% Check if the ROM for the session has been run before
+% 			if ~strcmp(sessionConditions{1}, fieldnames(anglesJointMeans.(regexprep(subjectName, ' ', '_'))));
+% 				ROMTrialsProcessing(pname, sessionConditions, BaseName, subjectName);
+% 			end
+% 		else
+% 			ROMTrialsProcessing(pname, sessionConditions, BaseName, subjectName);
+% 		end
 		
 		%% Clear for next session
 		clearvars -except pname fName motoDir physFolder subjectFolders subjectName sessionFolders BaseName i ii 

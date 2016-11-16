@@ -274,7 +274,7 @@ if isfield(data,'fp_data')
 	
 	% Create gap filling
 	if ~isempty(interval)
-		if interval(1) >= timeBeforeTransition
+		if interval(1) >= timeBeforeTransition && (interval(end) - length(force_data_out)) > 11
 			
 			% Start and finish values are +- 10 because it was too short
 			% otherwise

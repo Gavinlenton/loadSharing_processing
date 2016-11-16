@@ -234,6 +234,7 @@ for i = 1:length(data.fp_data.GRF_data)
 		end
 end
 	
+if ~isempty(nt)
 	data.FP = FP;
 	% Combine data from the force plates here provided the events were
 	% assigned correctly
@@ -243,4 +244,8 @@ end
 		disp('Forces were not assigned correctly for this trial, not assigning forces to data')
 		dataOutput = data;
 	end
+else
+	disp('No FP data for this trial, not assigning forces to data')
+	dataOutput = data;
+end
 end

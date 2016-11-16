@@ -1,5 +1,5 @@
-function [newPathName, dynamicFolders, dynamicCropFolders, maxc3dFile_name,...
-     sessionData, maxName] = initialiseForAnalysis(pname)
+function [newPathName, dynamicFolders, dynamicCropFolders,...
+     sessionData] = initialiseForAnalysis(pname)
 %Defines paths and files for processing of EMG and dynamic walking trials
 %in LS data
 %   Input the pathname to determine max EMG trial name, path names, and
@@ -19,22 +19,26 @@ dynamicFolders={sessionDirs(isub).name}';
 dynamicCropFolders={sessionDirs(isub).name}';
 dynamicFolders = selectWalkingTrials(dynamicFolders, 1); % dynamic subject folders
 dynamicCropFolders = selectWalkingTrials(dynamicCropFolders, 0); % dynamic subject folders without KneeFJC
-maxTrials = selectMaxTrials(dynamicFolders); % Only KneeFJC trials
+% maxTrials = selectMaxTrials(dynamicFolders); % Only KneeFJC trials
 
 % Specify name of max file
-maxc3dFile_name = [maxTrials{1},'.c3d'];
-
-% Specify name of other max file if it's in there.
-if ~exist([pname, filesep, maxc3dFile_name], 'file')
-     maxName = maxTrials{2};
-     maxc3dFileOther = [];
-     if ~exist([pname, filesep, maxName, '.c3d'], 'file')
-         disp('No max trials exist in this acquisition');
-         maxc3dFileOther = [];
-     end
-else
-     maxName = maxTrials{1};
-end
+% if ~isempty(maxTrials)
+% 	maxc3dFile_name = [maxTrials{1},'.c3d'];
+% 	
+% 	% Specify name of other max file if it's in there.
+% 	if ~exist([pname, filesep, maxc3dFile_name], 'file')
+% 		maxName = maxTrials{2};
+% 		maxc3dFileOther = [];
+% 		if ~exist([pname, filesep, maxName, '.c3d'], 'file')
+% 			disp('No max trials exist in this acquisition');
+% 			maxc3dFileOther = [];
+% 		end
+% 	else
+% 		maxName = maxTrials{1};
+% 	end
+% else
+% 	maxName = [];
+% end
 
 end
 

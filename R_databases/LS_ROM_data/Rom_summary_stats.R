@@ -160,32 +160,59 @@ pairwise.t.test(hip_flexion_30$hip_flex_ROM,
 
 
 # Bonferroni for armour type
-pairwise.t.test(hip_flexion_ROM.l$hip_flex_ROM,
-                hip_flexion_ROM.l$Armour_type,
+pairwise.t.test(trunk_flexion_ROM.l$trunk_flex_ROM,
+                trunk_flexion_ROM.l$Armour_type,
                 paired = TRUE,
                 p.adjust.method = "bonferroni")
 
 # Bonferroni for mass
-pairwise.t.test(hip_flexion_ROM.l$hip_flex_ROM,
-                hip_flexion_ROM.l$Mass,
+pairwise.t.test(trunk_flexion_ROM.l$trunk_flex_ROM,
+                trunk_flexion_ROM.l$Mass,
                 paired = TRUE,
                 p.adjust.method = "bonferroni")
 
 # Interaction simple effects analysis
 # Divide the data into mass levels
-hip_flexion_15 = subset(hip_flexion_ROM.l, Mass == "15")
-hip_flexion_30 = subset(hip_flexion_ROM.l, Mass == "30")
+trunk_flexion_15 = subset(trunk_flexion_ROM.l, Mass == "15")
+trunk_flexion_30 = subset(trunk_flexion_ROM.l, Mass == "30")
 
 # Bonferroni for armour type
-pairwise.t.test(hip_flexion_15$hip_flex_ROM,
-                hip_flexion_15$Armour_type,
+pairwise.t.test(trunk_flexion_15$trunk_flex_ROM,
+                trunk_flexion_15$Armour_type,
                 paired = TRUE,
                 p.adjust.method = "bonferroni")
 
-pairwise.t.test(hip_flexion_30$hip_flex_ROM,
-                hip_flexion_30$Armour_type,
+pairwise.t.test(trunk_flexion_30$trunk_flex_ROM,
+                trunk_flexion_30$Armour_type,
                 paired = TRUE,
                 p.adjust.method = "bonferroni")
+
+
+# Post hoc shoulder FF ----------------------------------------------------
+
+## ANOVA only showed significant value for mass
+# Bonferroni for mass
+pairwise.t.test(shoulder_FF_ROM.l$shoulder_FF_ROM,
+                shoulder_FF_ROM.l$Mass,
+                paired = TRUE,
+                p.adjust.method = "bonferroni")
+
+
+# Post hoc shoulder abduction ---------------------------------------------
+## ANOVA only showed significant value for armour type
+# Bonferroni for mass
+pairwise.t.test(UUA_ROM.l$UUA_ROM,
+                UUA_ROM.l$Armour_type,
+                paired = TRUE,
+                p.adjust.method = "bonferroni")
+
+UUA_pARM2 = subset(UUA_ROM.l, Armour_type == "pARM2")
+UUA_TBAS = subset(UUA_ROM.l, Armour_type == "TBAS")
+UUA_pARM3 = subset(UUA_ROM.l, Armour_type == "pARM3")
+
+mean_pARM2 = mean(UUA_pARM2$UUA_ROM); sd_pARM2 = sd(UUA_pARM2$UUA_ROM)
+mean_TBAS = mean(UUA_TBAS$UUA_ROM); sd_TBAS = sd(UUA_TBAS$UUA_ROM)
+mean_pARM3 = mean(UUA_pARM3$UUA_ROM); sd_pARM3 = sd(UUA_pARM3$UUA_ROM)
 
 # Summary_SE function -----------------------------------------------------
 
@@ -264,7 +291,7 @@ plot_HF <- ggplot(summary_hip_flex2, aes(x=Armour_type, y=hip_flex_ROM, fill=Mas
                 position=position_dodge(0.9)) +
   xlab("Armour type") +
   ylab("Range of motion (deg)") +
-  ggtitle("Hip Flexion") +
+  ggtitle("A") +
   coord_cartesian(ylim=c(60,90)) +
   scale_fill_manual(name="Mass", # Legend label, use darker colors
                     breaks=c("15", "30"),
@@ -272,11 +299,11 @@ plot_HF <- ggplot(summary_hip_flex2, aes(x=Armour_type, y=hip_flex_ROM, fill=Mas
                     values = c("#D5D5D5","#545354")) +
   scale_y_continuous(breaks=0:9*10) + 
   theme_classic(base_size = 12, base_family = "Calibri") +
-  theme(legend.background = element_rect(), legend.position=c(0.7, 0.85), legend.direction = "horizontal",
+  theme(legend.background = element_rect(), legend.position=c(0.7, 0.90), legend.direction = "horizontal",
         panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(), axis.ticks.x = element_blank(), axis.line.y = element_line(colour = "Black"),
         axis.line.x = element_line(colour = "Black"), axis.title.x  = element_blank(), axis.title.y = element_text(size=14), 
-        plot.title = element_text(""))
+        plot.title = element_text(hjust = -0.01, vjust=1))
 
 # shoulder ff plot --------------------------------------------------------
 
@@ -288,7 +315,7 @@ plot_SFF <- ggplot(summary_shoulder_FF2, aes(x=Armour_type, y=shoulder_FF_ROM, f
                 width=.2,                    # Width of the error bars
                 position=position_dodge(0.9)) +
   xlab("Armour type") +
-  ggtitle("Shoulder Flexion") +
+  ggtitle("C") +
   ylab("Range of motion (deg)") +
   coord_cartesian(ylim=c(110,150)) +
   scale_fill_manual(name="Mass", # Legend label, use darker colors
@@ -300,8 +327,8 @@ plot_SFF <- ggplot(summary_shoulder_FF2, aes(x=Armour_type, y=shoulder_FF_ROM, f
   theme(legend.background = element_rect(),
         panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(), axis.ticks.x = element_blank(), axis.line.y = element_line(colour = "Black"),
-        axis.line.x = element_line(colour = "Black"), axis.title  = element_text(size=14), legend.position = "None", 
-        axis.title.x  = element_blank())
+        axis.line.x = element_line(colour = "Black"), axis.title.y  = element_text(size=14), legend.position = "None", 
+        axis.title.x  = element_blank(), plot.title = element_text(hjust = -0.01, vjust=2.12))
 
 # trunk flexion plot ------------------------------------------------------
 
@@ -312,7 +339,7 @@ plot_TF <- ggplot(summary_trunk_flex2, aes(x=Armour_type, y=trunk_flex_ROM, fill
                 width=.2,                    # Width of the error bars
                 position=position_dodge(0.9)) +
   xlab("Armour type") +
-  ggtitle("Trunk Flexion") +
+  ggtitle("B") +
   ylab("Range of motion (deg)") +
   coord_cartesian(ylim=c(60,100)) +
   scale_fill_manual(name="Mass", # Legend label, use darker colors
@@ -324,8 +351,8 @@ plot_TF <- ggplot(summary_trunk_flex2, aes(x=Armour_type, y=trunk_flex_ROM, fill
   theme(legend.background = element_rect(),
         panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(), axis.ticks.x = element_blank(), axis.line.y = element_line(colour = "Black"),
-        axis.line.x = element_line(colour = "Black"), axis.title.y = element_text(size=14), legend.position = "None",
-        axis.title.x  = element_blank())
+        axis.line.x = element_line(colour = "Black"), axis.title.y = element_blank(), legend.position = "None",
+        axis.title.x  = element_blank(), plot.title = element_text(hjust = -0.01, vjust=2.12))
 
 # shoulder abduction plot -------------------------------------------------
 
@@ -336,7 +363,7 @@ plot_UUA <- ggplot(summary_UUA2, aes(x=Armour_type, y=UUA_ROM, fill=Mass)) +
                 width=.2,                    # Width of the error bars
                 position=position_dodge(0.9)) +
   xlab("Armour type") +
-  ggtitle("Shoulder Abduction") +
+  ggtitle("D") +
   ylab("Range of motion (deg)") +
   coord_cartesian(ylim=c(120,170)) +
   scale_fill_manual(name="Mass", # Legend label, use darker colors
@@ -348,11 +375,11 @@ plot_UUA <- ggplot(summary_UUA2, aes(x=Armour_type, y=UUA_ROM, fill=Mass)) +
   theme(legend.background = element_rect(),
         panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(), axis.ticks.x = element_blank(), axis.line.y = element_line(colour = "Black"),
-        axis.line.x = element_line(colour = "Black"), axis.title = element_text(size=14), legend.position = "None", 
-        axis.title.x  = element_blank())
+        axis.line.x = element_line(colour = "Black"), axis.title.y = element_blank(), legend.position = "None", 
+        axis.title.x  = element_blank(), plot.title = element_text(hjust = -0.01, vjust=2.12))
 
 # Plot all on same figure
-png(file="ROM.png",width = 10, height = 6, units = 'in', res = 300)
+png(file="ROM_summary.png",width = 8, height = 5, units = 'in', res = 300)
 multiplot(plot_HF, plot_SFF, plot_TF, plot_UUA, cols=2)
 
 dev.off()
