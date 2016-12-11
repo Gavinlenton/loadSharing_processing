@@ -51,7 +51,7 @@ for ii = 1:length(subjectFolders)
 	% Subject name
 	subjectName = subjectFolders{ii};
 	
-	fprintf('Processing data for %s, get jiggy with it...\n', subjectName);
+	fprintf('Processing data for %s...\n', subjectName);
 	
 	%% Loop through sessions
 	for i = 1:length(sessionFolders)
