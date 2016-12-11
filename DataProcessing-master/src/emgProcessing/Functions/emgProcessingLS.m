@@ -1,14 +1,15 @@
 function emgProcessingLS(isNotch, sessionData, timePoints, sessionName, emgMax, motoDir)
-%Input if Notch is required (Yes, No), session Data, timePoints from
-%cropping for processing of EMG data, and sessionName (e.g., fast or slow
-%walking). emgMax specifies the maxEMG file used for normalisation.
+%   Input if Notch is required (Yes, No), session Data, timePoints from
+%   cropping into gait cycles, and sessionName (e.g., fast or slow
+%   walking). emgMax specifies the maxEMG file used for normalisation.
 %   The Notch filter will only be applied for data collected directly
-%   through Nexus. The sessionData is from the MOtoNMS c3d2mat function
+%   through Nexus. motoDir specified the MotoNMS directory.
+%   The sessionData is from the MOtoNMS c3d2mat function
 
 %% EMG scaling code
 % Designed to work with Load sharing data set
-% Code searchers through user provided EMG mat files, process the signal
-% and search for it global max.
+% Code searchers through user provided EMG mat files, processes the signal
+% and searches for its global max.
 % Code then stores all max emg values to file using CEINMS standard format.
 % Code then asks for trials to scale the EMGs against max, and print to
 % CEINMS standard format.
@@ -67,7 +68,7 @@ notchFilter = design(notchDesign);
 % Alternative notch visualization
 % fvtool(b_notch, a_notch);
 
-%% EMG labels in the .mat file - MAY BE SOURCE OF ERROR BECAUSE CHANNEL2 AND CHANNEL5 WERE SKIPPED
+%% EMG labels in the .mat file - CHANGE IF THESE DON'T MATCH YOUR LABELS
 emgLabelsInMatFile = {'TA', 'Channel2',  'MG', 'LG', 'Channel5', 'BF', 'VM', 'VL',...
      'RF', 'Sol', 'MH'};
 emgLabelsCEINMS = {'tibant_r', 'Channel2', 'gasmed_r', 'gaslat_r', 'Channel5' 'bicfemlh_r', 'vasmed_r', ...
