@@ -17,6 +17,7 @@ load('IDMetrics_all.mat');
 
 % Sort IDMetrics so it's in correct order
 subjects = fieldnames(ID_metrics);
+subjectNumber = zeros(length(subjects), 1);
 newOrder = {'NA_slow', 'NA_fast', 'TBAS15_slow', 'TBAS15_fast', 'CRYE15_slow', 'CRYE15_fast',...
 	'TYR15_slow', 'TYR15_fast', 'USMC15_slow', 'USMC15_fast', 'CORE15_slow', 'CORE15_fast',...
 	'SORD15_slow', 'SORD15_fast', 'TBAS30_slow', 'TBAS30_fast', 'CRYE30_slow', 'CRYE30_fast',...
@@ -24,8 +25,15 @@ newOrder = {'NA_slow', 'NA_fast', 'TBAS15_slow', 'TBAS15_fast', 'CRYE15_slow', '
 	'SORD30_slow', 'SORD30_fast'};
 
 for t = 1:length(subjects)
+	
 	% Determine conditions for that subject
 	subjectFields = fieldnames(ID_metrics.(subjects{t}));
+	subjectName = subjects{t};
+	Key   = '_';
+	Index = strfind(subjectName, Key);
+	Value = sscanf(subjectName(Index(1) + length(Key):end), '%g', 1);
+	subjectNumber(t, 1) = Value;
+	
 	if length(subjectFields) ~= 26
 		% Find which conditions are missing
 		diffFields = setdiff(newOrder, subjectFields);
@@ -252,62 +260,81 @@ conditionLabels = {'TBAS'; 'ARM1'; 'ARM2'; 'ARM3'; 'ARM4'; 'ARM5'};
 % interest. Data output is each column represent a different joint and
 % each row represents a different armour condition
 
-% % Initialize vars
-% ankP15_mean = zeros(6, 2); ankP15_SD = zeros(6,2); ankP30_mean = zeros(6, 2); ankP30_SD =  zeros(6,2);
-% 
-% kneeF15_mean = zeros(6, 2);  kneeF15_SD = zeros(6, 2); kneeF30_mean = zeros(6,2); kneeF30_SD =  zeros(6,2);
-% 
-% hipE15_mean = zeros(6, 2);  hipE15_SD = zeros(6, 2); hipE30_mean = zeros(6,2); hipE30_SD =  zeros(6,2);
-% 
-% for tt = 1:2
-% 	increment = 2;
-% 	tt_30 = tt + 14;
-% 	
-% 	% Ankle
-% 	[ankP15_mean(:,tt), ankP15_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.ankle_plant_peak(:, (tt+2):increment:(increment*6)+tt)));
-% 	[ankP30_mean(:,tt), ankP30_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.ankle_plant_peak(:, tt_30:increment:(increment*5)+tt_30)));
-% 	
-% 	% Knee
-% 	[kneeF15_mean(:,tt), kneeF15_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_flex_peak(:, tt+2:increment:(increment*6)+tt));
-% 	[kneeF30_mean(:,tt), kneeF30_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_flex_peak(:, tt_30:increment:(increment*5)+tt_30));
-% 	
-% 	% Hip
-% 	[hipE15_mean(:,tt), hipE15_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.hip_ext_peak(:, tt+2:increment:(increment*6)+tt)));
-% 	[hipE30_mean(:,tt), hipE30_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.hip_ext_peak(:, tt_30:increment:(increment*5)+tt_30)));
-% 	
-% end
+% Initialize vars
+ankP15_mean = zeros(6, 2); ankP15_SD = zeros(6,2); ankP30_mean = zeros(6, 2); ankP30_SD =  zeros(6,2);
+
+kneeF15_mean = zeros(6, 2);  kneeF15_SD = zeros(6, 2); kneeF30_mean = zeros(6,2); kneeF30_SD =  zeros(6,2);
+kneeE15_mean = zeros(6, 2);  kneeE15_SD = zeros(6, 2); kneeE30_mean = zeros(6,2); kneeE30_SD =  zeros(6,2);
+
+hipE15_mean = zeros(6, 2);  hipE15_SD = zeros(6, 2); hipE30_mean = zeros(6,2); hipE30_SD =  zeros(6,2);
+
+for tt = 1:2
+	increment = 2;
+	tt_30 = tt + 14;
+	
+	% Ankle
+	[ankP15_mean(:,tt), ankP15_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.ankle_plant_peak(:, (tt+2):increment:(increment*6)+tt)));
+	[ankP30_mean(:,tt), ankP30_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.ankle_plant_peak(:, tt_30:increment:(increment*5)+tt_30)));
+	
+	% Knee
+	[kneeF15_mean(:,tt), kneeF15_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_flex_peak(:, tt+2:increment:(increment*6)+tt));
+	[kneeF30_mean(:,tt), kneeF30_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_flex_peak(:, tt_30:increment:(increment*5)+tt_30));
+	
+	% Knee extension
+	[kneeE15_mean(:,tt), kneeE15_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_ext_peak(:, tt+2:increment:(increment*6)+tt));
+	[kneeE30_mean(:,tt), kneeE30_SD(:, tt)] = Mean_SD(metrics_for_plot.knee_ext_peak(:, tt_30:increment:(increment*5)+tt_30));
+	
+	% Hip
+	[hipE15_mean(:,tt), hipE15_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.hip_ext_peak(:, tt+2:increment:(increment*6)+tt)));
+	[hipE30_mean(:,tt), hipE30_SD(:, tt)] = Mean_SD(abs(metrics_for_plot.hip_ext_peak(:, tt_30:increment:(increment*5)+tt_30)));
+	
+end
+
+% Make dir if it's not there
+if ~isdir([BasePath, filesep, 'results_moments'])
+	mkdir(BasePath, 'results_moments');
+end
+
+%% Save peaks in .mat files and .csv files
+cd(fullfile(BasePath, 'results_moments'));
+save('Moments.mat', '-struct', 'metrics_for_plot');
+
+createTableCSV(metrics_for_plot, subjectNumber, conditions);
 
 %% Subplots
 % Function to bring plots together
-% ha = tight_subplot(2,3,[.05 .03],[.1 .1],[.1 .01]);
-% 
-% % ANKLE
-% axes(ha(3))
-% CreatePlotExtraVar(ankP15_SD(:,1), ankP15_SD(:,2), ankP15_mean(:,1), ankP15_mean(:,2), conditionLabels, [0,3])
-% t = title('Ankle Plantarflexion'); set(t, 'Units', 'Normalized', 'Position', [0.5, 1.1, 0]);
-% legend({'Slow', 'Fast'}, 'Location', 'northeast', 'box', 'off', 'orientation', 'vertical', 'fontsize', 14);
-% 
-% axes(ha(6))
-% CreatePlotExtraVar(ankP30_SD(:,1), ankP30_SD(:,2), ankP30_mean(:,1), ankP30_mean(:,2), conditionLabels, [0, 3.5])
-% 
-% % KNEE
-% axes(ha(2))
-% CreatePlotExtraVar(kneeF15_SD(:,1), kneeF15_SD(:,2), kneeF15_mean(:,1), kneeF15_mean(:,2), conditionLabels, [0, 2])
-% t = title('Knee Flexion'); set(t, 'Units', 'Normalized', 'Position', [0.5, 1.1, 0]);
-% 
-% axes(ha(5))
-% CreatePlotExtraVar(kneeF30_SD(:,1), kneeF30_SD(:,2), kneeF30_mean(:,1), kneeF30_mean(:,2), conditionLabels, [0, 2])
-% set(gca, 'xticklabel', conditionLabels, 'fontsize', 14, 'ylim', [0,2], 'YTick', [0,1,2], 'FontName', 'Calibri', 'box', 'off');
-% 
-% % HIP
-% axes(ha(1))
-% CreatePlotExtraVar(hipE15_SD(:,1), hipE15_SD(:,2), hipE15_mean(:,1), hipE15_mean(:,2), conditionLabels, [0, 4])
-% y = ylabel({'15 kg'; 'Moment (N.m. BW^-^1)'});  t = title('Hip Extension'); 
-% set(y, 'Units', 'Normalized', 'Position', [-0.07, 0.5, 0]); set(t, 'Units', 'Normalized', 'Position', [0.5, 1.1, 0]);
-% 
-% axes(ha(4))
-% CreatePlotExtraVar(hipE30_SD(:,1), hipE30_SD(:,2), hipE30_mean(:,1), hipE30_mean(:,2), conditionLabels, [0, 4])
-% y = ylabel({'30 kg'; 'Moment (N.m. BW^-^1)'}); set(y, 'Units', 'Normalized', 'Position', [-0.07, 0.5, 0]);
+ha = tight_subplot(2,3,[.05 .03],[.1 .1],[.07 .01]);
+
+% ANKLE
+axes(ha(3))
+CreatePlotExtraVar(ankP15_SD(:,1), ankP15_SD(:,2), ankP15_mean(:,1), ankP15_mean(:,2), conditionLabels, [0,3])
+t = title('Ankle Plantarflexion'); set(t, 'Units', 'Normalized', 'Position', [0.5, 1, 0]);
+legend({'Slow', 'Fast'}, 'Location', 'northeast', 'box', 'off', 'orientation', 'vertical', 'fontsize', 14);
+set(gca, 'YTick', [0, 1, 2, 3]);
+
+axes(ha(6))
+CreatePlotExtraVar(ankP30_SD(:,1), ankP30_SD(:,2), ankP30_mean(:,1), ankP30_mean(:,2), conditionLabels, [0, 3.5])
+set(gca, 'YTick', [0, 1, 2, 3]);
+
+% KNEE
+axes(ha(2))
+CreatePlotExtraVar(kneeE15_SD(:,1), kneeE15_SD(:,2), kneeE15_mean(:,1)*-1, kneeE15_mean(:,2)*-1, conditionLabels, [0, 1])
+t = title('Knee Extension'); set(t, 'Units', 'Normalized', 'Position', [0.5, 1, 0]);
+set(gca, 'YTick', [0, 0.5, 1]);
+
+axes(ha(5))
+CreatePlotExtraVar(kneeE30_SD(:,1), kneeE30_SD(:,2), kneeE30_mean(:,1)*-1, kneeE30_mean(:,2)*-1, conditionLabels, [0, 2])
+set(gca, 'xticklabel', conditionLabels, 'fontsize', 14, 'ylim', [0,1], 'YTick', [0, 0.5, 1], 'FontName', 'Calibri', 'box', 'off');
+
+% HIP
+axes(ha(1))
+CreatePlotExtraVar(hipE15_SD(:,1), hipE15_SD(:,2), hipE15_mean(:,1), hipE15_mean(:,2), conditionLabels, [0, 4])
+y = ylabel({'15 kg'; 'Moment (N.m. kg^-^1)'});  t = title('Hip Extension'); 
+set(y, 'Units', 'Normalized', 'Position', [-0.07, 0.5, 0]); set(t, 'Units', 'Normalized', 'Position', [0.5, 1, 0]);
+
+axes(ha(4))
+CreatePlotExtraVar(hipE30_SD(:,1), hipE30_SD(:,2), hipE30_mean(:,1), hipE30_mean(:,2), conditionLabels, [0, 4])
+y = ylabel({'30 kg'; 'Moment (N.m. kg^-^1)'}); set(y, 'Units', 'Normalized', 'Position', [-0.07, 0.5, 0]);
 
 
 %% Moment plotting

@@ -316,10 +316,10 @@ for dof = 1:length(headers)
                          K4 = ismember(spanLocsBelow, goodSpansBelow(4));
                          work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1));
                          
-                    elseif length(goodSpansBelow) == 3
-                         K3 = ismember(spanLocsBelow, goodSpansBelow(2));
+                    elseif length(goodSpansBelow) <= 3
+                         K3 = ismember(spanLocsBelow, goodSpansBelow(end-1));
                          work_K3 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K3,1));
-                         K4 = ismember(spanLocsBelow, goodSpansBelow(3));
+                         K4 = ismember(spanLocsBelow, goodSpansBelow(end));
                          work_K4 = trapz(ID_metrics.(subject_name).(condition_name).(headers{dof}).('JOINT_POWER')(K4,1));
                     end
                     
