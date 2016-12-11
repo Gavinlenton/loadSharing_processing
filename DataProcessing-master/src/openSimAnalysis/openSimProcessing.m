@@ -8,7 +8,9 @@ clc; clear;
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath('..\');
+addpath(genpath('..\'));
+addpath(genpath('C:\Users\s2921887\Desktop\LS_main_data_collection\model_scaling'));
+addpath(genpath('C:\Users\s2921887\Desktop\LS_main_data_collection\DataProcessing-master'));
 
 %% Define BasePath with dynamicElaboration outputs and BOPS folder
 
@@ -160,10 +162,11 @@ for nS = 1:length(subjectNames)
                               end
                               
                               % Calculate mean position
-                              mean_y_pos = mean(allData, 2);
-                              IK_metrics.(regexprep(subjectNames{nS}, ' ', '_')).(IK_id).('torso_COM_posY') = mean_y_pos;
-                              cd(pwd);
+                              mean_y_pos = mean(allData, 2);                  
                          end
+                         
+                         IK_metrics.(regexprep(subjectNames{nS}, ' ', '_')).(IK_id).('torso_COM_posY') = mean_y_pos;
+                         cd(pwd);
                          
                          % Check to see if ID has been run
                     elseif ~exist([sessionName, filesep, 'inverseDynamics', filesep, IK_id], 'dir')
@@ -206,6 +209,7 @@ for nS = 1:length(subjectNames)
                          % Calculate mean position
                          mean_y_pos = mean(allData, 2);
                          IK_metrics.(regexprep(subjectNames{nS}, ' ', '_')).(IK_id).('torso_COM_posY') = mean_y_pos;
+                         save('IKMetrics_all.mat', 'IK_metrics');
                          cd(pwd);
                          
                     else
