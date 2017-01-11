@@ -13,5 +13,10 @@ Run Full_CAST.m
 	Optimises muscle parameters
 	
 Run BOPS_LS.m to process IK and ID for dynamic trials.
+	Runs IK first
+	Takes IK results and the model spline values to generate abd/add and int/ext 		rotation values and puts them into the .mot file from IK
+	Open the knee DOFS of the model - convert splines to linear functions
+	Run ID with the modified model and prescribed motion
+	Run Point kinematics to get the COM data from he pelvis
 
 

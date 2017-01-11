@@ -150,12 +150,11 @@ data_out_filtered = zeros(size(markersData));
 Fs = 1/data.marker_data.Info.frequency;
 
 % Filter freq
-Fc = 28;
+Fc = 8;
 
 % Apply 2nd order Butterworth filt with two passes.
 for col = 3:size(data_out,1)
-	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'damped');
-% 	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter');
+ 	data_out_filtered(:,col) = lpfilter(markersData(:,col),Fc,Fs, 'butter');
 	
 	markersData(:,col) = data_out_filtered(:,col);
 end
@@ -329,7 +328,7 @@ if isfield(data,'fp_data')
 		
 		% Define filter parameters
 % 		filt_freq = 8;
- 		damped_filt_freq = 10;
+ 		damped_filt_freq = 8;
 		
 		force_data_filtered = zeros(size(force_data_out));
 		
@@ -339,11 +338,11 @@ if isfield(data,'fp_data')
 % 			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),filt_freq,dt, 'butter');
 % 			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_filtered(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
 
-			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'damped');
+			force_data_filtered(a3(1):a3(end),col1+1) = lpfilter(force_data_out(a3(1):a3(end),col1+1),damped_filt_freq,dt, 'butter');
 			
 % 			% Right foot moments
 % 			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),filt_freq,dt, 'butter');
-			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'damped');
+			force_data_filtered(a3(1):a3(end),col1+7) = lpfilter(force_data_out(a3(1):a3(end),col1+7),damped_filt_freq,dt, 'butter');
 % 			% Left Foot forces
 % 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),filt_freq,dt, 'butter');
 % 			force_data_filtered(:,col1+10) = lpfilter(force_data_out(:,col1+10),damped_filt_freq,dt, 'damped');
@@ -353,12 +352,12 @@ if isfield(data,'fp_data')
 			
 			% COP right
 			if a3(end) ~= length(fp_time1)
-				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), damped_filt_freq,dt, 'damped');
+				force_data_filtered(a3(1):a3(end), col1+4) = lpfilter(force_data_out(a3(1):a3(end), col1+4), damped_filt_freq,dt, 'butter');
 			else
-				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), damped_filt_freq,dt, 'damped');
+				force_data_filtered(a3(1)+1:a3(end), col1+4) = lpfilter(force_data_out(a3(1)+1:a3(end), col1+4), damped_filt_freq,dt, 'butter');
 			end
 			% COP left
-			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'damped');
+			force_data_filtered(a2, col1+13) = lpfilter(force_data_out(a2, col1+13), damped_filt_freq,dt, 'butter');
 		end
 		
 		% Clean up again just to be sure
@@ -369,8 +368,6 @@ if isfield(data,'fp_data')
 				force_data_filtered(b(end):end,j+4) = force_data_filtered(b(end)-1,j+4);
 			end
 		end
-		
-		%% CHECK NORMAL FORCE PLATE VALUES IN LITERATURE FOR FREE MOMENT AND Mz
 	
 	% M/L and A/P free moments equal to zero as they contribute negligibly
 	% to ID
