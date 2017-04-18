@@ -7,7 +7,7 @@ function plotMoments(sessionName, model_file, IDoutputDir)
 
 if nargin < 3
      % Folder where the ID Results files are stored
-     IDoutputDir = uigetdir(sessionName, 'Select folder with INVERSE DYNAMICS results to use');
+     IDoutputDir = uigetdir([sessionName, filesep, trialName], 'Select folder with INVERSE DYNAMICS results to use');
 end
 
 % Generate list of trials
@@ -17,7 +17,7 @@ for k = 3:length(trials)
      trialsList{j}=trials(k).name;
      j = j + 1;
 end
-trialsList(ismember(trialsList,{'Figures','IDMetrics.mat'}))=[];
+trialsList(ismember(trialsList,{'Figures','IDMetrics.mat', '.DS_Store'}))=[];
 
  % Be selective if you want to
 [trialsIndex,~] = listdlg('PromptString','Select ID trials to plot:',...
@@ -44,6 +44,7 @@ IDfilename='inverse_dynamics.sto';
 dofsToPlot = {'hip_flexion_r'; 'hip_adduction_r'; 'hip_rotation_r'; 'knee_angle_r';...
      'knee_adduction_r'; 'knee_rotation_r'; 'ankle_angle_r'; 'lumbar_extension';...
      'lumbar_bending'; 'lumbar_rotation'};
+ 
 
 % UNCOMMENT THIS TO MANUALLY SELECT WHICH DOFS TO PLOT
 % [selectedDofsIndex,v] = listdlg('PromptString','Select dofs for plots:',...

@@ -64,8 +64,7 @@ conditions = fieldnames(ID_metrics_ordered.(subjects{1}))';
 % Create structure to store outputs
 metricsID = fieldnames(ID_metrics_ordered.(subjects{1}).(conditions{1}));
 metricsIK = fieldnames(IK_metrics_ordered.(subjects{1}).(conditions{1}));
-metricsID(ismember(metricsID,{'POWER_POS_TOTAL', 'POWER_NEG_TOTAL',...
-	'lumbar_bending_moment', 'lumbar_rotation_moment'}))=[];
+metricsID(ismember(metricsID,{'POWER_POS_TOTAL', 'POWER_NEG_TOTAL'}))=[];
 
 %% Extract the variables of interest from the data
 %[ID_metrics_for_analysis, IK_metrics_for_analysis] = extractVariables(subjects, metricsID, metricsIK, conditions, ID_metrics_ordered, IK_metrics_ordered);
@@ -109,10 +108,26 @@ combinedMetrics_ID = combineEnsembles(ID_metrics_for_analysis, subjects, conditi
 combinedMetrics_IK = combineEnsembles(IK_metrics_for_analysis, subjects, conditions);
 
 % Redo joint powers for plots
-ID_metrics_plots = workAndPowerCalcs(combinedMetrics_IK, combinedMetrics_ID, conditions, ID_metrics_for_analysis.step_time);
+[ID_metrics_plots, ID_metrics_powers] = workAndPowerCalcs(combinedMetrics_IK, combinedMetrics_ID, conditions, ID_metrics_for_analysis.step_time);
+
+if ~isdir([BasePath, filesep, 'results_powers'])
+	mkdir(BasePath, 'results_powers');
+end
+
+cd(fullfile(BasePath, 'results_powers'));
+save('Powers.mat', '-struct', 'ID_metrics_plots');
+save('powers_metrics.mat', '-struct', 'ID_metrics_powers');
 
 %% Plots - have to re-write this so it works for the code
-plot_trajectories_diffTBAS(metrics_fromTBAS);
+
+BasePath=uigetdir('../../../', 'Select Elaborated Data Folder');
+
+% First need to combine all 15kg and all 30 kg data
+moments = load([BasePath filesep 'results_moments' filesep 'mat_data' filesep 'Moments.mat']);
+kinematics = load([BasePath filesep 'results_kinematics' filesep 'mat files' filesep 'kinematics.mat']);
+
+plot_trajectories(kinematics, moments);
+plot_trajectories(moments);
 
 % plot trajectories
 plot_trajectories(combinedMetrics_ID);
@@ -143,13 +158,17 @@ save('kinematics.mat', '-struct', 'IK_metrics_for_analysis');
 ID_metrics_final = combineConditionsPeaks(ID_metrics_for_analysis);
 IK_metrics_final = combineConditionsPeaks(IK_metrics_for_analysis);
 
+power_metrics_final = combineConditionsPeaks(ID_metrics_powers);
+
 % Create paths to save data
 savePathID = fullfile(BasePath, 'results_moments');
 savePathIK = fullfile(BasePath, 'results_kinematics');
+savePathPowers = fullfile(BasePath, 'results_powers');
 
 % Create tables and export csv for R
 createTableCSV(ID_metrics_final, subjectNumber, conditions, savePathID);
 createTableCSV(IK_metrics_final, subjectNumber, conditions, savePathIK);
+createTableCSV(power_metrics_final, subjectNumber, conditions, savePathPowers);
 
 %% Peak values of moments
 % Obtain the mean and SD for the hip, knee, and ankle peak moments of
@@ -171,3 +190,25 @@ plot_power_percentages(power_percent, conditionLabels)
 
 %% Subplots for peak moments
 plot_peak_moments(peak_moments, conditionLabels);
+
+conditions = fieldnames(PressurePadz15);
+
+%TF = contains(variables, {'peak', 'diffTBAS'});
+%variables(TF)=[];
+
+for k = 1:length(conditions)
+conditionName = conditions{k};
+	
+	
+	% Create table with data
+	table = array2table(PressurePadz15.(conditionName));
+	
+	% Sort first column so participants are in ascending order
+	table_final = sortrows(table);
+	
+	% Write the table to a .csv file
+	writetable(table_final, [variableName '.csv']);
+	
+end
+
+
