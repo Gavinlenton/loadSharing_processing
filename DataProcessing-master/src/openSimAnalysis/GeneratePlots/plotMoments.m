@@ -20,11 +20,11 @@ end
 trialsList(ismember(trialsList,{'Figures','IDMetrics.mat', '.DS_Store'}))=[];
 
  % Be selective if you want to
-[trialsIndex,~] = listdlg('PromptString','Select ID trials to plot:',...
-     'SelectionMode','multiple',...
-     'ListString',trialsList);
+% [trialsIndex,~] = listdlg('PromptString','Select ID trials to plot:',...
+%      'SelectionMode','multiple',...
+%      'ListString',trialsList);
 
-inputTrials=trialsList(trialsIndex);
+inputTrials=trialsList;
 
 % inputTrials=trialsList;
 

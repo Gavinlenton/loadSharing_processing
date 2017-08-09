@@ -72,56 +72,56 @@ for ii = 1:length(subjectFolders)
 			
 			%% --- RUN ACQUISITION INTERFACE --- %%
 			
-			% If the acqusition xml does not exist then generate one
-			if ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i == 1
-				disp('acquisition.xml file does not exist, running AcquisitionInterface...');
-				
-				% Nav to file directory and run modified interface function
-				cd([motoDir, filesep, 'src', filesep, 'AcquisitionInterface', filesep]);
-				addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
-				disp(['Running acquisition for: ', subjectName]);
-				AcquisitionInterface_LS(subjectName, pname, sessionFolders{i,1});
-				
-				% If the acquisition does exist then just copy it from other
-				% file and updated parameter
-			elseif ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i ~= 1
-				fileSource = [fName, filesep, sessionFolders{1}, filesep, 'acquisition.xml'];
-				addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
-				copyfile(fileSource, c3dFile_folder)
-				cd(pname);
-				acquisitionInfo=xml_read(fullfile(pname, 'acquisition.xml'));
-				% Update acquisition date and save
-				acquisitionInfo.AcquisitionDate = sessionFolders{i};
-				xml_write('acquisition.xml' , acquisitionInfo);
-				
-			else
-				% It exists so continue happily
-				fprintf('acquisition.xml already exist in folder: %s,\nContinuing with analysis...\n', pname);
-			end
+% 			% If the acquisition xml does not exist then generate one
+% 			if ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i == 1
+% 				disp('acquisition.xml file does not exist, running AcquisitionInterface...');
+% 				
+% 				% Nav to file directory and run modified interface function
+% 				cd([motoDir, filesep, 'src', filesep, 'AcquisitionInterface', filesep]);
+% 				addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
+% 				disp(['Running acquisition for: ', subjectName]);
+% 				AcquisitionInterface_LS(subjectName, pname, sessionFolders{i,1});
+% 				
+% 				% If the acquisition does exist then just copy it from other
+% 				% file and updated parameter
+% 			elseif ~exist(fullfile(pname, 'acquisition.xml'), 'file') && i ~= 1
+% 				fileSource = [fName, filesep, sessionFolders{1}, filesep, 'acquisition.xml'];
+% 				addpath('/Users/s2921887/Google Drive/LS_main_data_collection/DataProcessing-master/src/c3dProcessing/MOtoNMS-master/src/shared');
+% 				copyfile(fileSource, c3dFile_folder)
+% 				cd(pname);
+% 				acquisitionInfo=xml_read(fullfile(pname, 'acquisition.xml'));
+% 				% Update acquisition date and save
+% 				acquisitionInfo.AcquisitionDate = sessionFolders{i};
+% 				xml_write('acquisition.xml' , acquisitionInfo);
+% 				
+% 			else
+% 				% It exists so continue happily
+% 				fprintf('acquisition.xml already exist in folder: %s,\nContinuing with analysis...\n', pname);
+% 			end
 			
 			%% --- MERGE EMG IF COLLECTED INTO A TXT FILE --- %%
 			
-			% Search inputData folder for txt files
-			if ~isempty(fieldnames(txtFiles))
-				% Merge EMG data if txt files exist
-				mergeEmgMain(pname, c3dFiles, txtFiles, physFolderName)
-			else
-				% If not merging then continue with analysis
-				disp('No text files exist in this session, continuing with analysis...');
-			end
+% 			% Search inputData folder for txt files
+% 			if ~isempty(fieldnames(txtFiles))
+% 				% Merge EMG data if txt files exist
+% 				mergeEmgMain(pname, c3dFiles, txtFiles, physFolderName)
+% 			else
+% 				% If not merging then continue with analysis
+% 				disp('No text files exist in this session, continuing with analysis...');
+% 			end
 			
-			%% --- RUN MOtoNMS C3D2BTK AND RENAME EMG CHANNELS --- %%
+			%% --- RUN MOtoNMS C3D2MAT AND RENAME EMG CHANNELS --- %%
 			
 			% Navigate to directory where function is
 			cd([motoDir, filesep, 'src' filesep, 'C3D2MAT_btk']);
 			% Run c3d2mat
 			
-			if ~exist(fullfile(regexprep(pname, 'InputData', 'ElaboratedData'), 'sessionData'), 'dir');
+			if ~exist(fullfile(regexprep(pname, 'InputData', 'ElaboratedData'), 'sessionData'), 'dir')
 				C3D2MAT(fName, c3dFiles, pname);
 			end
-			
-			% Replace emg analog labels
-			replaceAnalogLabels(pname);
+
+% 			% Replace emg analog labels
+% 			replaceAnalogLabels(pname);
 			
 			%% --- LOAD AND PROCESS C3D FILES IN THE ACQUISITION SESSION --- %%
 			

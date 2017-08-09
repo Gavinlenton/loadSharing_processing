@@ -26,8 +26,8 @@ function []=plotResultsMultipleTrials_LS(resultsPath, elabDataFolder, trialsList
 
 close all
 
-subject_weight = varargin{1};
-subject_name = regexprep(varargin{2}, ' ', '_');
+% subject_weight = varargin{1};
+% subject_name = regexprep(varargin{2}, ' ', '_');
 condition_name = varargin{3};
 
 % Define path names to save data - load if it alrady exists.
@@ -66,94 +66,94 @@ end
 
 dirRemoved = 0;
 
-% %Load data
-% for k=1:length(trialsList)
-%      
-%      folder_trial = [resultsPath trialsList{k} filesep];
-%      
-%      if exist([folder_trial, filename], 'file')
-%           
-%           % Import data
-%           file=importdata([folder_trial, filename]);
-%           
-%           if nargin>4
-%                
-%                coord_idx=findIndexes(file.colheaders,Yquantities);
-%           else
-%                Yquantities=file.colheaders(2:end); %take all columns except time
-%                coord_idx=[2:size(file.colheaders,2)];
-%           end
-%           
-%           %% CHECK THE FILENAMES FOR BOTH IK AND ID
-%           
-%           results = file.data;
-%           
-%           % Normalising moments to body weight
-%           if strcmp(filename,'inverse_dynamics.sto')
-%                results(:, 2:end) = results(:, 2:end)./subject_weight;
-%           end
-%           
-%           for j =1: length(coord_idx)
-%                
-%                coordCol=coord_idx(j);
-%                
-%                y{k,j} = results(:,coordCol);
-%                
-%           end
-%           
-%           timeVector{k}=getXaxis(x, results);
-%      else
+%Load data
+for k=1:length(trialsList)
+     
+     folder_trial = [resultsPath trialsList{k} filesep];
+     
+     if exist([folder_trial, filename], 'file')
+          
+          % Import data
+          file=importdata([folder_trial, filename]);
+          
+          if nargin>4
+               
+               coord_idx=findIndexes(file.colheaders,Yquantities);
+          else
+               Yquantities=file.colheaders(2:end); %take all columns except time
+               coord_idx=[2:size(file.colheaders,2)];
+          end
+          
+          %% CHECK THE FILENAMES FOR BOTH IK AND ID
+          
+          results = file.data;
+          
+          % Normalising moments to body weight
+          if strcmp(filename,'inverse_dynamics.sto')
+               results(:, 2:end) = results(:, 2:end)./subject_weight;
+          end
+          
+          for j =1: length(coord_idx)
+               
+               coordCol=coord_idx(j);
+               
+               y{k,j} = results(:,coordCol);
+               
+          end
+          
+          timeVector{k}=getXaxis(x, results);
+     else
 %           rmdir([resultsPath, filesep, trialsList{k}], 's');
-%           dirRemoved = dirRemoved + 1;
-%      end
-% end
-% 
-% % Remove the deleted trials from the cell matrix
-% [sizeR, sizeC] = size(y);
-% sizeR_deletedRows = sizeR - dirRemoved;
-% 
-% % Remove any nonzero
-% yNew = y(~cellfun('isempty',y));
-% yLength = length(yNew);
-% difference = yLength/length(Yquantities) - sizeR_deletedRows;
-% 
-% if difference ~= 0
-%      sizeR_deletedRows = sizeR_deletedRows + difference;
-% end
-% 
-% y = reshape(yNew, [sizeR_deletedRows, sizeC]);
-% 
-% %Save data in mat format
-% save([metricsPath, AnalysisName], 'y');
+          dirRemoved = dirRemoved + 1;
+     end
+end
 
-% save([figurePath, 'plottedData'], 'y')
-%
-% % Settings for plot
-% plotLabels=regexprep(Yquantities, '_', ' ');
-% legendLabels=regexprep(trialsList, '_', ' ');
-% cmap = colormap(parula(180));
-% plotTitle = filename;
-%
-% for k=1:size(y,1)
-%
-% 	plotColor = cmap(round(1+5.5*(k-1)),:);
-%
-% 	for j=1:size(y,2)
-%
-% 		h(j)=figure(j);
-%
-% 		plot(timeVector{k}, y{k,j},'Color',plotColor)
-% 		hold on
-%
-% 		xlabel(x)
-% 		ylabel([plotLabels(j)])
-% 		warning off
-% 		legend(legendLabels)
-% 		title(filename)
-%
-% 		saveas(h(j),[figurePath  Yquantities{j} '.fig'])
-% 	end
-% end
+% Remove the deleted trials from the cell matrix
+[sizeR, sizeC] = size(y);
+sizeR_deletedRows = sizeR - dirRemoved;
+
+% Remove any nonzero
+yNew = y(~cellfun('isempty',y));
+yLength = length(yNew);
+difference = yLength/length(Yquantities) - sizeR_deletedRows;
+
+if difference ~= 0
+     sizeR_deletedRows = sizeR_deletedRows + difference;
+end
+
+y = reshape(yNew, [sizeR_deletedRows, sizeC]);
+
+%Save data in mat format
+save([metricsPath, AnalysisName], 'y');
+
+save([figurePath, 'plottedData'], 'y')
+
+% Settings for plot
+plotLabels=regexprep(Yquantities, '_', ' ');
+legendLabels=regexprep(trialsList, '_', ' ');
+cmap = colormap(parula(180));
+plotTitle = filename;
+
+for k=1:size(y,1)
+
+	plotColor = cmap(round(1+5.5*(k-1)),:);
+
+	for j=1:size(y,2)
+
+		h(j)=figure(j);
+
+		plot(timeVector{k}, y{k,j},'Color',plotColor)
+		hold on
+
+		xlabel(x)
+		ylabel([plotLabels(j)])
+		warning off
+		legend(legendLabels)
+		title(filename)
+
+		saveas(h(j),[figurePath  Yquantities{j} '.fig'])
+	end
+end
 
 % After deleting bad data calculate the means and save to a structure
 headers = Yquantities;
@@ -163,45 +163,60 @@ headers = Yquantities;
 dt = 1/100;
 
 % Elab folder name
-elab_folder_index = regexp(metricsPath, 'Subject');
-elab_folder = metricsPath(1:elab_folder_index-1);
+% elab_folder_index = regexp(metricsPath, 'Subject');
+% elab_folder = metricsPath(1:elab_folder_index-1);
 
-%% Re-write this section to load kinematics data - and also compute joint
-% powers - save same metrics for joint kinematics, moments, and joint
-% powers data %%
-
-if exist([elabDataFolder, 'fatigueComparison.mat'], 'file')
-	load([elabDataFolder, 'fatigueComparison.mat']);
+if exist([elabDataFolder, 'fatigueComparisonID.mat'], 'file')
+	load([elabDataFolder, 'fatigueComparisonID.mat']);
+	load([elabDataFolder, 'fatigueComparisonIK.mat']);
 else
 	allData = [];
+	allDataIK = [];
 end
 	
-% Load the file name
-data4Analysis = load([metricsPath, AnalysisName]);
-trialNum = size(data4Analysis.y, 1);
-middleTrialIndex = floor(trialNum/2);
+% Load the file name and info for ID trials
+
+data4AnalysisID = load([metricsPath, AnalysisName]);
+trialNumID = size(data4AnalysisID.y, 1);
+middleTrialIndexID = floor(trialNumID/2);
+
+% Do the same for IK trials
+AnalysisNameIK = [condition_name, '_IK_raw_data'];
+data4AnalysisIK = load([elabDataFolder 'AnalysedData' filesep 'Angles' filesep AnalysisNameIK]);
+trialNumIK = size(data4AnalysisIK.y, 1);
+middleTrialIndexIK = floor(trialNumIK/2);
 
 % Put the metrics in a structure
 for dof = 1:length(headers)
 	
 	% 	stepTime = [];
 	% Loop through good trials
-	for trial = 1:trialNum
+	for trial = 1:trialNumID
 		
 		% Early trials
 		while trial < 3
 			
 			% Combine data into array - resample if necessary
 			% If it doesn't equal 101 then resample
-			if length(data4Analysis.y{trial, dof}) ~= 101
-				allData.(condition_name).(headers{dof}).('early')(:,trial) = resample(data4Analysis.y{trial, dof}, 101, length(data4Analysis.y{trial, dof}), 0);
+			if length(data4AnalysisID.y{trial, dof}) ~= 101
+				allData.(condition_name).(headers{dof}).('early')(:,trial) = resample(data4AnalysisID.y{trial, dof}, 101, length(data4AnalysisID.y{trial, dof}), 0);
+				allDataIK.(condition_name).(headers{dof}).('early')(:,trial) = resample(data4AnalysisIK.y{trial, dof}, 101, length(data4AnalysisIK.y{trial, dof}), 0);
 			else
-				allData.(condition_name).(headers{dof}).('early')(:,trial) = data4Analysis.y{trial,dof};
+				allData.(condition_name).(headers{dof}).('early')(:,trial) = data4AnalysisID.y{trial,dof};
+				allDataIK.(condition_name).(headers{dof}).('early')(:,trial) = data4AnalysisIK.y{trial,dof};
 			end
+			
+			% Get joint angular velocity and compute joint powers
+			allData.(condition_name).([headers{dof}(1:end-7), '_power']).('early')(:,trial) = gradient(allDataIK.(condition_name).(headers{dof}).('early')(:,trial)...
+				,dt)*(pi/180) .* allData.(condition_name).(headers{dof}).('early')(:,trial);
 			
 			% Get average
 			if trial  == 2
 				allData.(condition_name).(headers{dof}).('earlyMean') = lpfilter(mean(allData.(condition_name).(headers{dof}).('early')(:,:), 2),...
+					8, dt, 'butter');
+				allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean') = lpfilter(mean(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('early')(:,:), 2),...
+					8, dt, 'butter');
+				allDataIK.(condition_name).(headers{dof}).('earlyMean') = lpfilter(mean(allDataIK.(condition_name).(headers{dof}).('early')(:,:), 2),...
 					8, dt, 'butter');
 				
 				% Find peaks
@@ -209,34 +224,71 @@ for dof = 1:length(headers)
 					flex_peak = max(allData.(condition_name).(headers{dof}).('earlyMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('earlyMean'));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean'));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('earlyMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('earlyMean'));
+					
 					allData.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peak, ext_peak];
+					allDataIK.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peakIK, ext_peakIK];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyPeaks') = [flex_peakPower, ext_peakPower];
 					
 				elseif strcmp(headers{dof}, 'knee_angle_r_moment')
 					flex_peak = max(allData.(condition_name).(headers{dof}).('earlyMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('earlyMean')(1:50));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean')(1:50));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('earlyMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('earlyMean')(1:50));
+					
 					allData.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyPeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peakIK, ext_peakIK];
 					
 				elseif strcmp(headers{dof}, 'ankle_angle_r_moment')
 					ext_peak = max(allData.(condition_name).(headers{dof}).('earlyMean'));
 					flex_peak = min(allData.(condition_name).(headers{dof}).('earlyMean'));
 					
+					ext_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean'));
+					flex_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyMean'));
+					
+					ext_peakIK = max(allDataIK.(condition_name).(headers{dof}).('earlyMean'));
+					flex_peakIK = min(allDataIK.(condition_name).(headers{dof}).('earlyMean'));
+					
 					allData.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peak, ext_peak];
+					allDataIK.(condition_name).(headers{dof}).('earlyPeaks') = [flex_peakIK, ext_peakIK];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('earlyPeaks') = [flex_peakPower, ext_peakPower];
+					
 				end
 			end
 			break
 		end
 		
 		% Middle trials
-		while trial > 2 && trial >= middleTrialIndex && trial < middleTrialIndex+2
-			if length(data4Analysis.y{trial, dof}) ~= 101
-				allData.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndex+1) = resample(data4Analysis.y{trial, dof}, 101, length(data4Analysis.y{trial, dof}), 0);
+		while trial > 2 && trial >= middleTrialIndexID && trial < middleTrialIndexID+2
+			if length(data4AnalysisID.y{trial, dof}) ~= 101
+				allData.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1) = resample(data4AnalysisID.y{trial, dof}, 101, length(data4AnalysisID.y{trial, dof}), 0);
+				allDataIK.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1) = resample(data4AnalysisIK.y{trial, dof}, 101, length(data4AnalysisIK.y{trial, dof}), 0);
+				
 			else
-				allData.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndex+1) = data4Analysis.y{trial,dof};
+				allData.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1) = data4AnalysisID.y{trial,dof};
+				allDataIK.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1) = data4AnalysisIK.y{trial,dof};
 			end
+			
+			% Get joint angular velocity and compute joint powers
+			allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middle')(:,trial-middleTrialIndexID+1) = gradient(allDataIK.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1)...
+				,dt)*(pi/180) .* allData.(condition_name).(headers{dof}).('middle')(:,trial-middleTrialIndexID+1);
+			
 			% Get mean of the two trials
-			if trial  == middleTrialIndex+1
+			if trial  == middleTrialIndexID+1
 				allData.(condition_name).(headers{dof}).('middleMean') = lpfilter(mean(allData.(condition_name).(headers{dof}).('middle')(:,:), 2),...
+					8, dt, 'butter');
+				allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean') = lpfilter(mean(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middle')(:,:), 2),...
+					8, dt, 'butter');
+				allDataIK.(condition_name).(headers{dof}).('middleMean') = lpfilter(mean(allDataIK.(condition_name).(headers{dof}).('middle')(:,:), 2),...
 					8, dt, 'butter');
 				
 				% Find peaks
@@ -244,19 +296,43 @@ for dof = 1:length(headers)
 					flex_peak = max(allData.(condition_name).(headers{dof}).('middleMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('middleMean'));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean'));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('middleMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('middleMean'));
+					
 					allData.(condition_name).(headers{dof}).('middlePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middlePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('middlePeaks') = [flex_peakIK, ext_peakIK];
 					
 				elseif strcmp(headers{dof}, 'knee_angle_r_moment')
 					flex_peak = max(allData.(condition_name).(headers{dof}).('middleMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('middleMean')(1:50));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean')(1:50));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('middleMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('middleMean')(1:50));
+					
 					allData.(condition_name).(headers{dof}).('middlePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middlePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('middlePeaks') = [flex_peakIK, ext_peakIK];
 					
 				elseif strcmp(headers{dof}, 'ankle_angle_r_moment')
 					ext_peak = max(allData.(condition_name).(headers{dof}).('middleMean'));
 					flex_peak = min(allData.(condition_name).(headers{dof}).('middleMean'));
 					
+					ext_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean'));
+					flex_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middleMean'));
+					
+					ext_peakIK = max(allDataIK.(condition_name).(headers{dof}).('middleMean'));
+					flex_peakIK = min(allDataIK.(condition_name).(headers{dof}).('middleMean'));
+					
 					allData.(condition_name).(headers{dof}).('middlePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('middlePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('middlePeaks') = [flex_peakIK, ext_peakIK];
 				end
 			end
 			
@@ -264,25 +340,41 @@ for dof = 1:length(headers)
 		end
 		
 		% End trials
-		while trial >= trialNum - 1
+		while trial >= trialNumID - 1
 			
-			if trial < trialNum
-				if length(data4Analysis.y{trial, dof}) ~= 101
-					allData.(condition_name).(headers{dof}).('late')(:,trialNum-trial) = resample(data4Analysis.y{trial, dof}, 101, length(data4Analysis.y{trial, dof}), 0);
+			if trial < trialNumID
+				if length(data4AnalysisID.y{trial, dof}) ~= 101
+					allData.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1) = resample(data4AnalysisID.y{trial, dof}, 101, length(data4AnalysisID.y{trial, dof}), 0);
+					allDataIK.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1) = resample(data4AnalysisIK.y{trial, dof}, 101, length(data4AnalysisIK.y{trial, dof}), 0);
 				else
-					allData.(condition_name).(headers{dof}).('late')(:,trialNum-trial) = data4Analysis.y{trial,dof};
+					allData.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1) = data4AnalysisID.y{trial,dof};
+					allDataIK.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1) = data4AnalysisIK.y{trial,dof};
 				end
 				
+				% Get joint angular velocity and compute joint powers
+				allData.(condition_name).([headers{dof}(1:end-7), '_power']).('late')(:,trialNumID-trial+1) = gradient(allDataIK.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1)...
+					,dt)*(pi/180) .* allData.(condition_name).(headers{dof}).('late')(:,trialNumID-trial+1);
 			else
-				if length(data4Analysis.y{trial, dof}) ~= 101
-					allData.(condition_name).(headers{dof}).('late')(:,trial- trialNum+1) = resample(data4Analysis.y{trial, dof}, 101, length(data4Analysis.y{trial, dof}), 0);
+				if length(data4AnalysisID.y{trial, dof}) ~= 101 || length(data4AnalysisIK.y{trial, dof}) ~= 101
+					allData.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1) = resample(data4AnalysisID.y{trial, dof}, 101, length(data4AnalysisID.y{trial, dof}), 0);
+					allDataIK.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1) = resample(data4AnalysisIK.y{trial, dof}, 101, length(data4AnalysisIK.y{trial, dof}), 0);
 				else
-					allData.(condition_name).(headers{dof}).('late')(:,trial- trialNum+1) = data4Analysis.y{trial,dof};
+					allData.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1) = data4AnalysisID.y{trial,dof};
+					allDataIK.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1) = data4AnalysisIK.y{trial,dof};
 				end
+				
+				% Get joint angular velocity and compute joint powers
+				allData.(condition_name).([headers{dof}(1:end-7), '_power']).('late')(:,trial- trialNumID+1) = gradient(allDataIK.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1)...
+					,dt)*(pi/180) .* allData.(condition_name).(headers{dof}).('late')(:,trial- trialNumID+1);
 			end
+			
 			% Get mean of the two trials
-			if trial  == trialNum
+			if trial  == trialNumID
 				allData.(condition_name).(headers{dof}).('lateMean') = lpfilter(mean(allData.(condition_name).(headers{dof}).('late')(:,:), 2),...
+					8, dt, 'butter');
+				allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean') = lpfilter(mean(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('late')(:,:), 2),...
+					8, dt, 'butter');
+				allDataIK.(condition_name).(headers{dof}).('lateMean') = lpfilter(mean(allDataIK.(condition_name).(headers{dof}).('late')(:,:), 2),...
 					8, dt, 'butter');
 				
 				% Find peaks
@@ -290,19 +382,43 @@ for dof = 1:length(headers)
 					flex_peak = max(allData.(condition_name).(headers{dof}).('lateMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('lateMean'));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean'));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('lateMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('lateMean'));
+					
 					allData.(condition_name).(headers{dof}).('latePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('latePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('latePeaks') = [flex_peakIK, ext_peakIK];
 					
 				elseif strcmp(headers{dof}, 'knee_angle_r_moment')
 					flex_peak = max(allData.(condition_name).(headers{dof}).('lateMean'));
 					ext_peak = min(allData.(condition_name).(headers{dof}).('lateMean')(1:50));
 					
+					flex_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean'));
+					ext_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean')(1:50));
+					
+					flex_peakIK = max(allDataIK.(condition_name).(headers{dof}).('lateMean'));
+					ext_peakIK = min(allDataIK.(condition_name).(headers{dof}).('lateMean')(1:50));
+					
 					allData.(condition_name).(headers{dof}).('latePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('latePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('latePeaks') = [flex_peakIK, ext_peakIK];
 					
 				elseif strcmp(headers{dof}, 'ankle_angle_r_moment')
 					ext_peak = max(allData.(condition_name).(headers{dof}).('lateMean'));
 					flex_peak = min(allData.(condition_name).(headers{dof}).('lateMean'));
 					
+					ext_peakPower = max(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean'));
+					flex_peakPower = min(allData.(condition_name).([headers{dof}(1:end-7), '_power']).('lateMean'));
+					
+					ext_peakIK = max(allDataIK.(condition_name).(headers{dof}).('lateMean'));
+					flex_peakIK = min(allDataIK.(condition_name).(headers{dof}).('lateMean'));
+					
 					allData.(condition_name).(headers{dof}).('latePeaks') = [flex_peak, ext_peak];
+					allData.(condition_name).([headers{dof}(1:end-7), '_power']).('latePeaks') = [flex_peakPower, ext_peakPower];
+					allDataIK.(condition_name).(headers{dof}).('latePeaks') = [flex_peakIK, ext_peakIK];
 				end
 			end
 			break
@@ -328,7 +444,8 @@ for dof = 1:length(headers)
 end
 	 
 % Save all to file
-save([elabDataFolder, 'fatigueComparison.mat'], 'allData');
+save([elabDataFolder, 'fatigueComparisonID.mat'], 'allData');
+save([elabDataFolder, 'fatigueComparisonIK.mat'], 'allDataIK');
 
 cd(elabDataFolder);
 

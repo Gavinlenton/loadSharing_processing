@@ -275,8 +275,8 @@ isub = [subsdir(:).isdir]; %# returns logical vector of subdirectories
 subjectNames = {subsdir(isub).name}';
 SF = contains(subjectNames, {'Subject'});
 subjectNames(~SF)=[];
-SF14 = contains(subjectNames, {'Subject 14'});
-subjectNames(SF14)=[];
+% SF14 = contains(subjectNames, {'Subject 14'});
+% subjectNames(SF14)=[];
 
 % Loop through subjects
 for subjects = 1:length(subjectNames)
@@ -287,9 +287,9 @@ for subjects = 1:length(subjectNames)
 	sessionFolders(ismember(sessionFolders,{'.','..', 'ROM', 'AnalysedData', 'Figures'}))=[]; % dynamic subject folders
 	
 	% Break if the file already exists
-	if exist([BasePath, filesep, subjectNames{subjects}, filesep 'fatigueComparison.mat'], 'file')
-		continue
-	end
+% 	if exist([BasePath, filesep, subjectNames{subjects}, filesep 'fatigueComparison.mat'], 'file')
+% 		continue
+% 	end
 	
 	for folder = 1:length(sessionFolders)
 		sessionName = [BasePath, filesep, subjectNames{subjects}, filesep, sessionFolders{folder}];
@@ -299,8 +299,8 @@ for subjects = 1:length(subjectNames)
 		trialsFolders(ismember(trialsFolders,{'.','..', 'KneeFJC1_Processed', 'KneeFJC2_Processed'}))=[]; % dynamic trials folders
 		
 		% Edited this for fatigue analysis just to include 30 kg fast walking trials
-		TF = contains(trialsFolders, {'30_fast'});
-		trialsFolders(~TF)=[];
+% 		TF = contains(trialsFolders, {'30_fast'});
+% 		trialsFolders(~TF)=[];
 		% Select the .osim model
 		%      [genericModelID,genericModelPath]=uigetfile([sessionName, filesep,...
 		%           'staticElaborations', filesep, '*.osim'],...
@@ -314,9 +314,23 @@ for subjects = 1:length(subjectNames)
 			% Plot the kinematics result
 			%plotKinematics(sessionName, model_file_kneeUnlocked);
 			
-			% Plot the joint moments
-			plotMoments(sessionName, model_file_kneeUnlocked, [sessionName, filesep, 'inverseDynamics', filesep...
-				trialsFolders{trials}(1:end-10)]);
+			% Folder names for IK and ID
+			folderNameID = [sessionName, filesep, 'inverseDynamics', filesep...
+				trialsFolders{trials}(1:end-10)];
+			% 			folderNameIK = [sessionName, filesep, 'inverseKinematics', filesep...
+			% 				trialsFolders{trials}(1:end-10)];
+			
+			folderNamePK = [sessionName, filesep, 'kinematicsAnalysis', filesep...
+				trialsFolders{trials}(1:end-10)];
+			
+			folderNameGRFs = [sessionName, filesep, 'dynamicElaborations', filesep...
+				trialsFolders{trials}];
+			
+			% Run the data analysis for ID and IK
+			%plotMoments(sessionName, model_file_kneeUnlocked, folderNameID);
+			%plotPointKinematics(sessionName, folderNamePK)
+			
+			plotGRFs(sessionName, folderNameGRFs)
 			
 			% Plot the EMG data and save as .mat files
 			% 	loadPlotEMG(sessionName, fName);
@@ -324,324 +338,4 @@ for subjects = 1:length(subjectNames)
 		
 	end
 end
-
-%% Something I'm brewing
-
-cd('/Users/s2921887/Google Drive/LS_main_data_collection/ElaboratedData');
-load('fatigue_data_conditions.mat');
-
-conditions = fieldnames(conditionData);
-
-for i = 1:length(conditions)
-	conditionName = conditions{i};
-	dofs = fieldnames(conditionData.(conditionName));
-	
-	for k = 1:length(dofs)
-		
-		% Peaks
-		conditionData.(conditionName).(dofs{k}).earlyPeakMaxTrue = conditionData.(conditionName).(dofs{k}).earlyPeakMax...
-			(conditionData.(conditionName).(dofs{k}).earlyPeakMax~=0);
-		conditionData.(conditionName).(dofs{k}).earlyPeakMinTrue = conditionData.(conditionName).(dofs{k}).earlyPeakMin...
-			(conditionData.(conditionName).(dofs{k}).earlyPeakMin~=0);
-		conditionData.(conditionName).(dofs{k}).latePeakMaxTrue = conditionData.(conditionName).(dofs{k}).latePeakMax...
-			(conditionData.(conditionName).(dofs{k}).latePeakMax~=0);
-		conditionData.(conditionName).(dofs{k}).latePeakMinTrue = conditionData.(conditionName).(dofs{k}).latePeakMin...
-			(conditionData.(conditionName).(dofs{k}).latePeakMin~=0);
-		
-		% Waveforms
-		conditionData.(conditionName).(dofs{k}).earlyTrue = conditionData.(conditionName).(dofs{k}).early...
-			(conditionData.(conditionName).(dofs{k}).early~=0);
-		conditionData.(conditionName).(dofs{k}).earlyTrue =...
-			reshape(conditionData.(conditionName).(dofs{k}).earlyTrue, 101, length(conditionData.(conditionName).(dofs{k}).earlyPeakMaxTrue));
-		conditionData.(conditionName).(dofs{k}).lateTrue = conditionData.(conditionName).(dofs{k}).late...
-			(conditionData.(conditionName).(dofs{k}).late~=0);
-		conditionData.(conditionName).(dofs{k}).lateTrue =...
-			reshape(conditionData.(conditionName).(dofs{k}).lateTrue, 101, length(conditionData.(conditionName).(dofs{k}).earlyPeakMaxTrue));
-		
-		conditionData.(conditionName).(dofs{k}).early_mean = mean(conditionData.(conditionName).(dofs{k}).earlyTrue, 2);
-		conditionData.(conditionName).(dofs{k}).early_SD = std(conditionData.(conditionName).(dofs{k}).earlyTrue', 1)';
-		conditionData.(conditionName).(dofs{k}).late_mean = mean(conditionData.(conditionName).(dofs{k}).lateTrue, 2);
-		conditionData.(conditionName).(dofs{k}).late_SD = std(conditionData.(conditionName).(dofs{k}).lateTrue', 1)';
-		
-	end
-end
-
-conditionData.SORD30_fast.knee_angle_r_moment.latePeakMaxTrue(7)  = 0.6;
-conditionData.SORD30_fast.knee_angle_r_moment.latePeakMaxTrue(1)  = 1.8;
-
-%% Cleanup
-vars.knee_angle_r.NA_mean(end-4:end) = abs(vars.knee_angle_r.NA_mean(end-4:end));
-vars.knee_angle_r.light_mean(end-4:end) = abs(vars.knee_angle_r.light_mean(end-4:end));
-vars.knee_angle_r.heavy_mean(end-4:end) = abs(vars.knee_angle_r.heavy_mean(end-4:end));
-
-vars.ankle_angle_r_moment.NA_mean(18:38) = vars.ankle_angle_r_moment.NA_mean(18:38)-0.2;
-vars.ankle_angle_r_moment.NA_mean(26:41) = vars.ankle_angle_r_moment.NA_mean(26:41)-0.2;
-vars.ankle_angle_r_moment.light_mean(18:38) = vars.ankle_angle_r_moment.light_mean(18:38)-0.3;
-vars.ankle_angle_r_moment.light_mean(26:41) = vars.ankle_angle_r_moment.light_mean(26:41)-0.3;
-vars.ankle_angle_r_moment.heavy_mean(18:38) = vars.ankle_angle_r_moment.heavy_mean(18:38)-0.4;
-vars.ankle_angle_r_moment.heavy_mean(26:41) = vars.ankle_angle_r_moment.heavy_mean(26:41)-0.4;
-
-vars.knee_angle_r_moment.NA_mean(5:25) = vars.knee_angle_r_moment.NA_mean(5:25)-0.4;
-vars.knee_angle_r_moment.NA_mean = resample(vars.knee_angle_r_moment.NA_mean(3:end-8), 98, length(vars.knee_angle_r_moment.NA_mean(3:end-8)), 0);
-vars.knee_angle_r_moment.light_mean(5:25) = vars.knee_angle_r_moment.light_mean(5:25)-0.4;
-vars.knee_angle_r_moment.light_mean = resample(vars.knee_angle_r_moment.light_mean(3:end-8), 98, length(vars.knee_angle_r_moment.light_mean(3:end-8)), 0);
-vars.knee_angle_r_moment.heavy_mean(5:25) = vars.knee_angle_r_moment.heavy_mean(5:25)-0.4;
-vars.knee_angle_r_moment.heavy_mean = resample(vars.knee_angle_r_moment.heavy_mean(3:end-8), 98, length(vars.knee_angle_r_moment.heavy_mean(3:end-8)), 0);
-
-vars.hip_flexion_r_moment.NA_mean = resample(vars.hip_flexion_r_moment.NA_mean(1:end-8), 98, length(vars.hip_flexion_r_moment.NA_mean(1:end-8)), 0);
-vars.hip_flexion_r_moment.light_mean = resample(vars.hip_flexion_r_moment.light_mean(1:end-8), 98, length(vars.hip_flexion_r_moment.light_mean(1:end-8)), 0);
-vars.hip_flexion_r_moment.heavy_mean = resample(vars.hip_flexion_r_moment.heavy_mean(1:end-8), 98, length(vars.hip_flexion_r_moment.heavy_mean(1:end-8)), 0);
-
-%% Plots
-plotNumber = tight_subplot(2,3,[.05 .03],[.15 .1],[.07 .03]);
-
-massLabels = {'Early';'Late'};
-massNames = {'early_mean'; 'late_mean'};
-sdMassNames = {'early_SD'; 'late_SD'};
-
-cmap = [0,0.7,1; 0,1,0; 1,0,0];
-
-% Ankle
-axes(plotNumber(3))
-
-% Plot of moments for CRYE30 and ankle
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = '-';
-		plotColor = cmap(2, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(3, :);
-	end
-	a1 = plot(matfiltfilt(0.01, 6, 4, conditionData.(conditions{1}).(dofs{3}).(massNames{mName})), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (conditionData.(conditions{1}).(dofs{3}).(massNames{mName}) + conditionData.(conditions{1}).(dofs{3}).(sdMassNames{mName})));
-	lower = matfiltfilt(0.01, 6, 4, (conditionData.(conditions{1}).(dofs{3}).(massNames{mName}) - conditionData.(conditions{1}).(dofs{3}).(sdMassNames{mName})));
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-end
-t4 = title({'plantarflexion (+)       dorsiflexion (-)'}); set(t4, 'FontSize', 14, 'Color', [0 0 0]);
-x1 = xlabel('Gait Cycle (%)'); set(x1, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-0.5, 2.5], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-0.5,2.5], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-0.5,2.5], ':', 'Color', [0.2 0.2 0.2], 'LineWidth', 1.5);
-plot([62.4,62.4], [-0.5,2.5], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-
-axes(plotNumber(6))
-% Plot moments
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = ':';
-		plotColor = cmap(1, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(2, :);
-	else
-		linestyle = '-';
-		plotColor = cmap(3, :);
-	end
-	a2 = plot(matfiltfilt(0.01, 6, 4, (vars.(variables_mom{1}).(massNames{mName}))'*-1), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{1}).(massNames{mName}) + vars.(variables_mom{1}).(sdMassNames{mName}))')*-1;
-	lower = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{1}).(massNames{mName}) - vars.(variables_mom{1}).(sdMassNames{mName}))')*-1;
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-end
-t4 = title({'plantarflexion (+)       dorsiflexion (-)'}); set(t4, 'FontSize', 14, 'Color', [0 0 0]);
-x1 = xlabel('Gait Cycle (%)'); set(x1, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-0.5, 2.5], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-0.5,2.5], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-0.5,2.5], ':', 'Color', [0.2 0.2 0.2], 'LineWidth', 1.5);
-plot([62.4,62.4], [-0.5,2.5], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-
-% Knee
-axes(plotNumber(2))
-% Plot of angles
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = ':';
-		plotColor = cmap(1, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(2, :);
-	else
-		linestyle = '-';
-		plotColor = cmap(3, :);
-	end
-	k1 = plot(matfiltfilt(0.01, 6, 4, (vars.(variables_kin{6}).(massNames{mName}))'), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (vars.(variables_kin{6}).(massNames{mName}) + vars.(variables_kin{6}).(sdMassNames{mName}))');
-	lower = matfiltfilt(0.01, 6, 4, (vars.(variables_kin{6}).(massNames{mName}) - vars.(variables_kin{6}).(sdMassNames{mName}))');
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-end
-t2 = title({'Knee'; 'flexion (+)      extension (-)'}); set(t2, 'FontSize', 14, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xtick', [], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-5, 70], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-5,70], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-5,70], ':', 'Color', [0.1 0.1 0.1], 'LineWidth', 1.5);
-plot([62.4,62.4], [-5,70], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-
-% Plot moments
-axes(plotNumber(5))
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = ':';
-		plotColor = cmap(1, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(2, :);
-	else
-		linestyle = '-';
-		plotColor = cmap(3, :);
-	end
-	k2 = plot(matfiltfilt(0.01, 6, 4, (vars.(variables_mom{6}).(massNames{mName}))'*-1), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{6}).(massNames{mName}) + vars.(variables_mom{6}).(sdMassNames{mName}))')*-1;
-	lower = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{6}).(massNames{mName}) - vars.(variables_mom{6}).(sdMassNames{mName}))')*-1;
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-end
-t4 = title({'extension (+)       flexion (-)'}); set(t4, 'FontSize', 14, 'Color', [0 0 0]);
-x1 = xlabel('Gait Cycle (%)'); set(x1, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-1, 1], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-1,1], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-1,1], ':', 'Color', [0.2 0.2 0.2], 'LineWidth', 1.5);
-plot([62.4,62.4], [-1,1], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-
-% Hip
-axes(plotNumber(1))
-% Plot angles
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = ':';
-		plotColor = cmap(1, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(2, :);
-	else
-		linestyle = '-';
-		plotColor = cmap(3, :);
-	end
-	h1 = plot(matfiltfilt(0.01, 6, 4, (vars.(variables_kin{3}).(massNames{mName}))'), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (vars.(variables_kin{3}).(massNames{mName}) + vars.(variables_kin{3}).(sdMassNames{mName}))');
-	lower = matfiltfilt(0.01, 6, 4, (vars.(variables_kin{3}).(massNames{mName}) - vars.(variables_kin{3}).(sdMassNames{mName}))');
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-	% Make it so the SDs won't appear in legend
-	set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-end
-t3 = title({'Hip'; 'flexion (+)      extension (-)'}); set(t3, 'FontSize', 14, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xtick', [], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-30, 50], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-30,50], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-30,50], ':', 'Color', [0.2 0.2 0.2], 'LineWidth', 1.5);
-plot([62.4,62.4], [-30,50], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-y = ylabel({'Angle (deg)'}); set(y, 'Position', [-8.5, 6, 0], 'Color', [0 0 0]);
-l = legend(massLabels, 'Location', 'south', 'box', 'off', 'orientation', 'horizontal', 'fontsize', 16, 'TextColor', [0 0 0]);
-
-% Plot of moments
-axes(plotNumber(4))
-for mName = 1:length(massLabels)
-	%plotColor = cmap(round(10+100*(mName-1)),:);
-	% Define line styles and colour
-	if mName == 1
-		linestyle = ':';
-		plotColor = cmap(1, :);
-	elseif mName == 2
-		linestyle = '--';
-		plotColor = cmap(2, :);
-	else
-		linestyle = '-';
-		plotColor = cmap(3, :);
-	end
-	h2 = plot(matfiltfilt(0.01, 6, 4, (vars.(variables_mom{3}).(massNames{mName}))'*-1), 'LineWidth', 1.5, 'Color',plotColor, 'LineStyle', linestyle);
-	hold on
-	% Plot SD
-	upper = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{3}).(massNames{mName}) + vars.(variables_mom{3}).(sdMassNames{mName}))')*-1;
-	lower = matfiltfilt(0.01, 6, 4, (vars.(variables_mom{3}).(massNames{mName}) - vars.(variables_mom{3}).(sdMassNames{mName}))')*-1;
-	x = 1:1:length(upper);
-	[ph,msg]=jbfill(x,lower', upper', plotColor, plotColor ,0,.1);
-end
-t4 = title({'extension (+)      flexion (-)'}); set(t4, 'FontSize', 14, 'Color', [0 0 0]);
-set(gca, 'xlim', [0,100], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [-1.5, 3], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-plot([60,60], [-2,3], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-plot([61.8,61.8], [-1.5,3], ':', 'Color', [0.2 0.2 0.2], 'LineWidth', 1.5);
-plot([62.4,62.4], [-1.5,3], '--', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
-y = ylabel({'Moment (N·m kg^-^1)'}); set(y, 'Position', [-8.5, 0.7, 0], 'Color', [0 0 0]);
-x1 = xlabel('Gait Cycle (%)'); set(x1, 'Color', [0 0 0]);
-
-%% Scatter plots
-plotNumber = tight_subplot(1,3,[.05 .03],[.15 .1],[.07 .03]);
-
-% Fit linear trendlines
-cmap = jet(255);
-legendLabels = {'CRYE', 'SORD', 'TBAS', 'TYR', 'USMC', 'CORE'};
-ticks = [0,1,2,3];
-xlim = [0,3];
-all_fits = [];
-dim = [0.25, 0.1, 0.25, 0.2];
-
-for t = 1:length(dofs)
-	axes(plotNumber(t))
-	for l = 1:6
-		
-		plotColour = cmap(l*30+30, :);
-		x = abs(conditionData.(conditions{l}).(dofs{t}).earlyPeakMaxTrue);
-		y = abs(conditionData.(conditions{l}).(dofs{t}).latePeakMaxTrue);
-		scatter(x,y, 'filled', 'MarkerFaceColor', plotColour)
-		hold on
-		if l == 6
-			coef_fit = polyfit(x,y,1);
-			all_fits = [all_fits, coef_fit(1)];
-			y_fit = polyval(coef_fit,xlim);
-			kk = plot(xlim,y_fit,'k');
-			txt1 = ['R^2 = ', num2str(coef_fit(1), '%6.2f')];
-			annotation('textbox', dim, 'String',txt1,'FitBoxToText','on', 'LineStyle', 'none');
-			% Make it so the SDs won't appear in legend
-			set(get(get(kk,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-			hold off
-		end
-	end
-	
-	if t == 1
-		set(gca, 'xlim', xlim, 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0],...
-			'ylim', [0, 3], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-		xticks(ticks(2:end));
-		yticks(ticks);
-		y = ylabel('Late Moments (N·m kg^-^1)'); set(y, 'Color', [0 0 0]);
-		% 		x1 = xlabel('Early Moments (N·m kg^-^1)'); set(x1, 'Color', [0 0 0]);
-		t1 = title({'Hip flexion'}); set(t1, 'FontSize', 14, 'Color', [0 0 0]);
-	elseif t == 2
-		set(gca, 'xlim', [0,3], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0],...
-			'ylim', [0, 3], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-		xticks(ticks(2:end));
-		yticks(ticks);
-		x2 = xlabel('Early Moments (N·m kg^-^1)'); set(x2, 'Color', [0 0 0]);
-		t2 = title({'Knee extension'}); set(t2, 'FontSize', 14, 'Color', [0 0 0]);
-	else
-		set(gca, 'xlim', [0,3], 'Color', [1 1 1], 'xcolor', [0 0 0], 'ycolor', [0 0 0], 'ylim', [0, 3], 'FontName', 'Calibri', 'FontSize', 14, 'box', 'off');
-		xticks(ticks(2:end));
-		yticks(ticks);
-		% 		x3 = xlabel('Early Moments (N·m kg^-^1)'); set(x3, 'Color', [0 0 0]);
-		t3 = title({'Ankle plantarflexion'}); set(t3, 'FontSize', 14, 'Color', [0 0 0]);
-	end
-	dim(1) = dim(1)+0.305;
-end
-l = legend(legendLabels, 'Location', 'south', 'box', 'off', 'orientation', 'vertical', 'fontsize', 14, 'TextColor', [0 0 0]);
-
 

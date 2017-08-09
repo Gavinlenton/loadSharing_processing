@@ -62,8 +62,8 @@ conditions = fieldnames(ID_metrics_ordered.(subjects{1}))';
 
 % Create structure to store outputs
 all_variables = fieldnames(ID_metrics_ordered.(subjects{1}).(conditions{1}));
-all_variables(ismember(all_variables,{'step_time', 'POWER_POS_TOTAL', 'POWER_NEG_TOTAL', 'lumbar_extension_moment',...
-	'lumbar_bending_moment', 'lumbar_rotation_moment'}))=[];
+%all_variables(ismember(all_variables,{'step_time', 'POWER_POS_TOTAL', 'POWER_NEG_TOTAL', 'lumbar_extension_moment',...
+	%'lumbar_bending_moment', 'lumbar_rotation_moment'}))=[];
 metrics_for_plot = struct();
 
 % Extract the variables of interest from the data
