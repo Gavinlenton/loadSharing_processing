@@ -187,17 +187,17 @@ for i = 1:length(data.fp_data.GRF_data)
 					% know it will be for the second (i.e., left) body.
 				elseif i == 1 && j == 2
 					
-					data.GRF.FP(j).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
-					data.GRF.FP(j).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
-					data.GRF.FP(j).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
+					data.GRF.FP(j).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
+					data.GRF.FP(j).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
+					data.GRF.FP(j).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
 					
 					% If force plate = 2 and it's the first force
 					% assignment we know that it's the left body toe-off
 				elseif i == 2 && j == 1
 					
-					data.GRF.FP(i).F(a,:) = lpfilter(data.fp_data.GRF_data(i).F(a,:),10,dt, 'damped');
-					data.GRF.FP(i).M(a,:) = lpfilter(data.fp_data.GRF_data(i).M(a,:),10,dt, 'damped');
-					data.GRF.FP(i).P(a,:) = lpfilter(data.fp_data.GRF_data(i).P(a,:),10,dt, 'damped');
+					data.GRF.FP(i).F(a,:) = data.fp_data.GRF_data(i).F(a,:);
+					data.GRF.FP(i).M(a,:) = data.fp_data.GRF_data(i).M(a,:);
+					data.GRF.FP(i).P(a,:) = data.fp_data.GRF_data(i).P(a,:);
 					
 					% If force plate = 2 and it's the second force
 					% assignment we know that it's the right body late

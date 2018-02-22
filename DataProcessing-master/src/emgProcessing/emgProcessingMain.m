@@ -45,17 +45,19 @@ if tf == 0
 		emgProcessingMaxMultiple('no', sessionData, dynamicFolders, motoDir);
 		disp('Max processing done, loading for EMG processing...');
 		
-		% Only run on waking trials - not kneeFJC trials
+		% Only run on walking trials - not kneeFJC trials
 		if ~strcmp(c3dFile_name(1:4), 'Knee')
 		[emgMax] = importMaxEMGFile(emgMaxFile);
 		emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+%  		emgProcessingLS_v2('no', sessionData, c3dFile_name(1:end-4), emgMax, motoDir, dynamicFolders);
 		end
 	
 	else
 		% Load max trial value and process
 		if ~strcmp(c3dFile_name(1:4), 'Knee')
 		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
-		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
+% 		emgProcessingLS_v2('no', sessionData, c3dFile_name(1:end-4), emgMax, motoDir, dynamicFolders);
+		emgProcessingLS('no', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
 		end
 	end
 	
@@ -71,6 +73,7 @@ else
 		
 		if ~strcmp(c3dFile_name(1:4), 'Knee')
 		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+% 		emgProcessingLS_v2('yes', sessionData, c3dFile_name(1:end-4), emgMax, motoDir, dynamicFolders);
 		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
 		end
 		
@@ -78,6 +81,7 @@ else
 		% Load max trial value and process
 		if ~strcmp(c3dFile_name(1:4), 'Knee')
 		[emgMax] = importMaxEMGFile([emgMaxFileLoc, filesep, 'maxEmg.txt']);
+% 		emgProcessingLS_v2('yes', sessionData, c3dFile_name(1:end-4), emgMax, motoDir, dynamicFolders);
 		emgProcessingLS('yes', sessionData, times, c3dFile_name(1:end-4), emgMax, motoDir);
 		end
 	end

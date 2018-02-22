@@ -34,8 +34,15 @@ dirRemoved = 0;
 %Load data
 for k=1:length(trialsList)
 	
-	folder_trial = [resultsPath filesep trialsList{k} filesep];
+	folder_trial = [resultsPath, filesep, trialsList{k} filesep];
 	
+	if ~exist(folder_trial, 'dir')
+		
+		disp(['no folder: ' folder_trial]);
+		dirRemoved = dirRemoved + 1;
+		continue
+	end
+		
 	for pk_result = 1:length(Yquantities)
 		
 		% Define filename
@@ -76,47 +83,55 @@ for k=1:length(trialsList)
 			
 			timeVector{k}= file.('time');
 		else
-			rmdir([resultsPath, filesep, trialsList{k}], 's');
-			dirRemoved = dirRemoved + 1;
+			error(['No folder specified for: ', subject_name, ', ', condition_name]);
 		end
 	end
 end
 
-% % Remove the deleted trials from the cell matrix
-% % Acc
-% [sizeR, sizeC] = size(pk_acc);
-% sizeR_deletedRows = sizeR - dirRemoved;
-% 
-% % Remove any nonzero
-% pk_accNew = pk_acc(~cellfun('isempty',pk_acc));
-% pk_accNewLength = length(pk_accNew);
-% difference = pk_accNewLength/length(Yquantities) - sizeR_deletedRows;
-% 
-% if difference ~= 0
-%      sizeR_deletedRows = sizeR_deletedRows + difference;
-% end
-% 
-% y = reshape(yNew, [sizeR_deletedRows, sizeC]);
-% 
-% % Vel
-% [sizeR, sizeC] = size(pk_vel);
-% sizeR_deletedRows = sizeR - dirRemoved;
-% 
-% 
-% % Disp
-% [sizeR, sizeC] = size(pk_pos);
-% sizeR_deletedRows = sizeR - dirRemoved;
-% 
-% % Remove any nonzero
-% yNew = y(~cellfun('isempty',y));
-% yLength = length(yNew);
-% difference = yLength/length(Yquantities) - sizeR_deletedRows;
-%
-% if difference ~= 0
-%      sizeR_deletedRows = sizeR_deletedRows + difference;
-% end
-%
-% y = reshape(yNew, [sizeR_deletedRows, sizeC]);
+% Remove the deleted trials from the cell matrix
+% Acc
+[sizeR, sizeC] = size(pk_acc);
+sizeR_deletedRows = sizeR - dirRemoved;
+
+% Remove any nonzero
+pk_accNew = pk_acc(~cellfun('isempty',pk_acc));
+pk_accNewLength = length(pk_accNew);
+difference = pk_accNewLength/sizeC - sizeR_deletedRows;
+
+if difference ~= 0
+     sizeR_deletedRows = sizeR_deletedRows + difference;
+end
+
+pk_acc = reshape(pk_accNew, [sizeR_deletedRows, sizeC]);
+
+% Vel
+[sizeR, sizeC] = size(pk_vel);
+sizeR_deletedRows = sizeR - dirRemoved;
+% Remove any nonzero
+pk_velNew = pk_vel(~cellfun('isempty',pk_vel));
+pk_velNewLength = length(pk_velNew);
+difference = pk_velNewLength/sizeC - sizeR_deletedRows;
+
+if difference ~= 0
+     sizeR_deletedRows = sizeR_deletedRows + difference;
+end
+
+pk_vel = reshape(pk_velNew, [sizeR_deletedRows, sizeC]);
+
+% Disp
+[sizeR, sizeC] = size(pk_pos);
+sizeR_deletedRows = sizeR - dirRemoved;
+
+% Remove any nonzero
+pk_posNew = pk_pos(~cellfun('isempty',pk_pos));
+pk_posLength = length(pk_posNew);
+difference = pk_posLength/sizeC - sizeR_deletedRows;
+
+if difference ~= 0
+     sizeR_deletedRows = sizeR_deletedRows + difference;
+end
+
+pk_pos = reshape(pk_posNew, [sizeR_deletedRows, sizeC]);
 
 %Save data in mat format
 y.acc = pk_acc; y.vel = pk_vel; y.pos = pk_pos;
@@ -139,7 +154,12 @@ else
 	massSystem = subject_weight;
 end
 
+% Changed based on whether subject name has 2 numbers or one
+if length(subject_name) == 10
+	elabFolder = elabDataFolder(1:end-11);
+else
 elabFolder = elabDataFolder(1:end-10);
+end
 
 % Load existing file
 cd(elabDataFolder);
@@ -163,7 +183,7 @@ for dof = 1:length(headers)
 	
 	% 	stepTime = [];
 	% Loop through good trials
-	for trial = 1:length(y.(headers{dof}))
+	for trial = 1:sizeR
 		
 		for axis = 1:3
 			% Combine data into array - resample if necessary
@@ -176,7 +196,7 @@ for dof = 1:length(headers)
 			end
 			
 			% If it's the final trial then compute the mean
-			if trial == length(y.(headers{dof}))
+			if trial == sizeR
 				
 				% Get summary stats of all trials
 				meanOfTrials = mean(allData.(headers{dof}).(axes{axis}), 2);
@@ -193,13 +213,12 @@ for dof = 1:length(headers)
 				PK_metrics.(subject_name).(condition_name).(headers{dof}).(axes{axis}).('mean')...
 					= meanOfTrials;
 				
-				% Determine vPosEquil - might have to add a condition if
-				% maxIndex>minIndex and vice-versa
+				% Determine vPosEquil
 				if dof == 3 && axis == 2 % Means that data is positional
 					
 					PK_metrics.(subject_name).(condition_name).(headers{dof}).(axes{axis}).('vPosMean')...
 						= mean(meanOfTrials(maxIndex: minIndex));
-					PK_metrics.(subject_name).(condition_name).('COM_disp_vert') = rangeResult;
+					PK_metrics.(subject_name).(condition_name).('range_COM_disp_vert') = rangeResult;
 					
 					% Correct max index if it occurs after min index
 					if maxIndex>minIndex
@@ -208,6 +227,26 @@ for dof = 1:length(headers)
 						maxIndex = loc(1);
 						PK_metrics.(subject_name).(condition_name).('maxIndex')...
 							= maxIndex;
+						[peaks2, loc2] = findpeaks(meanOfTrials*-1, 'minPeakProminence', 0.03);
+						
+						% For some reason if displacement is small then
+						% reduce peak prominence
+						if isempty(loc2)
+							[peaks2, loc2] = findpeaks(meanOfTrials*-1, 'minPeakProminence', 0.02);
+						end
+						
+						minIndex = loc2(1);
+						
+						if maxIndex<minIndex
+							disp('Correction worked, good job team!')
+							PK_metrics.(subject_name).(condition_name).('minIndex')...
+								= minIndex;
+							PK_metrics.(subject_name).(condition_name).(headers{dof}).(axes{axis}).('vPosMean')...
+								= mean(meanOfTrials(maxIndex: minIndex));
+						else
+							disp('correction failed')
+						end
+						
 					else
 						PK_metrics.(subject_name).(condition_name).('maxIndex')...
 							= maxIndex;
@@ -225,8 +264,8 @@ data4stiffy = PK_metrics.(subject_name).(condition_name).(headers{3}).(axes{2}).
 vPosEquil = PK_metrics.(subject_name).(condition_name).(headers{3}).(axes{2}).('vPosMean');
 
 % Get indexes to start and end of period of interest
-maxIndex = PK_metrics.(subject_name).(condition_name).(headers{3}).(axes{2}).maxIndex;
-minIndex = PK_metrics.(subject_name).(condition_name).(headers{3}).(axes{2}).minIndex;
+maxIndex = PK_metrics.(subject_name).(condition_name).maxIndex;
+minIndex = PK_metrics.(subject_name).(condition_name).minIndex;
 
 % Filter and differentiate to get accelerations
 vVel = gradient(PK_metrics.(subject_name).(condition_name).(headers{3}).(axes{2}).mean...
@@ -249,6 +288,10 @@ end
 
 % Vert stiffness save to person and condition
 meanVertStiff = mean(stiffnessVert);
+
+if isnan(meanVertStiff)
+	error(['Vertical stiffness is NaN for ', subject_name, ', ', condition_name], 'Error in stiffness calculation');
+end
 
 PK_metrics.(subject_name).(condition_name).('jointStiffnessMean') = abs(meanVertStiff);
 PK_metrics.(subject_name).(condition_name).('jointStiffness') = stiffnessVert;

@@ -8,9 +8,7 @@ clc; clear;
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath(genpath('..\'));
-addpath(genpath('C:\Users\s2921887\Desktop\LS_main_data_collection\model_scaling'));
-addpath(genpath('C:\Users\s2921887\Desktop\LS_main_data_collection\DataProcessing-master'));
+addpath(genpath('..\')); addpath(genpath('..\..\'));
 
 %% Define BasePath with dynamicElaboration outputs and BOPS folder
 
@@ -199,17 +197,6 @@ for nS = 1:length(subjectNames)
 						load('IKMetrics_all.mat')
 					end
 					
-					% Add y-trajectory position to the
-					% structure
-					allData = [];
-					for kk = 1:length(y_position)
-						allData(:,kk) = resample(y_position{kk,1}, 101, length(y_position{kk,1}), 0);
-					end
-					
-					% Calculate mean position
-					mean_y_pos = mean(allData, 2);
-					IK_metrics.(regexprep(subjectNames{nS}, ' ', '_')).(IK_id).('torso_COM_posY') = mean_y_pos;
-					save('IKMetrics_all.mat', 'IK_metrics');
 					cd(pwd);
 					
 				else
@@ -275,8 +262,6 @@ isub = [subsdir(:).isdir]; %# returns logical vector of subdirectories
 subjectNames = {subsdir(isub).name}';
 SF = contains(subjectNames, {'Subject'});
 subjectNames(~SF)=[];
-% SF14 = contains(subjectNames, {'Subject 14'});
-% subjectNames(SF14)=[];
 
 % Loop through subjects
 for subjects = 1:length(subjectNames)
@@ -287,20 +272,21 @@ for subjects = 1:length(subjectNames)
 	sessionFolders(ismember(sessionFolders,{'.','..', 'ROM', 'AnalysedData', 'Figures'}))=[]; % dynamic subject folders
 	
 	% Break if the file already exists
-% 	if exist([BasePath, filesep, subjectNames{subjects}, filesep 'fatigueComparison.mat'], 'file')
-% 		continue
-% 	end
+	% 	if exist([BasePath, filesep, subjectNames{subjects}, filesep 'fatigueComparison.mat'], 'file')
+	% 		continue
+	% 	end
 	
+	% Loop through session folders
 	for folder = 1:length(sessionFolders)
 		sessionName = [BasePath, filesep, subjectNames{subjects}, filesep, sessionFolders{folder}];
 		trialsDirs = dir([sessionName, filesep, 'dynamicElaborations']);
 		isub=[trialsDirs(:).isdir];
 		trialsFolders={trialsDirs(isub).name}';
-		trialsFolders(ismember(trialsFolders,{'.','..', 'KneeFJC1_Processed', 'KneeFJC2_Processed'}))=[]; % dynamic trials folders
+		trialsFolders(ismember(trialsFolders,{'.','..', 'KneeFJC1_Processed', 'KneeFJC2_Processed', '01'}))=[]; % dynamic trials folders
 		
 		% Edited this for fatigue analysis just to include 30 kg fast walking trials
-% 		TF = contains(trialsFolders, {'30_fast'});
-% 		trialsFolders(~TF)=[];
+		% 		TF = contains(trialsFolders, {'30_fast'});
+		% 		trialsFolders(~TF)=[];
 		% Select the .osim model
 		%      [genericModelID,genericModelPath]=uigetfile([sessionName, filesep,...
 		%           'staticElaborations', filesep, '*.osim'],...
@@ -309,12 +295,13 @@ for subjects = 1:length(subjectNames)
 		
 		model_file_kneeUnlocked=[];
 		
+		% Loop through trial folders
 		for trials = 1:length(trialsFolders)
 			
 			% Plot the kinematics result
 			%plotKinematics(sessionName, model_file_kneeUnlocked);
 			
-			% Folder names for IK and ID
+			% Folder names for IK, ID, PK, and GRFs
 			folderNameID = [sessionName, filesep, 'inverseDynamics', filesep...
 				trialsFolders{trials}(1:end-10)];
 			% 			folderNameIK = [sessionName, filesep, 'inverseKinematics', filesep...
@@ -326,11 +313,22 @@ for subjects = 1:length(subjectNames)
 			folderNameGRFs = [sessionName, filesep, 'dynamicElaborations', filesep...
 				trialsFolders{trials}];
 			
+			folderNameGRFDataTest = [sessionName, filesep, 'dynamicElaborations', filesep];
+			
 			% Run the data analysis for ID and IK
 			%plotMoments(sessionName, model_file_kneeUnlocked, folderNameID);
-			%plotPointKinematics(sessionName, folderNamePK)
 			
-			plotGRFs(sessionName, folderNameGRFs)
+
+			
+			% Don't run processing if grf_results.mat file exists because
+			% this data has already been processed.
+			
+% 			if exist([folderNameGRFDataTest, trialsFolders{trials}, '_grf_results.mat'], 'file')
+% 				disp(['Data already processed for: ', subjectNames{subjects}, ', trial: ', trialsFolders{trials}(1:end-10)]);
+% 			else
+% 				plotPointKinematics(sessionName, folderNamePK)
+				plotGRFs(sessionName, folderNameGRFs)
+% 			end
 			
 			% Plot the EMG data and save as .mat files
 			% 	loadPlotEMG(sessionName, fName);

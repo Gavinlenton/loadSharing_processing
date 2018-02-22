@@ -19,33 +19,33 @@ if any(walkingTrial) == 1
     
     % Now have to copy the cropped c3d files from C: to Google Drive.
     % Loop through c3d files
-    for newFiles = 1:length(rightHS)-1
-        fileSource = [physFolderName, filesep, [c3dFile_name(1:end-4), ...
-            num2str(newFiles), '.c3d']];
-        try
-            % Copy file to Google Drive folder
-            copyfile(fileSource, pname)
-        catch
-            
-            % Switch to the next file
-            fileSource = [physFolderName, filesep, [c3dFile_name(1:end-4), ...
-                num2str(newFiles+1), '.c3d']];
-            
-            % Try again, with modified file
-            try
-                copyfile(fileSource, pname)
-                
-            catch
-                % Re-throw original error
-                disp('Cannot copy file, stop code and check it');
-                uiwait
-            end
-        end
-        
-        % Delete file from physical drive
-        delete(fileSource);
-        
-    end
+%     for newFiles = 1:length(rightHS)-1
+%         fileSource = [physFolderName, filesep, [c3dFile_name(1:end-4), ...
+%             num2str(newFiles), '.c3d']];
+%         try
+%             % Copy file to Google Drive folder
+%             copyfile(fileSource, pname)
+%         catch
+%             
+%             % Switch to the next file
+%             fileSource = [physFolderName, filesep, [c3dFile_name(1:end-4), ...
+%                 num2str(newFiles+1), '.c3d']];
+%             
+%             % Try again, with modified file
+%             try
+%                 copyfile(fileSource, pname)
+%                 
+%             catch
+%                 % Re-throw original error
+%                 disp('Cannot copy file, stop code and check it');
+%                 uiwait
+%             end
+%         end
+%         
+%         % Delete file from physical drive
+%         delete(fileSource);
+%         
+%     end
     
     % Create a times variable with right heel-strike and right toe-off
     % to use in emg analysis.

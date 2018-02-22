@@ -11,11 +11,12 @@ cd(fileparts(tmp.Filename));
 addpath(genpath('GeneratePlots'));
 
 %% Load the data
-BasePath=uigetdir('../../../', 'Select Elaborated Data Folder');
+BasePath=uigetdir('../..', 'Select Elaborated Data Folder');
 cd(BasePath);
 load('IDMetrics_all.mat'); load('IKMetrics_all.mat');
+load('GRF_metrics_all.mat'); load('PK_metrics_all.mat');
 
-% Sort IDMetrics so it's in correct order
+%% Sort IDMetrics so it's in correct order
 subjects = fieldnames(ID_metrics);
 subjectNumber = zeros(length(subjects), 1);
 newOrder = {'NA_slow', 'NA_fast', 'TBAS15_slow', 'TBAS15_fast', 'CRYE15_slow', 'CRYE15_fast',...
@@ -28,7 +29,7 @@ newOrder = {'NA_slow', 'NA_fast', 'TBAS15_slow', 'TBAS15_fast', 'CRYE15_slow', '
 for t = 1:length(subjects)
 	
 	% Determine conditions for that subject
-	subjectFields = fieldnames(ID_metrics.(subjects{t}));
+	subjectFields = fieldnames(GRF_metrics.(subjects{t}));
 	subjectName = subjects{t};
 	Key   = '_';
 	Index = strfind(subjectName, Key);
@@ -51,115 +52,57 @@ for t = 1:length(subjects)
 		% Reorder conditions
 		ID_metrics_ordered.(subjects{t}) = orderfields(ID_metrics.(subjects{t}), subject_new_order);
 		IK_metrics_ordered.(subjects{t}) = orderfields(IK_metrics.(subjects{t}), subject_new_order);
+		GRF_metrics_ordered.(subjects{t}) = orderfields(GRF_metrics.(subjects{t}), subject_new_order);
+		PK_metrics_ordered.(subjects{t}) = orderfields(PK_metrics.(subjects{t}), subject_new_order);
 	else
 		ID_metrics_ordered.(subjects{t}) = orderfields(ID_metrics.(subjects{t}), newOrder);
 		IK_metrics_ordered.(subjects{t}) = orderfields(IK_metrics.(subjects{t}), newOrder);
+		GRF_metrics_ordered.(subjects{t}) = orderfields(GRF_metrics.(subjects{t}), newOrder);
+		PK_metrics_ordered.(subjects{t}) = orderfields(PK_metrics.(subjects{t}), newOrder);
 	end
 end
-
-% Determine how many condition fields exist
-conditions = fieldnames(ID_metrics_ordered.(subjects{1}))';
-
-% Create structure to store outputs
-all_variables = fieldnames(ID_metrics_ordered.(subjects{1}).(conditions{1}));
-%all_variables(ismember(all_variables,{'step_time', 'POWER_POS_TOTAL', 'POWER_NEG_TOTAL', 'lumbar_extension_moment',...
-	%'lumbar_bending_moment', 'lumbar_rotation_moment'}))=[];
-metrics_for_plot = struct();
 
 % Extract the variables of interest from the data
-
-
-% Loop through all conditions
-for cName = 1:length(conditions)
-	
-	conditionName = conditions{cName};
-	
-	% Loop through subjects
-	for sName = 1:length(subjects)
-		
-		% Determine if subject has that condition name
-		if any(strcmp(fieldnames(ID_metrics_ordered.(subjects{sName})), conditionName))
-			
-			% Loop through the variables of interest
-			for k = 1:length(all_variables)
-				variableName = all_variables{k};
-				
-				switch variableName
-					
-					% Integer variables are stored as subjects (rows) * conditions
-					% (columns) and vectors stored as variable * subject (columns) *
-					% conditions (z direction)
-					case 'hip_flexion_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.hip_flexion_p(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).JOINT_POWER;
-						metrics_for_plot.hip_ext_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.hip_flex_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-					case 'hip_adduction_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.hip_flexion_p(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).JOINT_POWER;
-						metrics_for_plot.hip_add_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.hip_abd_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-					case 'hip_rotation_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.hip_flexion_p(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).JOINT_POWER;
-						metrics_for_plot.hip_int_rot_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.hip_ext_rot_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-					case 'knee_angle_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.knee_flexion_p(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).JOINT_POWER;
-						metrics_for_plot.knee_ext_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.knee_flex_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-					case 'knee_adduction_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.knee_add_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						
-					case 'knee_rotation_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.knee_int_rot_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.knee_ext_rot_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-					case 'ankle_angle_r_moment'
-						metrics_for_plot.(variableName)(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).mean;
-						metrics_for_plot.ankle_flexion_p(:, sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).JOINT_POWER;
-						metrics_for_plot.ankle_plant_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(2);
-						metrics_for_plot.ankle_dors_peak(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName).max_min_range(1);
-						
-						% Joint work metrics
-					case 'WORK_POS_TOTAL'
-						metrics_for_plot.work_pos(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-					case 'WORK_NEG_TOTAL'
-						metrics_for_plot.work_neg(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-						
-						% Joint positive power metrics
-					case 'PERC_POS_HIP'
-						metrics_for_plot.perc_pos_hip(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-					case 'PERC_POS_KNEE'
-						metrics_for_plot.perc_pos_knee(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-					case 'PERC_POS_ANKLE'
-						metrics_for_plot.perc_pos_ankle(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-						
-						% Joint negative power metrics
-					case 'PERC_NEG_HIP'
-						metrics_for_plot.perc_neg_hip(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-					case 'PERC_NEG_KNEE'
-						metrics_for_plot.perc_neg_knee(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-					case 'PERC_NEG_ANKLE'
-						metrics_for_plot.perc_neg_ankle(sName, cName) = ID_metrics_ordered.(subjects{sName}).(conditionName).(variableName);
-				end
-			end
-		end
-	end
-end
+metrics_for_plot_PK = extractVarFromStrct(PK_metrics_ordered, subjects, 'PK');
+metrics_for_plot_GRF = extractVarFromStrct(GRF_metrics_ordered, subjects, 'GRF');
+metrics_for_plot_moments = extractVarFromStrct(ID_metrics_ordered, subjects, 'ID');
 
 % Quick loop through variables to convert zeros to NaNs
-variable_names = fieldnames(metrics_for_plot);
+variable_names = fieldnames(metrics_for_plot_PK);
 for vName = 1:length(variable_names)
-	metrics_for_plot.(variable_names{vName})(~metrics_for_plot.(variable_names{vName})) = nan;
+	metrics_for_plot_PK.(variable_names{vName})(~metrics_for_plot_PK.(variable_names{vName})) = nan;
 end
+variable_names = fieldnames(metrics_for_plot_GRF);
+for vName = 1:length(variable_names)
+	metrics_for_plot_GRF.(variable_names{vName})(~metrics_for_plot_GRF.(variable_names{vName})) = nan;
+end
+variable_names = fieldnames(metrics_for_plot_moments);
+for vName = 1:length(variable_names)
+	metrics_for_plot_moments.(variable_names{vName})(~metrics_for_plot_moments.(variable_names{vName})) = nan;
+end
+
+%% Examine ID powers for each joint to see why it's lower than COM power
+
+
+% Load ID-derived powers and check against COM power
+hip_power = nanmean(metrics_for_plot_moments.hip_flexion_p(:,:,1), 2) + ...
+	nanmean(metrics_for_plot_moments.hip_add_p(:,:,1), 2) +...
+	nanmean(metrics_for_plot_moments.hip_rot_p(:,:,1), 2);
+knee_power = nanmean(metrics_for_plot_moments.knee_flexion_p(:,:,1), 2) + ...
+	nanmean(metrics_for_plot_moments.knee_add_p(:,:,1), 2) +...
+	nanmean(metrics_for_plot_moments.knee_rot_p(:,:,1), 2);
+ankle_power = nanmean(metrics_for_plot_moments.ankle_flexion_p(:,:,1), 2);
+lumbar_power = mean(metrics_for_plot_moments.lumbar_flexion_p(:,:,1), 2) + ...
+	nanmean(metrics_for_plot_moments.lumbar_bending_p(:,:,1), 2) +...
+	nanmean(metrics_for_plot_moments.lumbar_rot_p(:,:,1), 2);
+
+plot(hip_power)
+hold on
+plot(knee_power)
+plot(ankle_power)
+plot(lumbar_power)
+
+
 
 %% Plotting power percentage
 
@@ -305,7 +248,16 @@ end
 cd(fullfile(BasePath, 'results_moments'));
 save('Moments.mat', '-struct', 'metrics_for_plot');
 
-createTableCSV(metrics_for_plot, subjectNumber, conditions);
+cd(BasePath)
+save('PK_results.mat', '-struct', 'metrics_for_plot_PK');
+save('GRF_results.mat', '-struct', 'metrics_for_plot_GRF');
+
+%% Load data and write to table
+savePath = [BasePath, filesep, 'results_COM_work_new'];
+conditions = fieldnames(PK_metrics_ordered.(subjects{1}))';
+% Table for COM work and GRF data
+createTableCSV(metrics_for_plot_PK, subjectNumber, conditions, savePath);
+createTableCSV(metrics_for_plot_GRF, subjectNumber, conditions, savePath);
 
 %% Subplots
 % Function to bring plots together
@@ -343,12 +295,13 @@ CreatePlotExtraVar(hipE30_SD(:,1), hipE30_SD(:,2), hipE30_mean(:,1), hipE30_mean
 y = ylabel({'30 kg'; 'Moment (N.m. kg^-^1)'}); set(y, 'Units', 'Normalized', 'Position', [-0.07, 0.5, 0]);
 
 
-%% Moment plotting
+%% Moment plotting and COM power plotting
 
 % Trajectories
 % Obtain the mean and SD for the hip, knee, and ankle moments of
 % interest. Data output is each column represent a different joint and
-% each row represents a different armour condition
+% each row represents a different armour condition. Speeds are separated
+% based upon the z axis with 1 = slow walking and 2 = fast walking
 
 % Initialize vars
 ank15_mean = zeros(101, 6, 2); ank15_SD = zeros(101, 6,2); ank30_mean = zeros(101, 6, 2); ank30_SD =  zeros(101, 6,2);
@@ -359,6 +312,10 @@ knee15Upper = zeros(101, 6, 2); knee15Lower = zeros(101, 6, 2); knee30Upper = ze
 
 hip15_mean = zeros(101, 6, 2);  hip15_SD = zeros(101, 6, 2); hip30_mean = zeros(101, 6,2); hip30_SD =  zeros(101, 6,2);
 hip15Upper = zeros(101, 6, 2); hip15Lower = zeros(101, 6, 2); hip30Upper = zeros(101, 6, 2); hip30Lower = zeros(101, 6, 2);
+
+% workCOMNoLoad_mean = zeros(101, 2);  workCOMNoLoad_SD = zeros(101, 2); workIDNoLoad_mean = zeros(101, 2); workIDNoLoad_SD =  zeros(101,2);
+% workCOMNoLoadUpper = zeros(101, 2); workCOMNoLoadLower = zeros(101, 2); workIDNoLoadUpper = zeros(101, 2); workIDNoLoadLower = zeros(101, 2);
+% workSTNoLoad_mean = zeros(101, 2); workSTNoLoad_SD = zeros(101, 2); workSTNoLoadUpper = zeros(101, 2); workSTNoLoadLower = zeros(101, 2);
 
 for m = 1:2
 	increment = 2;
@@ -381,7 +338,234 @@ for m = 1:2
 		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m+2:increment:(increment*6)+m));
 	[hip30_mean(:, :, m), hip30_SD(:, :, m), hip30Upper(:,:,m), hip30Lower(:,:,m)]...
 		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
+	
+	% Lumbar
+	[hip15_mean(:, :, m), hip15_SD(:, :, m), hip15Upper(:,:,m), hip15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m+2:increment:(increment*6)+m));
+	[hip30_mean(:, :, m), hip30_SD(:, :, m), hip30Upper(:,:,m), hip30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
 end
+
+% ID power for each joint
+for m = 1:2
+	increment = 2;
+	m_30 = m + 14;
+	
+	% Ankle
+	[ank15_mean(:, :, m), ank15_SD(:, :, m), ank15Upper(:, :, m), ank15Lower(:, :, m)]...
+		= Mean_SD_3D(metrics_for_plot.ankle_angle_r_moment(:, :, (m+2):increment:(increment*6)+m));
+	[ank30_mean(:, :, m), ank30_SD(:, :, m), ank30Upper(:, :, m), ank30Lower(:, :, m)]...
+		= Mean_SD_3D(metrics_for_plot.ankle_angle_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
+	% Knee
+	[knee15_mean(:, :, m), knee15_SD(:, :, m), knee15Upper(:,:,m), knee15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.knee_angle_r_moment(:, :,  m+2:increment:(increment*6)+m));
+	[knee30_mean(:, :, m), knee30_SD(:, :, m), knee30Upper(:,:,m), knee30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.knee_angle_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
+	% Hip
+	[hip15_mean(:, :, m), hip15_SD(:, :, m), hip15Upper(:,:,m), hip15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m+2:increment:(increment*6)+m));
+	[hip30_mean(:, :, m), hip30_SD(:, :, m), hip30Upper(:,:,m), hip30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
+	
+	% Lumbar
+	[hip15_mean(:, :, m), hip15_SD(:, :, m), hip15Upper(:,:,m), hip15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m+2:increment:(increment*6)+m));
+	[hip30_mean(:, :, m), hip30_SD(:, :, m), hip30Upper(:,:,m), hip30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot.hip_flexion_r_moment(:, :, m_30:increment:(increment*5)+m_30));
+	
+end
+
+%%
+% COM data
+for m = 1:2
+	increment = 2;
+	m_30 = m + 14;
+	
+	% No load data
+		% COM power
+	[workCOMNoLoad_mean, workCOMNoLoad_SD, workCOMNoLoadUpper, workCOMNoLoadLower]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerCOM(:, :, 1:2));
+	[workIDNoLoad_mean, workIDNoLoad_SD, workIDNoLoadUpper, workIDNoLoadLower]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerID(:, :,  1:2));
+	[workSTNoLoad_mean, workSTNoLoad_SD, workSTNoLoadUpper, workSTNoLoadLower]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerSoftTissue(:, :,  1:2));
+	
+	% COM power
+	[ank15_mean(:, :, m), ank15_SD(:, :, m), ank15Upper(:, :, m), ank15Lower(:, :, m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerCOM(:, :, (m+2):increment:(increment*6)+m));
+	[ank30_mean(:, :, m), ank30_SD(:, :, m), ank30Upper(:, :, m), ank30Lower(:, :, m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerCOM(:, :, m_30:increment:(increment*5)+m_30));
+	
+	% Combined joint power
+	[knee15_mean(:, :, m), knee15_SD(:, :, m), knee15Upper(:,:,m), knee15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerID(:, :,  m+2:increment:(increment*6)+m));
+	[knee30_mean(:, :, m), knee30_SD(:, :, m), knee30Upper(:,:,m), knee30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerID(:, :, m_30:increment:(increment*5)+m_30));
+	
+	% soft tissue power
+	[hip15_mean(:, :, m), hip15_SD(:, :, m), hip15Upper(:,:,m), hip15Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerSoftTissue(:, :, m+2:increment:(increment*6)+m));
+	[hip30_mean(:, :, m), hip30_SD(:, :, m), hip30Upper(:,:,m), hip30Lower(:,:,m)]...
+		= Mean_SD_3D(metrics_for_plot_GRF.powerSoftTissue(:, :, m_30:increment:(increment*5)+m_30));
+end
+
+%% Get means for different masses and plot them
+softTissue15Mean = matfiltfilt(0.01, 8, 4, mean(mean(hip15_mean(:,:,:),2),3)); softTissueNoLoadMean = matfiltfilt(0.01, 8, 4, mean(mean(workSTNoLoad_mean(:,:,:),2),3));
+softTissue30Mean =  mean(mean(hip30_mean(:,:,:),2),3);
+% softTissue30Mean(1:25) = softTissue30Mean(1:25)-50;
+% softTissue30Mean = matfiltfilt(0.01, 8, 4, softTissue30Mean);
+
+
+ST15Lower = mean(mean(hip15Lower(:,:,:),2),3); STNoLoadLower = mean(mean(workSTNoLoadLower(:,:,:),2),3);
+ST30Lower = mean(mean(hip30Lower(:,:,:),2),3); ST15Upper = mean(mean(hip15Upper(:,:,:),2),3); 
+STNoLoadUpper = mean(mean(workSTNoLoadUpper(:,:,:),2),3); ST30Upper = mean(mean(hip30Upper(:,:,:),2),3);
+
+COM15Mean = mean(mean(ank15_mean(:,:,:),2),3); COMNoLoadMean = mean(mean(workCOMNoLoad_mean(:,:,:),2),3);
+COM30Mean = mean(mean(ank30_mean(:,:,:),2),3);
+
+ID15Mean = mean(mean(knee15_mean(:,:,:),2),3); IDNoLoadMean = mean(mean(workIDNoLoad_mean(:,:,:),2),3);
+ID30Mean = mean(mean(knee30_mean(:,:,:),2),3);
+
+COM15Upper= mean(mean(ank15Upper(:,:,:),2),3); COMNoLoadUpper = mean(mean(workCOMNoLoadUpper(:,:,:),2),3);
+COM30Upper = mean(mean(ank30Upper(:,:,:),2),3); COM15Lower= mean(mean(ank15Lower(:,:,:),2),3); 
+COMNoLoadLower = mean(mean(workCOMNoLoadLower(:,:,:),2),3); COM30Lower = mean(mean(ank30Lower(:,:,:),2),3);
+
+ID15Lower = mean(mean(knee15Lower(:,:,:),2),3); IDNoLoadLower = mean(mean(workIDNoLoadLower(:,:,:),2),3);
+ID30Lower = mean(mean(knee30Lower(:,:,:),2),3); ID15Upper = mean(mean(knee15Upper(:,:,:),2),3); 
+IDNoLoadUpper = mean(mean(workIDNoLoadLower(:,:,:),2),3); ID30Upper = mean(mean(knee30Upper(:,:,:),2),3);
+
+% Get means for different speeds
+softTissueSpeedMean = mean(mean(hip15_mean(:,:,:),2) + mean(hip30_mean(:,:,:),2) + mean(workSTNoLoad_mean(:,:,:),2),2); 
+softTissueSlowMean = softTissueSpeedMean(:,:,1);
+softTissueFastMean = softTissueSpeedMean(:,:,2);
+
+COMSpeedMean = mean(mean(ank15_mean(:,:,:),2) + mean(ank30_mean(:,:,:),2) + mean(workCOMNoLoad_mean(:,:,:),2),2); 
+COMSlowMean = COMSpeedMean(:,:,1);
+COMFastMean = COMSpeedMean(:,:,2);
+
+IDSpeedMean = mean(mean(knee15_mean(:,:,:),2) + mean(knee30_mean(:,:,:),2) + mean(workIDNoLoad_mean(:,:,:),2),2); 
+IDSlowMean = IDSpeedMean(:,:,1);
+IDFastMean = IDSpeedMean(:,:,2);
+
+timeVec = (0:100)';
+timeVecStance = (0:1:64)';
+
+%% Plot of all speeds for each var
+pST = plot(timeVec, softTissueSlowMean,  'r-', timeVec, softTissueFastMean, 'g--'); hold on; plot(timeVec, zeros(101), 'k:');
+set(pST, 'LineWidth', 2); legend('Moderate', 'Fast', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+pCOM = plot(timeVec, COMSlowMean,  'r-', timeVec, COMFastMean, 'g--'); hold on; plot(timeVec, zeros(101), 'k:');
+set(pCOM, 'LineWidth', 2); legend('Moderate', 'Fast', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+pID = plot(timeVec, IDSlowMean,  'r-', timeVec, IDFastMean, 'g--'); hold on; plot(timeVec, zeros(101), 'k:');
+set(pID, 'LineWidth', 2); legend('Moderate', 'Fast', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+
+%% Plot of all loads for each var
+
+workparams = tight_subplot(3,1,[.08 .03],[.15 .1],[.1 .03]);
+cmap = colormap(hsv(250));
+plotColors = [cmap(2,:); cmap(80,:); cmap(125,:)];
+axes(workparams(1))
+%plotColors = cmap(round(1+40*(1-1)),:);
+% COM
+plotColor = plotColors(2,:);
+pCOM = plot(timeVecStance, COMNoLoadMean(1:65),  '-', 'Color',plotColor, 'LineWidth', 1); hold on
+[ph,msg]=jbfill(timeVecStance', COMNoLoadLower(1:65)', COMNoLoadUpper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(3,:);
+plot(timeVecStance, COM15Mean(1:65), '--', 'Color',plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', COM15Lower(1:65)', COM15Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(1,:);
+plot(timeVecStance, COM30Mean(1:65),  ':', 'Color', plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', COM30Lower(1:65)', COM30Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+plot(timeVecStance, zeros(65), 'k-'); title('COM work');
+set(pCOM, 'LineWidth', 2); set(gca, 'fontsize', 14, 'FontName', 'Gravity', 'Box', 'off', 'XLim', [0,62], 'YLim', [-400, 600]);
+
+% Soft tissue
+%plotColor = cmap(round(1+40*(6-1)),:);
+axes(workparams(3))
+
+plotColor = plotColors(2,:);
+pST = plot(timeVecStance, softTissueNoLoadMean(1:65),  '-', 'Color',plotColor, 'LineWidth', 1); hold on
+[ph,msg]=jbfill(timeVecStance', STNoLoadLower(1:65)', STNoLoadUpper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(3,:);
+plot(timeVecStance, softTissue15Mean(1:65), '--', 'Color',plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', ST15Lower(1:65)', ST15Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(1,:);
+plot(timeVecStance, softTissue30Mean(1:65),  ':', 'Color', plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', ST30Lower(1:65)', ST30Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+plot(timeVecStance, zeros(65), 'k-');
+set(pST, 'LineWidth', 2); set(gca, 'fontsize', 14, 'FontName', 'Gravity', 'Box', 'off', 'XLim', [0,62], 'YLim', [-400, 600]);
+set(gca, 'fontsize', 14, 'FontName', 'Gravity', 'Box', 'off'); title('Soft tissue work');
+xlabel('Gait cycle (%)');
+
+
+axes(workparams(2))
+% ID-based
+plotColor = plotColors(2,:);
+pID = plot(timeVecStance, IDNoLoadMean(1:65),  '-', 'Color',plotColor, 'LineWidth', 1); hold on
+[ph,msg]=jbfill(timeVecStance', IDNoLoadLower(1:65)', STNoLoadUpper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(3,:);
+plot(timeVecStance, ID15Mean(1:65), '--', 'Color',plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', ID15Lower(1:65)', ID15Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+
+plotColor = plotColors(1,:);
+plot(timeVecStance, ID30Mean(1:65),  ':', 'Color', plotColor, 'LineWidth', 2); 
+[ph,msg]=jbfill(timeVecStance', ID30Lower(1:65)', ID30Upper(1:65)', plotColor, plotColor, 0,.1);
+set(get(get(ph,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+plot(timeVecStance, zeros(65), 'k-');
+set(pID, 'LineWidth', 2); 
+set(workparams(2), 'fontsize', 14, 'FontName', 'Gravity', 'Box', 'off', 'XLim', [0,65], 'YLim', [-400, 600]);
+set(gca, 'fontsize', 14, 'FontName', 'Gravity', 'Box', 'off', 'XLim', [0,62]); title('ID work');
+ylabel('Mechanical Power (W)');
+legend('No load', '15 kg', '30 kg', 'Location', 'SouthOutside', 'Orientation', 'horizontal'); 
+
+%% Plots of all vars for each load
+
+% Plot of no load
+pNoLoad = plot(timeVec, IDNoLoadMean,  'r-', timeVec, COMNoLoadMean, 'g--', timeVec, softTissueNoLoadMean,  'b:'); hold on; plot(timeVec, zeros(101), 'k-');
+set(pNoLoad, 'LineWidth', 2); legend('ID-based', 'COM-based', 'Soft tissue', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+
+% Plot of 15 kg
+p15Load = plot(timeVec, ID15Mean,  'r-', timeVec, COM15Mean, 'g--', timeVec, softTissue15Mean,  'b:'); hold on; plot(timeVec, zeros(101), 'k-');
+set(p15Load, 'LineWidth', 2); legend('ID-based', 'COM-based', 'Soft tissue', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+% Plot of 30 kg
+p30Load = plot(timeVec, ID30Mean,  'r-', timeVec, COM30Mean, 'g--', timeVec, softTissue30Mean,  'b:'); hold on; plot(timeVec, zeros(101), 'k-');
+set(p30Load, 'LineWidth', 2); legend('ID-based', 'COM-based', 'Soft tissue', 'Location', 'SouthOutside',...
+	'Orientation', 'horizontal'); set(gca, 'fontsize', 16, 'FontName', 'Gravity', 'Box', 'off');
+xlabel('% gait cycle'); ylabel('Mechanical Power (W)');
+
+
 
 %% plots
 moments = tight_subplot(2,3,[.05 .03],[.15 .1],[.07 .03]);

@@ -66,29 +66,35 @@ else
 	for k = 1:length(variables)
 		variableName = variables{k};
 		
-		% If it's diff from TBAS data
-		VN = contains(variableName, 'diffTBAS');
+		% If it's not a scalar (i.e., waveform)
+		sizeOfData = size(metrics_for_stats.(variables{k}));
 		
-		if VN ~= 1
-			% Create table with data
-			table = array2table([subjectNumber, metrics_for_stats.(variableName)], 'VariableNames', ['Participants', conditions]);
+		if length(sizeOfData) < 3
 			
-		else
-			% Create table with modified variable names - removed NA labels
-			conditions4TBAS = conditions;
-			V4TBAS = contains(conditions4TBAS, {'TBAS', 'NA'});
-			conditions4TBAS(V4TBAS) = [];
-			table = array2table([subjectNumber, metrics_for_stats.(variableName)], 'VariableNames', ['Participants', conditions4TBAS]);
+			% If it's diff from TBAS data
+			VN = contains(variableName, 'diffTBAS');
 			
+			if VN ~= 1
+				% Create table with data
+				table = array2table([subjectNumber, metrics_for_stats.(variableName)], 'VariableNames', ['Participants', conditions]);
+				
+			else
+				% Create table with modified variable names - removed NA labels
+				conditions4TBAS = conditions;
+				V4TBAS = contains(conditions4TBAS, {'TBAS', 'NA'});
+				conditions4TBAS(V4TBAS) = [];
+				table = array2table([subjectNumber, metrics_for_stats.(variableName)], 'VariableNames', ['Participants', conditions4TBAS]);
+				
+			end
+			
+			
+			% Sort first column so participants are in ascending order
+			table_final = sortrows(table);
+			
+			% Write the table to a .csv file
+			writetable(table_final, [variableName '.csv']);
 		end
-		% Sort first column so participants are in ascending order
-		table_final = sortrows(table);
-		
-		% Write the table to a .csv file
-		writetable(table_final, [variableName '.csv']);
-		
 	end
-	
 end
 
 cd ../

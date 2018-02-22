@@ -78,7 +78,13 @@ channelNames = {'Channel1', 'Channel3', 'Channel4','Channel6','Channel7',...
      'Channel8','Channel9','Channel10','Channel11'};
 
 for i = 1:9
+	if lastConversion > length(ChannelData(:,i))
+		lastConversion = length(ChannelData(:,i));
      emg.(channelNames{1,i}) = shrinkEmgData2(ChannelData(:,i), firstConversion, lastConversion);
+	else
+		emg.(channelNames{1,i}) = shrinkEmgData2(ChannelData(:,i), firstConversion, lastConversion);
+	end
+	
 end
 
 Time = shrinkEmgData2(Times, firstConversion, lastConversion);
@@ -143,8 +149,8 @@ outputName = inputc3d;
 btkWriteAcquisition(h, outputName);
 
 % Copy file back to Google Drive
-fileSource = [physFolderName, filesep, outputName];
-copyfile(fileSource, c3dFile_folder)
+% fileSource = [physFolderName, filesep, outputName];
+% copyfile(fileSource, c3dFile_folder)
 
 cd(c3dFile_folder);
 

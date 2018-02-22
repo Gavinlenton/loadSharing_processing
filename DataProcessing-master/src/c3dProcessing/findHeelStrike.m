@@ -17,7 +17,7 @@ toeOffR = data.marker_data.Markers.SAC1 - data.marker_data.Markers.RMT1;
 % function does not compute multiple peaks close to eachother. Can also
 % specify a minimum peak height. 
 
-[pks1, HSRight] = findpeaks(maxDistanceR(:,2), 'MinPeakDistance', 70);
+[pks1, HSRight] = findpeaks(maxDistanceR(:,2), 'MinPeakDistance', 50);
 
 [pks1, TORight] = findpeaks(toeOffR(:,2), 'MinPeakDistance', 60);
 

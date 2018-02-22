@@ -5,7 +5,7 @@ function [dataFinal, force_data2] = assignForceOutputTrcMot(data, fileName)
 %   must be a file generated from the function btk_loadc3d
 
 % Choose force plate filter frequency
-data.FilterFreq = 26;
+% data.FilterFreq = 26;
 
 % Combine force measures from both plates
 %           dataForcesAssigned2 = assign_forces_LS(data,{'RCAL';'LCAL'},{'calcn_r';'calcn_l'},[20, 0.25],data.FilterFreq);

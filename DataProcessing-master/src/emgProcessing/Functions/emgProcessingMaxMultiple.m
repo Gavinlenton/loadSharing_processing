@@ -65,8 +65,6 @@ emgLabelsInMatFile = {'TA', 'Channel2',  'MG', 'LG', 'Channel5', 'BF', 'VM', 'VL
 
 %% Directories and files
 motoNmsSrcDir = motoDir;
-% trialsFile = 'C:\Users\s2790936\Desktop\SCOPEX\SCOPEX Trials DJS.xlsm';
-% maxDir = 'C:\Users\s2790936\Desktop\SCOPEXTemp\Baseline'; % Max's
 
 originalPath=pwd;
 cd([motoNmsSrcDir filesep, 'src']);
@@ -113,20 +111,11 @@ for files = 1:length(maxc3dFileNames)
 	
 	% Store max data in this array
 	for n = 1:length(emgLabelsInMatFile)
-		if strcmp(emgData1.AnalogData.Labels{n}, emgLabelsInMatFile{n})
-			try
-				emgData(:,n) = emgData1.AnalogData.RawData(:,n);
-			catch
-				tempData = emgData1.AnalogData.RawData(:,n);
-				if length(tempData) > size(emgData,1)
-					emgData(:,n) = tempData(1:size(emgData,1),:);
-				else
-					emgData(:,n) = [tempData ; zeros(size(emgData,1) - length(tempData), 1)];
-				end
-				break;
-			end
-		end
+		
+		emgData(:,n) = emgData1.AnalogData.RawData(:,n);
+		
 	end
+
 	
 	%% Find max signal
 	
@@ -177,6 +166,12 @@ for files = 1:length(maxc3dFileNames)
 		lowPassOut = lpfilter(fullWaveRectifiedSignal, lowPassCutOff, emgSamplingRate, filterType);
 		
 		% Find max, output magnitude and frame number
+		% Find moving average for every 10 frames
+		aveMax = movmean(lowPassOut, 10);
+		
+		% Find max of this output
+		[emgMax(1, l), emgMax(2, l)] = max(aveMax);
+		
 		[emgMax(1, l), emgMax(2, l)] = max(lowPassOut);
 		
 		% Optional plotting of signal processing steps, uncomment to

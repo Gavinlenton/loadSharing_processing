@@ -13,7 +13,7 @@ for k = 3:length(trials)
      trialsList{j}=trials(k).name;
      j = j + 1;
 end
-trialsList(ismember(trialsList,{'Figures','IDMetrics.mat', '.DS_Store'}))=[];
+trialsList(ismember(trialsList,{'Figures', 'EMGs', 'IDMetrics.mat', '.DS_Store'}))=[];
 
  % Be selective if you want to
 % [trialsIndex,~] = listdlg('PromptString','Select ID trials to plot:',...
